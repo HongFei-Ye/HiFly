@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HiFly.AiChat", "HiFly.AiCha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.BbAiChat", "HiFly.AiChat\HiFly.BbAiChat\HiFly.BbAiChat.csproj", "{B9814CF9-608B-439E-B396-D0ABA7C5523D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Identity", "HiFly.ClassLibrarys\HiFly.Identity\HiFly.Identity.csproj", "{2F40BAD8-4EC7-4813-B298-162EA92FF55E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,10 @@ Global
 		{B9814CF9-608B-439E-B396-D0ABA7C5523D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9814CF9-608B-439E-B396-D0ABA7C5523D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9814CF9-608B-439E-B396-D0ABA7C5523D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F40BAD8-4EC7-4813-B298-162EA92FF55E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F40BAD8-4EC7-4813-B298-162EA92FF55E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F40BAD8-4EC7-4813-B298-162EA92FF55E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F40BAD8-4EC7-4813-B298-162EA92FF55E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{DEB6A6B0-B7DC-E4E8-E710-B775E05E6479} = {35B533FE-F1E2-4872-99A0-F3D9C0EA393A}
 		{E9C04191-CD1A-49AD-5B0D-D9B59DFB1DE5} = {35B533FE-F1E2-4872-99A0-F3D9C0EA393A}
 		{B9814CF9-608B-439E-B396-D0ABA7C5523D} = {F10F2649-5754-48A7-8BA6-45EDC8574BBA}
+		{2F40BAD8-4EC7-4813-B298-162EA92FF55E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DBF20451-6E40-4397-8E8E-D0FE73A00119}

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HiFly.ClassLibrarys\HiFly.Identity\HiFly.Identity.csproj" />
     <ProjectReference Include="..\..\HiFly.ClassLibrarys\HiFly.Openiddict\HiFly.Openiddict.csproj" />
     <ProjectReference Include="..\HiFly.BbTables\HiFly.BbTables.csproj" />
   </ItemGroup>

@@ -2,8 +2,8 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using HiFly.Openiddict.Identity.Services;
-using HiFly.Openiddict.Identity.Services.Interfaces;
+using HiFly.Identity.Services;
+using HiFly.Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;

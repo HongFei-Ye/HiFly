@@ -2,29 +2,32 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using HiFly.Openiddict.Identity.Data.Interfaces;
+using HiFly.Identity.Data.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-namespace HiFly.Openiddict.Identity.Data;
+namespace HiFly.Identity.Data;
 
-public class UserToken : IdentityUserToken<string>, IUserToken
+public class UserRole : IdentityUserRole<string>, IUserRole
 {
+    [Key]
+    [DisplayName("识别码")]
+    public virtual string Id { get; set; } = Guid.NewGuid().ToString();
+
     [DisplayName("创建时间(UTC)")]
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("用户ID")]
     public override string UserId { get; set; } = default!;
 
-    [DisplayName("登录提供程序")]
-    public override string LoginProvider { get; set; } = default!;
+    [DisplayName("角色ID")]
+    public override string RoleId { get; set; } = default!;
 
-    [DisplayName("令牌名称")]
-    public override string Name { get; set; } = default!;
-
-    [DisplayName("令牌值")]
-    public override string? Value { get; set; }
+    [DisplayName("上级用户ID")]
+    public string? SuperiorUserId { get; set; }
 
     [DisplayName("是否启用")]
     public bool Enable { get; set; } = true;
+
 }

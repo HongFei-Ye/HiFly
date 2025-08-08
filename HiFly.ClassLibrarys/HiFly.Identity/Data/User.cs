@@ -2,12 +2,12 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using HiFly.Openiddict.Identity.Data.Interfaces;
+using HiFly.Identity.Data.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace HiFly.Openiddict.Identity.Data;
+namespace HiFly.Identity.Data;
 
 public class User : IdentityUser, IUser
 {

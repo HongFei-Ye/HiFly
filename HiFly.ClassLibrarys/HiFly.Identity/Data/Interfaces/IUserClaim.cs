@@ -2,13 +2,13 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-namespace HiFly.Openiddict.Identity.Data.Interfaces;
+namespace HiFly.Identity.Data.Interfaces;
 
-public interface IRoleClaim
+public interface IUserClaim
 {
     int Id { get; set; }
 
-    string RoleId { get; set; }
+    string UserId { get; set; }
 
     string? ClaimType { get; set; }
 

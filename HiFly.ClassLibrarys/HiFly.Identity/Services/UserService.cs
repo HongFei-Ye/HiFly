@@ -2,11 +2,11 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using HiFly.Openiddict.Identity.Data.Interfaces;
-using HiFly.Openiddict.Identity.Services.Interfaces;
+using HiFly.Identity.Data.Interfaces;
+using HiFly.Identity.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace HiFly.Openiddict.Identity.Services;
+namespace HiFly.Identity.Services;
 
 public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) : IUserService
     where TContext : DbContext

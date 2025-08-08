@@ -3,7 +3,7 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
-using HiFly.Openiddict.Identity.Data.Interfaces;
+using HiFly.Identity.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HiFly.OpeniddictBbUI.IdentityManages.TItemIdFilters;

@@ -4,7 +4,7 @@
 
 using System.Security.Claims;
 
-namespace HiFly.Openiddict.Identity.Services.Interfaces;
+namespace HiFly.Identity.Services.Interfaces;
 
 /// <summary>
 /// 提供用户认证状态的访问服务，用于快速获取当前用户的身份信息

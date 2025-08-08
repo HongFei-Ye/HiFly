@@ -2,11 +2,11 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using HiFly.Openiddict.Identity.Services.Interfaces;
+using HiFly.Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace HiFly.Openiddict.Identity.Services;
+namespace HiFly.Identity.Services;
 
 /// <summary>
 /// 用户认证状态服务，提供对当前用户身份信息的访问功能

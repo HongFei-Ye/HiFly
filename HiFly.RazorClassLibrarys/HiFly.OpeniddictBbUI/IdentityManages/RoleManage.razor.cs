@@ -3,7 +3,7 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using HiFly.BbTables;
-using HiFly.Openiddict.Identity.Data.Interfaces;
+using HiFly.Identity.Data.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 
