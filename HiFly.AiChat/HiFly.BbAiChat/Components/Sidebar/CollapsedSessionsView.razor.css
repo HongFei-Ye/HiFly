@@ -1,0 +1,222 @@
+/* CollapsedSessionsView 组件样式 */
+.collapsed-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.5rem;
+    gap: 1rem;
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+}
+
+.collapsed-new-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    flex-shrink: 0;
+}
+
+.collapsed-new-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.collapsed-btn-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    transform: translateX(-100%) rotate(45deg);
+    transition: transform 0.6s ease;
+}
+
+.collapsed-new-btn:hover .collapsed-btn-bg {
+    transform: translateX(100%) rotate(45deg);
+}
+
+.collapsed-divider {
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+    margin: 0.5rem 0;
+    flex-shrink: 0;
+}
+
+/* 折叠状态的会话列表 */
+.collapsed-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    max-height: none;
+    min-height: 0;
+}
+
+/* 折叠状态下的会话项 */
+.collapsed-session-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.collapsed-session-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.collapsed-session-item:hover .collapsed-session-bg {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.collapsed-session-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.collapsed-session-item.active .collapsed-session-bg {
+    background: transparent;
+}
+
+.collapsed-session-icon {
+    position: relative;
+    z-index: 2;
+    color: #6c757d;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.collapsed-session-item:hover .collapsed-session-icon {
+    color: #495057;
+    transform: scale(1.1);
+}
+
+.collapsed-session-item.active .collapsed-session-icon {
+    color: white;
+}
+
+.collapsed-session-pulse {
+    position: absolute;
+    inset: -2px;
+    border-radius: 14px;
+    border: 2px solid #667eea;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* "更多"指示器 */
+.collapsed-more-indicator {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(108, 117, 125, 0.2);
+    flex-shrink: 0;
+}
+
+.collapsed-more-indicator:hover {
+    background: rgba(108, 117, 125, 0.2);
+    color: #495057;
+    transform: scale(1.05);
+}
+
+.more-count {
+    font-size: 0.6rem;
+    margin-top: 2px;
+    font-weight: 600;
+}
+
+/* 暗色主题支持 */
+body.dark-theme .collapsed-session-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .collapsed-session-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .collapsed-session-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+body.dark-theme .collapsed-session-item.active .collapsed-session-bg {
+    background: transparent;
+}
+
+body.dark-theme .collapsed-session-icon {
+    color: #a0aec0;
+}
+
+body.dark-theme .collapsed-session-item:hover .collapsed-session-icon {
+    color: #e2e8f0;
+}
+
+body.dark-theme .collapsed-session-item.active .collapsed-session-icon {
+    color: white;
+}
+
+body.dark-theme .collapsed-more-indicator {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a0aec0;
+}
+
+body.dark-theme .collapsed-more-indicator:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}

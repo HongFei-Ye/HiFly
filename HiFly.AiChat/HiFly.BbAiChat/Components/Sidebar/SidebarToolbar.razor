@@ -1,0 +1,66 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="left-panel-toolbar">
+    @if (!IsCollapsed)
+    {
+        <button class="btn-new-chat" @onclick="HandleNewChat">
+            <div class="btn-new-chat-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <span class="btn-new-chat-text">新建对话</span>
+            <div class="btn-new-chat-shine"></div>
+        </button>
+        
+        <!-- 宽度调整控件插槽 -->
+        @ChildContent
+    }
+    
+    <button class="panel-toggle-btn @(IsCollapsed ? "collapsed" : "")" 
+            @onclick="HandleToggleCollapse"
+            title="@(IsCollapsed ? "展开侧边栏" : "折叠侧边栏")">
+        <div class="toggle-btn-bg"></div>
+        <i class="fas @(IsCollapsed ? "fa-angle-right" : "fa-angle-left")"></i>
+    </button>
+</div>
+
+@code {
+    /// <summary>
+    /// 是否折叠状态
+    /// </summary>
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+
+    /// <summary>
+    /// 新建对话事件
+    /// </summary>
+    [Parameter]
+    public EventCallback OnNewChat { get; set; }
+
+    /// <summary>
+    /// 折叠切换事件
+    /// </summary>
+    [Parameter]
+    public EventCallback OnToggleCollapse { get; set; }
+
+    /// <summary>
+    /// 子内容（用于插入宽度控制组件）
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private async Task HandleNewChat()
+    {
+        if (OnNewChat.HasDelegate)
+        {
+            await OnNewChat.InvokeAsync();
+        }
+    }
+
+    private async Task HandleToggleCollapse()
+    {
+        if (OnToggleCollapse.HasDelegate)
+        {
+            await OnToggleCollapse.InvokeAsync();
+        }
+    }
+}

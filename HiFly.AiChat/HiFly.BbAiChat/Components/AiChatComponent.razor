@@ -1,0 +1,1630 @@
+﻿@using Microsoft.AspNetCore.Components
+@using BootstrapBlazor.Components
+
+<div class="ai-chat-container">
+    <!-- 顶部面板 -->
+    <div class="ai-chat-header">
+        @if (TopPanelTemplate != null)
+        {
+            @TopPanelTemplate
+        }
+        else
+        {
+            <div class="default-header">
+                <div class="header-left">
+                    <div class="app-branding">
+                        <div class="app-icon">
+                            <i class="fas fa-robot"></i>
+                            <div class="icon-glow"></div>
+                        </div>
+                        <div class="app-info">
+                            <h4 class="app-title">@Title</h4>
+                            <span class="app-subtitle">智能对话助手</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <div class="connection-status online">
+                        <div class="status-indicator"></div>
+                        <span class="status-text">已连接</span>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="header-action-btn clear-btn" @onclick="OnClearChat" title="清空对话">
+                            <div class="btn-bg"></div>
+                            <i class="fas fa-broom"></i>
+                            <span class="btn-text">清空</span>
+                            <div class="btn-ripple"></div>
+                        </button>
+                        <button class="header-action-btn settings-btn" @onclick="OnToggleSettings" title="设置">
+                            <div class="btn-bg"></div>
+                            <i class="fas fa-cog"></i>
+                            <span class="btn-text">设置</span>
+                            <div class="btn-ripple"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- 主体区域 -->
+    <div class="ai-chat-body">
+        <!-- 左侧面板 -->
+        @if (ShowLeftPanel)
+        {
+            <div class="ai-chat-left-panel @(IsLeftPanelCollapsed ? "collapsed" : "")" style="width: @(IsLeftPanelCollapsed ? "60px" : LeftPanelWidth)">
+                @if (LeftPanelTemplate != null)
+                {
+                    @LeftPanelTemplate
+                }
+                else
+                {
+                    <div class="default-left-panel">
+                        <!-- 顶部工具栏，包含折叠按钮和新建对话 -->
+                        <div class="left-panel-toolbar">
+                            @if (!IsLeftPanelCollapsed)
+                            {
+                                <button class="btn-new-chat" @onclick="OnNewChat">
+                                    <div class="btn-new-chat-icon">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <span class="btn-new-chat-text">新建对话</span>
+                                    <div class="btn-new-chat-shine"></div>
+                                </button>
+                            }
+                            <button class="panel-toggle-btn @(IsLeftPanelCollapsed ? "collapsed" : "")" 
+                                    @onclick="OnToggleLeftPanel"
+                                    title="@(IsLeftPanelCollapsed ? "展开侧边栏" : "折叠侧边栏")">
+                                <div class="toggle-btn-bg"></div>
+                                <i class="fas @(IsLeftPanelCollapsed ? "fa-angle-right" : "fa-angle-left")"></i>
+                            </button>
+                        </div>
+
+                        @if (!IsLeftPanelCollapsed)
+                        {
+                            <!-- 对话历史标题 -->
+                            <div class="panel-section-header">
+                                <div class="section-header-content">
+                                    <div class="section-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <h6 class="section-title">对话历史</h6>
+                                </div>
+                                <div class="section-badge">
+                                    <span class="session-count">@ChatSessions.Count</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 对话历史列表 -->
+                            <div class="chat-history-list">
+                                @foreach (var session in ChatSessions)
+                                {
+                                    <div class="chat-session-item @(session.Id == CurrentSessionId ? "active" : "")"
+                                         @onclick="() => OnSelectSession(session.Id)">
+                                        <div class="session-item-bg"></div>
+                                        <div class="session-indicator"></div>
+                                        <div class="session-content">
+                                            <div class="session-icon">
+                                                <i class="fas fa-comment-alt"></i>
+                                            </div>
+                                            <div class="session-info">
+                                                <div class="session-title">@session.Title</div>
+                                                <div class="session-meta">
+                                                    <span class="session-time">
+                                                        <i class="far fa-clock"></i>
+                                                        @GetRelativeTime(session.CreateTime)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="session-actions">
+                                            <button class="session-action-btn edit-btn" 
+                                                    @onclick:stopPropagation="true"
+                                                    title="编辑对话">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="session-action-btn delete-btn" 
+                                                    @onclick:stopPropagation="true"
+                                                    @onclick="() => OnDeleteSession(session.Id)"
+                                                    title="删除对话">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (!ChatSessions.Any())
+                                {
+                                    <div class="empty-sessions">
+                                        <div class="empty-sessions-content">
+                                            <div class="empty-icon">
+                                                <i class="fas fa-comments"></i>
+                                                <div class="empty-icon-shine"></div>
+                                            </div>
+                                            <h6 class="empty-title">暂无对话历史</h6>
+                                            <p class="empty-subtitle">点击上方按钮开始新的对话</p>
+                                            <div class="empty-action">
+                                                <button class="btn-start-chat" @onclick="OnNewChat">
+                                                    <i class="fas fa-rocket me-2"></i>
+                                                    开始对话
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- 底部统计信息区域 -->
+                            <div class="left-panel-stats">
+                                <div class="stats-compact-grid">
+                                    <div class="stat-compact-item" title="当前会话消息数">
+                                        <div class="stat-compact-icon">
+                                            <i class="fas fa-comment-dots"></i>
+                                        </div>
+                                        <div class="stat-compact-info">
+                                            <div class="stat-compact-value">@Messages.Count</div>
+                                            <div class="stat-compact-label">消息</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-compact-item" title="总会话数">
+                                        <div class="stat-compact-icon">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <div class="stat-compact-info">
+                                            <div class="stat-compact-value">@ChatSessions.Count</div>
+                                            <div class="stat-compact-label">会话</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-compact-item" title="当前会话时长">
+                                        <div class="stat-compact-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-compact-info">
+                                            <div class="stat-compact-value">@GetSessionDuration()</div>
+                                            <div class="stat-compact-label">时长</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="stat-compact-item" title="预估令牌使用量">
+                                        <div class="stat-compact-icon">
+                                            <i class="fas fa-fire"></i>
+                                        </div>
+                                        <div class="stat-compact-info">
+                                            <div class="stat-compact-value">@GetTokensUsed()</div>
+                                            <div class="stat-compact-label">令牌</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- 折叠状态下的快捷操作 -->
+                            <div class="collapsed-actions">
+                                <button class="collapsed-new-btn" 
+                                        @onclick="OnNewChat"
+                                        title="新建对话">
+                                    <div class="collapsed-btn-bg"></div>
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                
+                                <div class="collapsed-divider"></div>
+                                
+                                <div class="collapsed-sessions">
+                                    @foreach (var session in ChatSessions.Take(6))
+                                    {
+                                        <div class="collapsed-session-item @(session.Id == CurrentSessionId ? "active" : "")"
+                                             @onclick="() => OnSelectSession(session.Id)"
+                                             title="@session.Title">
+                                            <div class="collapsed-session-bg"></div>
+                                            <div class="collapsed-session-icon">
+                                                <i class="fas fa-comment-dots"></i>
+                                            </div>
+                                            @if (session.Id == CurrentSessionId)
+                                            {
+                                                <div class="collapsed-session-pulse"></div>
+                                            }
+                                        </div>
+                                    }
+                                    
+                                    @if (ChatSessions.Count > 6)
+                                    {
+                                        <div class="collapsed-more-indicator">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                            <span class="more-count">+@(ChatSessions.Count - 6)</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            @if (!IsLeftPanelCollapsed)
+            {
+                <div class="panel-splitter"></div>
+            }
+        }
+
+        <!-- 中间对话区域 + 底部输入区域 -->
+        <div class="ai-chat-center">
+            <!-- 对话消息区域 -->
+            <div class="chat-messages" @ref="messagesContainer">
+                @if (Messages.Any())
+                {
+                    @foreach (var message in Messages)
+                    {
+                        <div class="message @(message.IsUser ? "user-message" : "ai-message")">
+                            <div class="message-avatar">
+                                <div class="avatar-container">
+                                    @if (message.IsUser)
+                                    {
+                                        <div class="user-avatar">
+                                            <i class="fas fa-user"></i>
+                                            <div class="avatar-ring"></div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="ai-avatar">
+                                            <i class="fas fa-robot"></i>
+                                            <div class="ai-glow"></div>
+                                            <div class="ai-pulse"></div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="message-bubble">
+                                <div class="bubble-container">
+                                    <div class="message-header">
+                                        <span class="message-sender">@(message.IsUser ? "您" : "AI助手")</span>
+                                        <span class="message-time">
+                                            <i class="far fa-clock"></i>
+                                            @message.Timestamp.ToString("HH:mm:ss")
+                                        </span>
+                                    </div>
+                                    <div class="message-body">
+                                        @if (message.IsUser)
+                                        {
+                                            <div class="user-message-text">@message.Content</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="ai-message-text">
+                                                @((MarkupString)FormatAiMessage(message.Content))
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (!message.IsUser)
+                                    {
+                                        <div class="message-actions">
+                                            <button class="message-action-btn copy-btn" @onclick="() => OnCopyMessage(message.Content)" title="复制内容">
+                                                <i class="fas fa-copy"></i>
+                                                <span>复制</span>
+                                            </button>
+                                            <button class="message-action-btn regenerate-btn" @onclick="() => OnRegenerateResponse(message)" title="重新生成">
+                                                <i class="fas fa-redo-alt"></i>
+                                                <span>重生成</span>
+                                            </button>
+                                            <button class="message-action-btn like-btn" title="点赞">
+                                                <i class="far fa-thumbs-up"></i>
+                                                <span>赞</span>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="bubble-tail"></div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-chat">
+                        <div class="empty-chat-content">
+                            <div class="empty-animation">
+                                <div class="chat-bubbles">
+                                    <div class="bubble bubble-1"></div>
+                                    <div class="bubble bubble-2"></div>
+                                    <div class="bubble bubble-3"></div>
+                                </div>
+                            </div>
+                            <h5 class="empty-title">开始新的对话</h5>
+                            <p class="empty-description">我是您的AI助手，准备为您提供帮助</p>
+
+                            <!-- 快捷建议 -->
+                            <div class="suggestions-section">
+                                <div class="suggestions-title">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>快捷建议</span>
+                                </div>
+                                <div class="suggestion-categories">
+                                    <div class="suggestion-category">
+                                        <div class="category-header">
+                                            <i class="fas fa-hand-wave"></i>
+                                            <span>开始对话</span>
+                                        </div>
+                                        <div class="category-suggestions">
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("你好，请介绍一下自己"))">
+                                                <span class="suggestion-text">打个招呼</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("你能帮我做什么？"))">
+                                                <span class="suggestion-text">了解功能</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("我想开始一个有趣的对话"))">
+                                                <span class="suggestion-text">随意聊聊</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="suggestion-category">
+                                        <div class="category-header">
+                                            <i class="fas fa-brain"></i>
+                                            <span>学习助手</span>
+                                        </div>
+                                        <div class="category-suggestions">
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("解释一下人工智能的工作原理"))">
+                                                <span class="suggestion-text">AI工作原理</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("什么是机器学习？"))">
+                                                <span class="suggestion-text">机器学习入门</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("深度学习和机器学习有什么区别？"))">
+                                                <span class="suggestion-text">深度学习概念</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="suggestion-category">
+                                        <div class="category-header">
+                                            <i class="fas fa-code"></i>
+                                            <span>编程助手</span>
+                                        </div>
+                                        <div class="category-suggestions">
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("帮我写一个Python函数"))">
+                                                <span class="suggestion-text">Python编程</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("解释这段代码的作用"))">
+                                                <span class="suggestion-text">代码解析</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("如何优化代码性能？"))">
+                                                <span class="suggestion-text">代码优化</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="suggestion-category">
+                                        <div class="category-header">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            <span>学习规划</span>
+                                        </div>
+                                        <div class="category-suggestions">
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("帮我制定学习计划"))">
+                                                <span class="suggestion-text">制定计划</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("推荐一些学习资源"))">
+                                                <span class="suggestion-text">学习资源</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("如何提高学习效率？"))">
+                                                <span class="suggestion-text">学习方法</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="suggestion-category">
+                                        <div class="category-header">
+                                            <i class="fas fa-tools"></i>
+                                            <span>实用工具</span>
+                                        </div>
+                                        <div class="category-suggestions">
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("今天的天气怎么样？"))">
+                                                <span class="suggestion-text">天气查询</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("帮我写一封邮件"))">
+                                                <span class="suggestion-text">写作助手</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="suggestion-chip detailed" @onclick="@(() => SetQuickMessage("翻译一段文字"))">
+                                                <span class="suggestion-text">翻译服务</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (IsLoading)
+                {
+                    <div class="message ai-message loading">
+                        <div class="message-avatar">
+                            <div class="avatar-container">
+                                <div class="ai-avatar loading">
+                                    <i class="fas fa-robot"></i>
+                                    <div class="ai-glow"></div>
+                                    <div class="ai-pulse loading-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message-bubble loading">
+                            <div class="bubble-container">
+                                <div class="typing-indicator">
+                                    <span class="typing-dot"></span>
+                                    <span class="typing-dot"></span>
+                                    <span class="typing-dot"></span>
+                                </div>
+                                <div class="typing-text">AI正在思考中...</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- 底部输入区域 - 现在只在中间区域内 -->
+            <div class="ai-chat-footer">
+                <!-- 工具栏 -->
+                <div class="chat-toolbar">
+                    @if (ToolbarTemplate != null)
+                    {
+                        @ToolbarTemplate
+                    }
+                    else
+                    {
+                        <div class="default-toolbar">
+                            <div class="toolbar-left">
+                                <button class="toolbar-btn attach-btn" @onclick="OnAttachFile" disabled="@IsLoading" title="添加附件">
+                                    <div class="toolbar-btn-bg"></div>
+                                    <i class="fas fa-paperclip"></i>
+                                    <span class="btn-tooltip">附件</span>
+                                </button>
+                                <button class="toolbar-btn template-btn" @onclick="OnInsertTemplate" disabled="@IsLoading" title="插入模板">
+                                    <div class="toolbar-btn-bg"></div>
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="btn-tooltip">模板</span>
+                                </button>
+                                <button class="toolbar-btn voice-btn @(IsVoiceRecording ? "recording" : "")" @onclick="OnToggleVoice" disabled="@IsLoading" title="@(IsVoiceRecording ? "停止录音" : "语音输入")">
+                                    <div class="toolbar-btn-bg"></div>
+                                    <i class="fas @(IsVoiceRecording ? "fa-stop" : "fa-microphone")"></i>
+                                    <span class="btn-tooltip">@(IsVoiceRecording ? "停止" : "语音")</span>
+                                    @if (IsVoiceRecording)
+                                    {
+                                        <div class="recording-indicator"></div>
+                                    }
+                                </button>
+                            </div>
+                            
+                            <div class="toolbar-right">
+                                <div class="input-stats">
+                                    <span class="char-count">@(CurrentMessage?.Length ?? 0)/2000</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- 输入框区域 -->
+                <div class="chat-input-container">
+                    <div class="input-wrapper-enhanced">
+                        <div class="input-field">
+                            <textarea class="chat-input-enhanced"
+                                      placeholder="@InputPlaceholder"
+                                      @bind="CurrentMessage"
+                                      @onkeydown="OnKeyDown"
+                                      @onkeydown:preventDefault="true"
+                                      @ref="inputTextarea"
+                                      rows="1"
+                                      maxlength="2000"
+                                      disabled="@IsLoading"></textarea>
+                            <div class="input-border"></div>
+                            <div class="input-glow"></div>
+                        </div>
+                        
+                        <button class="send-button-enhanced @(IsLoading ? "loading" : "") @(string.IsNullOrWhiteSpace(CurrentMessage) ? "disabled" : "active")"
+                                @onclick="OnSendMessage"
+                                disabled="@(IsLoading || string.IsNullOrWhiteSpace(CurrentMessage))"
+                                title="发送消息 (Enter)">
+                            <div class="send-btn-bg"></div>
+                            @if (IsLoading)
+                            {
+                                <div class="loading-spinner">
+                                    <div class="spinner-ring"></div>
+                                    <div class="spinner-ring"></div>
+                                    <div class="spinner-ring"></div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="send-icon">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <div class="send-trail"></div>
+                                </div>
+                            }
+                            <div class="send-ripple"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        @if (ShowRightPanel)
+        {
+            <div class="panel-splitter"></div>
+            <div class="ai-chat-right-panel" style="width: @RightPanelWidth">
+                @if (RightPanelTemplate != null)
+                {
+                    @RightPanelTemplate
+                }
+                else
+                {
+                    <div class="default-right-panel">
+                        <!-- 面板标题 -->
+                        <div class="right-panel-header">
+                            <div class="panel-title">
+                                <div class="title-icon">
+                                    <i class="fas fa-sliders-h"></i>
+                                </div>
+                                <h6>AI 配置</h6>
+                            </div>
+                            <div class="panel-badge">
+                                <span class="model-indicator online">
+                                    <i class="fas fa-circle"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 模型设置区域 -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h6 class="section-title">模型设置</h6>
+                            </div>
+
+                            <div class="settings-group enhanced">
+                                <label class="enhanced-label">
+                                    <span class="label-icon">
+                                        <i class="fas fa-microchip"></i>
+                                    </span>
+                                    <span class="label-text">AI模型</span>
+                                    <span class="label-badge">@SelectedModel</span>
+                                </label>
+                                <div class="select-wrapper">
+                                    <Select TValue="string" Value="@SelectedModel" ValueChanged="OnModelChanged" class="enhanced-select">
+                                        @foreach (var model in AvailableModels)
+                                        {
+                                            <SelectOption Text="@model.Name" Value="@model.Id" />
+                                        }
+                                    </Select>
+                                    <div class="select-arrow">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-group enhanced">
+                                <label class="enhanced-label">
+                                    <span class="label-icon">
+                                        <i class="fas fa-thermometer-half"></i>
+                                    </span>
+                                    <span class="label-text">创造性</span>
+                                    <span class="label-value">@Temperature.ToString("F1")</span>
+                                </label>
+                                <div class="slider-wrapper">
+                                    <Slider TValue="double" @bind-Value="Temperature"
+                                            Min="0" Max="1" Step="0.1"
+                                            OnValueChanged="OnTemperatureSliderChanged" 
+                                            class="enhanced-slider" />
+                                    <div class="slider-labels">
+                                        <span>保守</span>
+                                        <span>创新</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-group enhanced">
+                                <label class="enhanced-label">
+                                    <span class="label-icon">
+                                        <i class="fas fa-list-ol"></i>
+                                    </span>
+                                    <span class="label-text">最大令牌数</span>
+                                    <span class="label-value">@MaxTokens</span>
+                                </label>
+                                <div class="input-wrapper-right">
+                                    <input type="number" class="enhanced-number-input" @bind="MaxTokens" min="100" max="4000" step="100" />
+                                    <div class="input-suffix">tokens</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 高级设置区域 -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <h6 class="section-title">高级设置</h6>
+                            </div>
+
+                            <div class="settings-group enhanced">
+                                <label class="enhanced-label">
+                                    <span class="label-icon">
+                                        <i class="fas fa-memory"></i>
+                                    </span>
+                                    <span class="label-text">上下文记忆</span>
+                                </label>
+                                <div class="toggle-wrapper">
+                                    <Switch @bind-Value="EnableMemory" OnColor="Color.Success" 
+                                            OffColor="Color.Secondary" class="enhanced-switch" />
+                                </div>
+                            </div>
+
+                            <div class="settings-group enhanced">
+                                <label class="enhanced-label">
+                                    <span class="label-icon">
+                                        <i class="fas fa-stream"></i>
+                                    </span>
+                                    <span class="label-text">流式响应</span>
+                                </label>
+                                <div class="toggle-wrapper">
+                                    <Switch @bind-Value="EnableStreaming" OnColor="Color.Primary" 
+                                            OffColor="Color.Secondary" class="enhanced-switch" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 快捷操作区域 -->
+                        <div class="actions-section">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h6 class="section-title">快捷操作</h6>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="action-btn export-btn" @onclick="OnExportChat" title="导出对话">
+                                    <i class="fas fa-download"></i>
+                                    <span>导出对话</span>
+                                </button>
+                                <button class="action-btn share-btn" @onclick="OnShareChat" title="分享链接">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>分享链接</span>
+                                </button>
+                                <button class="action-btn theme-btn" @onclick="OnToggleTheme" title="切换主题">
+                                    <i class="fas fa-palette"></i>
+                                    <span>主题切换</span>
+                                </button>
+                                <button class="action-btn reset-btn" @onclick="OnResetSettings" title="重置设置">
+                                    <i class="fas fa-undo-alt"></i>
+                                    <span>重置设置</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

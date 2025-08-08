@@ -1,0 +1,98 @@
+/* AiChatSidebar 主容器样式 - 重构版本 */
+
+/* ============================================
+   基础容器样式
+   ============================================ */
+.ai-chat-left-panel {
+    background: #fafafa;
+    border-right: none;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+/* 可调整宽度的侧边栏 */
+.ai-chat-left-panel.resizable {
+    transition: none; /* 拖拽时禁用过渡 */
+}
+
+/* 右侧渐变边界线 */
+.ai-chat-left-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+    z-index: 1;
+}
+
+.ai-chat-left-panel.collapsed {
+    background: #f8f9fa;
+    box-shadow: 1px 0 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.default-left-panel {
+    padding: 1.25rem 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-chat-left-panel.collapsed .default-left-panel {
+    padding: 1rem 0.5rem;
+    overflow: hidden;
+}
+
+/* ============================================
+   响应式设计
+   ============================================ */
+@media (max-width: 768px) {
+    .ai-chat-left-panel {
+        position: absolute;
+        z-index: 1000;
+        height: 100%;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .ai-chat-left-panel.collapsed {
+        transform: translateX(-100%);
+    }
+
+    .default-left-panel {
+        padding: 1rem 0.8rem;
+    }
+}
+
+/* ============================================
+   暗色主题支持
+   ============================================ */
+body.dark-theme .ai-chat-left-panel {
+    background: #2d3748;
+}
+
+body.dark-theme .ai-chat-left-panel.collapsed {
+    background: #2d3748;
+}
+
+/* ============================================
+   性能优化和无障碍支持
+   ============================================ */
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .ai-chat-left-panel {
+        transition: none !important;
+        animation: none !important;
+    }
+}

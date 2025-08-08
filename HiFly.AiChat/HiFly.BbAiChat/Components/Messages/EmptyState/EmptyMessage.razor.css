@@ -1,0 +1,807 @@
+/* 空状态消息组件样式 - 现代化设计 */
+.empty-chat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.02) 0%, 
+        rgba(118, 75, 162, 0.02) 50%, 
+        rgba(64, 153, 255, 0.02) 100%);
+}
+
+.empty-chat-content {
+    max-width: 1000px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-intro-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;        /* 减少底部边距，保持平衡 */
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.empty-animation {
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* 优化后的chat-bubbles容器 - 缩小左右间距 */
+.chat-bubbles {
+    position: relative;
+    width: 170px;           /* 缩小宽度，减少左右间距 */
+    height: 120px;          /* 适中的高度 */
+    margin: 0 auto;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 8px 32px rgba(102, 126, 234, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: bubbleFloat 4s ease-in-out infinite;
+    transform-origin: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bubble:hover {
+    transform: scale(1.08) translateY(-6px);
+    box-shadow: 
+        0 16px 40px rgba(102, 126, 234, 0.25),
+        0 4px 16px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.bubble-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.bubble-sparkle {
+    position: absolute;
+    top: 20%;
+    right: 25%;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: sparkle 2.5s ease-in-out infinite;
+}
+
+/* 重新调整bubble布局 - 缩小左右间距 */
+.bubble-1 {
+    width: 65px;            /* 主要bubble，左侧垂直居中 */
+    height: 42px;
+    background: linear-gradient(135deg, 
+        #667eea 0%, 
+        #764ba2 50%, 
+        #667eea 100%);
+    left: 10px;             /* 稍微向右移动 */
+    top: 50%;               /* 垂直居中 */
+    transform: translateY(-50%);
+    animation-delay: 0s;
+    z-index: 3;
+}
+
+.bubble-2 {
+    width: 50px;            /* 右上角bubble */
+    height: 32px;
+    background: linear-gradient(135deg, 
+        #4099ff 0%, 
+        #3182ce 50%, 
+        #4099ff 100%);
+    right: 15px;            /* 向左靠近一些 */
+    top: 15px;              /* 右上位置 */
+    animation-delay: 1s;
+    z-index: 2;
+}
+
+.bubble-3 {
+    width: 40px;            /* 右下角bubble */
+    height: 26px;
+    background: linear-gradient(135deg, 
+        #38a169 0%, 
+        #2f855a 50%, 
+        #38a169 100%);
+    right: 18px;            /* 向左靠近一些 */
+    bottom: 18px;           /* 右下位置 */
+    animation-delay: 2s;
+    z-index: 1;
+}
+
+/* 优化连接线 - 适配新的距离 */
+.connection-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.line {
+    position: absolute;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(102, 126, 234, 0.3), 
+        transparent);
+    height: 2px;
+    animation: lineFlow 3s ease-in-out infinite;
+    border-radius: 1px;
+}
+
+.line-1 {
+    top: 40%;               /* 连接bubble-1和bubble-2 */
+    left: 42%;              /* 调整起始位置 */
+    width: 30%;             /* 缩短连接线 */
+    animation-delay: 0.5s;
+    transform: rotate(-12deg);
+    transform-origin: left center;
+}
+
+.line-2 {
+    top: 62%;               /* 连接bubble-1和bubble-3 */
+    left: 42%;              /* 调整起始位置 */
+    width: 25%;             /* 缩短连接线 */
+    animation-delay: 1.5s;
+    transform: rotate(12deg);
+    transform-origin: left center;
+}
+
+/* bubble-1的特殊动画，保持垂直居中 */
+@keyframes bubbleFloat {
+    0%, 100% { 
+        transform: translateY(-50%) rotate(0deg) scale(1); 
+    }
+    33% { 
+        transform: translateY(-62px) rotate(1deg) scale(1.02); 
+    }
+    66% { 
+        transform: translateY(-56px) rotate(-0.5deg) scale(0.98); 
+    }
+}
+
+/* 其他bubbles的标准动画 */
+.bubble-2,
+.bubble-3 {
+    animation: bubbleFloatStandard 4s ease-in-out infinite;
+}
+
+@keyframes bubbleFloatStandard {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg) scale(1); 
+    }
+    33% { 
+        transform: translateY(-10px) rotate(1deg) scale(1.02); 
+    }
+    66% { 
+        transform: translateY(-5px) rotate(-0.5deg) scale(0.98); 
+    }
+}
+
+.bubble-2 {
+    animation-delay: 1s;
+}
+
+.bubble-3 {
+    animation-delay: 2s;
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        opacity: 0.4; 
+        transform: scale(0.8); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.2); 
+    }
+}
+
+@keyframes lineFlow {
+    0% { 
+        opacity: 0; 
+        transform: scaleX(0); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scaleX(1); 
+    }
+    100% { 
+        opacity: 0; 
+        transform: scaleX(0); 
+    }
+}
+
+.empty-text-content {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+}
+
+.content-wrapper {
+    position: relative;
+}
+
+.empty-title {
+    margin: 0 0 1rem 0;
+    font-weight: 800;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    position: relative;
+}
+
+.title-gradient {
+    background: linear-gradient(135deg, 
+        #2d3748 0%, 
+        #4a5568 25%, 
+        #667eea 50%, 
+        #4a5568 75%, 
+        #2d3748 100%);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 4s ease-in-out infinite;
+}
+
+.title-underline {
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    height: 4px;
+    width: 0;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    animation: underlineExpand 1.2s ease-out 0.5s forwards;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes underlineExpand {
+    to { width: 60%; }
+}
+
+.empty-description {
+    margin: 0;
+    color: #718096;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    font-weight: 400;
+    position: relative;
+}
+
+.description-text {
+    position: relative;
+    z-index: 1;
+}
+
+.description-decoration {
+    display: flex;
+    gap: 4px;
+    margin-top: 0.5rem;
+    opacity: 0;
+    animation: dotsAppear 0.8s ease-out 1s forwards;
+}
+
+.decoration-dot {
+    width: 6px;
+    height: 6px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+.decoration-dot:nth-child(2) { animation-delay: 0.3s; }
+.decoration-dot:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes dotsAppear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.suggestions-wrapper {
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    margin-top: 1rem;       /* 给建议区域添加适当的上边距 */
+}
+
+/* 背景装饰 */
+.background-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.decoration-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(102, 126, 234, 0.05) 0%, 
+        rgba(102, 126, 234, 0.02) 50%, 
+        transparent 70%);
+    animation: circleFloat 20s linear infinite;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    left: -150px;
+}
+
+.circle-2 {
+    width: 200px;
+    height: 200px;
+    top: 20%;
+    right: -100px;
+    animation-delay: -7s;
+}
+
+.circle-3 {
+    width: 150px;
+    height: 150px;
+    bottom: -75px;
+    left: 30%;
+    animation-delay: -14s;
+}
+
+@keyframes circleFloat {
+    0% { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+}
+
+.floating-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    animation: particleFloat 8s ease-in-out infinite;
+}
+
+.particle-1 { top: 20%; left: 10%; animation-delay: 0s; }
+.particle-2 { top: 40%; right: 15%; animation-delay: 2s; }
+.particle-3 { bottom: 30%; left: 20%; animation-delay: 4s; }
+.particle-4 { top: 60%; left: 70%; animation-delay: 6s; }
+.particle-5 { bottom: 20%; right: 30%; animation-delay: 1s; }
+
+@keyframes particleFloat {
+    0%, 100% { 
+        opacity: 0; 
+        transform: translateY(0px) scale(0.5); 
+    }
+    25% { 
+        opacity: 1; 
+        transform: translateY(-20px) scale(1); 
+    }
+    75% { 
+        opacity: 0.5; 
+        transform: translateY(-40px) scale(0.8); 
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 禁用动画的样式 */
+.no-animations .empty-intro-section,
+.no-animations .suggestions-wrapper,
+.no-animations .bubble,
+.no-animations .bubble-sparkle,
+.no-animations .line,
+.no-animations .title-gradient,
+.no-animations .decoration-dot,
+.no-animations .decoration-circle,
+.no-animations .particle {
+    animation: none !important;
+}
+
+.no-animations .title-underline {
+    width: 60%;
+    animation: none !important;
+}
+
+.no-animations .description-decoration {
+    opacity: 1;
+    animation: none !important;
+}
+
+.no-animations .bubble:hover {
+    transform: none;
+}
+
+.no-animations .bubble-1 {
+    transform: translateY(-50%);
+}
+
+/* 平板设备适配 (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .empty-intro-section {
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-title {
+        font-size: 2rem;
+    }
+    
+    .empty-description {
+        font-size: 1rem;
+    }
+    
+    .chat-bubbles {
+        width: 140px;
+        height: 95px;
+    }
+    
+    .bubble-1 { width: 52px; height: 34px; left: 8px; }
+    .bubble-2 { width: 40px; height: 26px; right: 12px; top: 12px; }
+    .bubble-3 { width: 32px; height: 21px; right: 14px; bottom: 15px; }
+    
+    .line-1 { left: 40%; width: 25%; }
+    .line-2 { left: 40%; width: 20%; }
+}
+
+/* 移动设备适配 (最大768px) */
+@media (max-width: 768px) {
+    .empty-chat {
+        padding: 1.5rem 1rem;
+    }
+
+    .empty-intro-section {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;      /* 移动端减少边距 */
+    }
+
+    .empty-text-content {
+        text-align: center;
+    }
+
+    .empty-title {
+        font-size: 1.875rem;
+    }
+
+    .title-underline {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .empty-description {
+        font-size: 1rem;
+    }
+
+    .description-decoration {
+        justify-content: center;
+    }
+
+    .chat-bubbles {
+        width: 110px;
+        height: 75px;
+    }
+
+    .bubble-1 { width: 36px; height: 24px; left: 6px; }
+    .bubble-2 { width: 28px; height: 18px; right: 8px; top: 8px; }
+    .bubble-3 { width: 22px; height: 15px; right: 10px; bottom: 12px; }
+
+    .line-1, .line-2 { display: none; }
+    
+    .suggestions-wrapper {
+        margin-top: 0.5rem;     /* 移动端减少上边距 */
+    }
+}
+
+/* 小屏幕移动设备 (最大480px) */
+@media (max-width: 480px) {
+    .empty-chat {
+        padding: 1rem 0.75rem;
+    }
+
+    .empty-intro-section {
+        gap: 1.5rem;
+        margin-bottom: 1rem;        /* 小屏幕进一步减少边距 */
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+    }
+
+    .empty-description {
+        font-size: 0.9rem;
+    }
+
+    .chat-bubbles {
+        width: 90px;
+        height: 60px;
+    }
+
+    .bubble-1 { width: 28px; height: 18px; left: 5px; }
+    .bubble-2 { width: 22px; height: 14px; right: 6px; top: 6px; }
+    .bubble-3 { width: 18px; height: 12px; right: 7px; bottom: 10px; }
+
+    .decoration-circle {
+        display: none;
+    }
+    
+    .suggestions-wrapper {
+        margin-top: 0.25rem;    /* 小屏幕最小上边距 */
+    }
+}
+
+/* 大屏幕优化 (最小1200px) */
+@media (min-width: 1200px) {
+    .empty-intro-section {
+        gap: 4rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .empty-title {
+        font-size: 3rem;
+    }
+
+    .empty-description {
+        font-size: 1.25rem;
+    }
+
+    .chat-bubbles {
+        width: 200px;
+        height: 140px;
+    }
+
+    .bubble-1 { width: 75px; height: 48px; left: 12px; }
+    .bubble-2 { width: 58px; height: 38px; right: 18px; top: 18px; }
+    .bubble-3 { width: 46px; height: 30px; right: 20px; bottom: 22px; }
+    
+    .line-1 { left: 44%; width: 28%; }
+    .line-2 { left: 44%; width: 23%; }
+    
+    .suggestions-wrapper {
+        margin-top: 1.5rem;     /* 大屏幕适当增加上边距 */
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .empty-chat {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.05) 0%, 
+        rgba(118, 75, 162, 0.05) 50%, 
+        rgba(64, 153, 255, 0.05) 100%);
+}
+
+body.dark-theme .title-gradient {
+    background: linear-gradient(135deg, 
+        #e2e8f0 0%, 
+        #cbd5e0 25%, 
+        #667eea 50%, 
+        #cbd5e0 75%, 
+        #e2e8f0 100%);
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.dark-theme .empty-description {
+    color: #a0aec0;
+}
+
+body.dark-theme .bubble {
+    box-shadow: 
+        0 8px 32px rgba(102, 126, 234, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 为减少动画的用户提供静态版本 */
+@media (prefers-reduced-motion: reduce) {
+    .bubble,
+    .bubble-sparkle,
+    .line,
+    .title-gradient,
+    .decoration-dot,
+    .decoration-circle,
+    .particle {
+        animation: none !important;
+    }
+    
+    .empty-intro-section,
+    .suggestions-wrapper {
+        animation: none !important;
+    }
+    
+    .title-underline {
+        width: 60%;
+        animation: none !important;
+    }
+    
+    .description-decoration {
+        opacity: 1;
+        animation: none !important;
+    }
+}
+
+/* 高对比度模式优化 */
+@media (prefers-contrast: high) {
+    .bubble {
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 
+            0 8px 24px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .empty-title {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .empty-description {
+        color: #2d3748;
+    }
+
+    body.dark-theme .empty-description {
+        color: #f7fafc;
+    }
+}
+
+/* 性能优化 */
+.bubble,
+.decoration-circle,
+.particle,
+.line {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* 焦点可访问性 */
+.empty-chat:focus-within .bubble {
+    animation-play-state: paused;
+}
+
+.bubble:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 4px;
+}
+
+/* 打印样式 */
+@media print {
+    .empty-animation,
+    .background-decoration {
+        display: none;
+    }
+    
+    .empty-intro-section {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-text-content {
+        text-align: center;
+    }
+    
+    .title-gradient {
+        background: #2d3748;
+        background-clip: unset;
+        -webkit-background-clip: unset;
+        -webkit-text-fill-color: unset;
+    }
+}
+
+/* 横屏模式适配 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .empty-intro-section {
+        flex-direction: row;
+        gap: 2rem;
+        margin-bottom: 1rem;    /* 横屏模式减少边距 */
+    }
+    
+    .empty-text-content {
+        text-align: left;
+    }
+    
+    .title-underline {
+        left: 0;
+        transform: none;
+    }
+    
+    .description-decoration {
+        justify-content: flex-start;
+    }
+    
+    .chat-bubbles {
+        width: 90px;
+        height: 60px;
+    }
+    
+    .suggestions-wrapper {
+        margin-top: 0.5rem;
+    }
+}
+
+/* RTL语言支持 */
+[dir="rtl"] .empty-text-content {
+    text-align: right;
+}
+
+[dir="rtl"] .empty-intro-section {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .title-underline {
+    right: 0;
+    left: auto;
+}
+
+[dir="rtl"] .description-decoration {
+    justify-content: flex-end;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) {
+    .bubble:hover {
+        transform: none;
+        box-shadow: 
+            0 8px 32px rgba(102, 126, 234, 0.15),
+            0 2px 8px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .bubble-1:hover {
+        transform: translateY(-50%);
+    }
+}

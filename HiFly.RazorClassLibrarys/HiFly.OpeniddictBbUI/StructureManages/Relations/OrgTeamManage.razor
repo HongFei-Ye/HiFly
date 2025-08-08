@@ -1,0 +1,45 @@
+﻿@inject IOrganizationService OrganizationService
+@inject ITeamService TeamService
+
+@typeparam TContext where TContext : DbContext
+@typeparam TOrgTeam where TOrgTeam : class, IOrgTeam, new()
+@typeparam TOrganization where TOrganization : class, IOrganization, new()
+@typeparam TTeam where TTeam : class, ITeam, new()
+
+<PageTitle>组织小组关系</PageTitle>
+
+<TItemTable TContext="TContext" TItem="TOrgTeam">
+
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.OrganizationId" Text="组织名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@OrganizationService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <OrgVirtualizeSelect TContext="@TContext" TOrganization="@TOrganization" @bind-Value="@value.OrganizationId"></OrgVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <OrgIdFilter TContext="@TContext" TOrganization="@TOrganization"></OrgIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="@context.TeamId" Text="小组名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@TeamService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <TeamVirtualizeSelect TContext="@TContext" TTeam="@TTeam" @bind-Value="@value.TeamId"></TeamVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <TeamIdFilter TContext="@TContext" TTeam="@TTeam"></TeamIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+    </TableColumns>
+
+
+</TItemTable>

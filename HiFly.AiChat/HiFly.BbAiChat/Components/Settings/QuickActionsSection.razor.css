@@ -1,0 +1,387 @@
+﻿/* ===========================================
+   快捷操作区域组件样式 - 优化版本
+   =========================================== */
+
+/* 快捷操作区域整体样式 */
+.actions-section {
+    margin-top: auto;
+    margin-bottom: 0;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.625rem; /* 从 0.75rem 减少到 0.625rem */
+    padding: 0;
+}
+
+/* 操作按钮基础样式 - 优化版本 */
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem; /* 从 0.875rem 1rem 减少 */
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    border-radius: 10px; /* 从 12px 减少到 10px */
+    color: #667eea;
+    cursor: pointer;
+    font-size: 0.75rem; /* 从 0.8rem 减少到 0.75rem */
+    font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* 加快过渡 */
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    min-height: 2.75rem; /* 从 3rem 减少到 2.75rem */
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+}
+
+.action-btn:hover {
+    transform: translateY(-1px); /* 从 -2px 减少到 -1px */
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15); /* 减少阴影强度 */
+    border-color: rgba(102, 126, 234, 0.25);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* 按钮类型特殊样式 - 更精致的配色 */
+.action-btn.export-btn {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.08) 0%, rgba(49, 130, 206, 0.08) 100%);
+    border-color: rgba(66, 153, 225, 0.2);
+    color: #4299e1;
+}
+
+.action-btn.export-btn:hover {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.15) 0%, rgba(49, 130, 206, 0.15) 100%);
+    border-color: rgba(66, 153, 225, 0.35);
+    box-shadow: 0 4px 16px rgba(66, 153, 225, 0.2);
+}
+
+.action-btn.share-btn {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.08) 0%, rgba(56, 161, 105, 0.08) 100%);
+    border-color: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+}
+
+.action-btn.share-btn:hover {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.15) 0%, rgba(56, 161, 105, 0.15) 100%);
+    border-color: rgba(72, 187, 120, 0.35);
+    box-shadow: 0 4px 16px rgba(72, 187, 120, 0.2);
+}
+
+.action-btn.theme-btn {
+    background: linear-gradient(135deg, rgba(237, 137, 54, 0.08) 0%, rgba(221, 107, 32, 0.08) 100%);
+    border-color: rgba(237, 137, 54, 0.2);
+    color: #ed8936;
+}
+
+.action-btn.theme-btn:hover {
+    background: linear-gradient(135deg, rgba(237, 137, 54, 0.15) 0%, rgba(221, 107, 32, 0.15) 100%);
+    border-color: rgba(237, 137, 54, 0.35);
+    box-shadow: 0 4px 16px rgba(237, 137, 54, 0.2);
+}
+
+.action-btn.reset-btn {
+    background: linear-gradient(135deg, rgba(229, 62, 62, 0.08) 0%, rgba(197, 48, 48, 0.08) 100%);
+    border-color: rgba(229, 62, 62, 0.2);
+    color: #e53e3e;
+}
+
+.action-btn.reset-btn:hover {
+    background: linear-gradient(135deg, rgba(229, 62, 62, 0.15) 0%, rgba(197, 48, 48, 0.15) 100%);
+    border-color: rgba(229, 62, 62, 0.35);
+    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);
+}
+
+/* 优化的光效动画 */
+.action-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease; /* 稍快一些 */
+    border-radius: 10px;
+}
+
+.action-btn:hover::before {
+    transform: translateX(100%);
+}
+
+/* 按钮图标样式优化 */
+.action-btn i {
+    font-size: 0.85rem; /* 从 0.9rem 减少到 0.85rem */
+    transition: transform 0.25s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.action-btn:hover i {
+    transform: scale(1.08); /* 从 1.1 减少到 1.08 */
+}
+
+.action-btn span {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    letter-spacing: 0.2px; /* 从 0.3px 减少 */
+    line-height: 1.2;
+}
+
+/* 按钮状态优化 */
+.action-btn.loading {
+    pointer-events: none;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.action-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 按钮成功状态 */
+.action-btn.success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border-color: #48bb78;
+    box-shadow: 0 4px 16px rgba(72, 187, 120, 0.3);
+}
+
+.action-btn.success i {
+    animation: successPulse 0.5s ease; /* 从 0.6s 减少到 0.5s */
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); } /* 从 1.2 减少到 1.15 */
+}
+
+/* 按钮错误状态 */
+.action-btn.error {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+    border-color: #e53e3e;
+    animation: errorShake 0.4s ease; /* 从 0.5s 减少到 0.4s */
+    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.3);
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); } /* 从 -4px 减少到 -3px */
+    75% { transform: translateX(3px); }  /* 从 4px 减少到 3px */
+}
+
+/* 按钮涟漪效果优化 */
+.action-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.25); /* 从 0.3 减少到 0.25 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s ease, height 0.25s ease; /* 加快过渡 */
+    z-index: 1;
+}
+
+.action-btn:active::after {
+    width: 150px; /* 从 200px 减少到 150px */
+    height: 150px;
+}
+
+/* 按钮功能分组优化 */
+.action-btn.export-btn,
+.action-btn.share-btn {
+    /* 工具类按钮 */
+    font-weight: 500;
+}
+
+.action-btn.theme-btn,
+.action-btn.reset-btn {
+    /* 设置类按钮 */
+    font-weight: 600;
+}
+
+/* 按钮优先级视觉 */
+.action-btn.export-btn {
+    /* 主要操作 - 稍微突出 */
+    border-width: 1.5px;
+}
+
+.action-btn.reset-btn {
+    /* 危险操作 - 稍微内敛 */
+    opacity: 0.9;
+}
+
+.action-btn.reset-btn:hover {
+    opacity: 1;
+}
+
+/* 按钮组布局响应式优化 */
+@media (max-width: 768px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        padding: 0.625rem 0.75rem; /* 进一步减少移动端padding */
+        font-size: 0.7rem;
+        min-height: 2.5rem;
+        gap: 0.375rem;
+    }
+    
+    .action-btn i {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        gap: 0.375rem;
+    }
+    
+    .action-btn {
+        padding: 0.5rem;
+        font-size: 0.65rem;
+        min-height: 2.25rem;
+        gap: 0.25rem;
+    }
+    
+    .action-btn span {
+        display: none; /* 移动端只显示图标 */
+    }
+    
+    .action-btn i {
+        font-size: 0.9rem;
+    }
+}
+
+/* 暗色主题支持优化 */
+body.dark-theme .action-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #a0aec0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .action-btn.export-btn {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.12) 0%, rgba(49, 130, 206, 0.12) 100%);
+    color: #63b3ed;
+}
+
+body.dark-theme .action-btn.share-btn {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.12) 0%, rgba(56, 161, 105, 0.12) 100%);
+    color: #68d391;
+}
+
+body.dark-theme .action-btn.theme-btn {
+    background: linear-gradient(135deg, rgba(237, 137, 54, 0.12) 0%, rgba(221, 107, 32, 0.12) 100%);
+    color: #f6ad55;
+}
+
+body.dark-theme .action-btn.reset-btn {
+    background: linear-gradient(135deg, rgba(229, 62, 62, 0.12) 0%, rgba(197, 48, 48, 0.12) 100%);
+    color: #fc8181;
+}
+
+/* 可访问性增强 */
+.action-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+    z-index: 10;
+}
+
+.action-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* 高级交互状态 */
+.action-btn:focus-visible {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .action-btn:hover {
+        transform: none;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    }
+    
+    .action-btn:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    .action-btn {
+        transition: color 0.2s ease, background-color 0.2s ease;
+    }
+    
+    .action-btn::before,
+    .action-btn::after {
+        display: none;
+    }
+    
+    .action-btn i {
+        animation: none !important;
+        transition: none;
+    }
+    
+    .action-btn:hover {
+        transform: none;
+    }
+}
+
+/* 高对比度支持 */
+@media (prefers-contrast: high) {
+    .action-btn {
+        border-width: 2px;
+        font-weight: 700;
+        box-shadow: none;
+    }
+    
+    .action-btn:hover {
+        border-width: 3px;
+        box-shadow: none;
+    }
+    
+    .action-btn:focus {
+        outline-width: 3px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .action-buttons {
+        display: none;
+    }
+}

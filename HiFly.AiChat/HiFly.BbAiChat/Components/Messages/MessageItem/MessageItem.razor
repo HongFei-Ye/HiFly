@@ -1,0 +1,40 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components.Messages.Avatar
+@using HiFly.BbAiChat.Components.Messages.MessageActions
+
+<div class="message @(Message.IsUser ? "user-message" : "ai-message")">
+    <MessageAvatar IsUser="@Message.IsUser" IsLoading="@IsLoading" />
+    
+    <div class="message-bubble">
+        <div class="bubble-container">
+            <div class="message-header">
+                <span class="message-sender">@(Message.IsUser ? "Äú" : "AIÖúÊÖ")</span>
+                <span class="message-time">
+                    <i class="far fa-clock"></i>
+                    @Message.Timestamp.ToString("HH:mm:ss")
+                </span>
+            </div>
+            <div class="message-body">
+                @if (Message.IsUser)
+                {
+                    <div class="user-message-text">@Message.Content</div>
+                }
+                else
+                {
+                    <div class="ai-message-text">
+                        @((MarkupString)FormatAiMessage(Message.Content))
+                    </div>
+                }
+            </div>
+            @if (!Message.IsUser)
+            {
+                <MessageActionBar Content="@Message.Content"
+                                 Message="@Message"
+                                 OnCopyMessage="HandleCopyMessage"
+                                 OnRegenerateResponse="HandleRegenerateResponse"
+                                 OnLikeMessage="HandleLikeMessage" />
+            }
+        </div>
+        <div class="bubble-tail"></div>
+    </div>
+</div>

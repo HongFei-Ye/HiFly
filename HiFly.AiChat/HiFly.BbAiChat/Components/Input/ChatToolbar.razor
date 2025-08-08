@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="chat-toolbar">
+    @if (ToolbarTemplate != null)
+    {
+        @ToolbarTemplate
+    }
+    else
+    {
+        <div class="default-toolbar">
+            <div class="toolbar-left">
+                <!-- 左侧主要功能区 - 文件操作类 -->
+                <div class="toolbar-left-primary">
+                    <button class="toolbar-btn attach-btn" 
+                            @onclick="OnAttachFile" 
+                            disabled="@IsDisabled" 
+                            title="添加附件">
+                        <div class="toolbar-btn-bg"></div>
+                        <i class="fas fa-paperclip"></i>
+                        <span class="btn-tooltip">附件</span>
+                    </button>
+                    <button class="toolbar-btn template-btn" 
+                            @onclick="OnInsertTemplate" 
+                            disabled="@IsDisabled" 
+                            title="插入模板">
+                        <div class="toolbar-btn-bg"></div>
+                        <i class="fas fa-file-alt"></i>
+                        <span class="btn-tooltip">模板</span>
+                    </button>
+                </div>
+
+                <!-- 左侧AI增强功能区 - AI能力类 -->
+                <div class="toolbar-left-secondary">
+                    <button class="toolbar-btn deep-think-btn" 
+                            @onclick="OnDeepThink" 
+                            disabled="@IsDisabled" 
+                            title="启用深度思考模式">
+                        <div class="toolbar-btn-bg"></div>
+                        <i class="fas fa-brain"></i>
+                        <span class="btn-tooltip">深度思考</span>
+                    </button>
+                    <button class="toolbar-btn web-search-btn" 
+                            @onclick="OnWebSearch" 
+                            disabled="@IsDisabled" 
+                            title="启用联网搜索">
+                        <div class="toolbar-btn-bg"></div>
+                        <i class="fas fa-globe-americas"></i>
+                        <span class="btn-tooltip">联网搜索</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="toolbar-right">
+                <div class="toolbar-status">
+                    <span class="input-hint">@InputHint</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

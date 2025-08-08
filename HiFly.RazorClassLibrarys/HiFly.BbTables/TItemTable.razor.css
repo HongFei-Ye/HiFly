@@ -1,0 +1,8 @@
+﻿
+.table-full {
+    height: calc(100vh - 82px - var(--bb-layout-footer-height) - var(--bb-tabs-item-height, 0px));
+}
+
+.table-full-125 {
+    height: calc(100vh - 125px - var(--bb-layout-footer-height) - var(--bb-tabs-item-height, 0px));
+}

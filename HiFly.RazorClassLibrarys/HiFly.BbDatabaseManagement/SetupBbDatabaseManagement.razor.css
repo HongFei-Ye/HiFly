@@ -1,0 +1,68 @@
+﻿/* 背景渐变 */
+::deep body {
+    background: linear-gradient(135deg, #032538 0%, #1565C0 100%);
+    min-height: 100vh;
+}
+
+/* 动画相关 */
+::deep .animate__animated {
+    animation-duration: 0.5s;
+}
+
+::deep .animate__headShake {
+    animation-name: headShake;
+}
+
+@keyframes headShake {
+    0% {
+        transform: translateX(0);
+    }
+
+    6.5% {
+        transform: translateX(-6px) rotateY(-9deg);
+    }
+
+    18.5% {
+        transform: translateX(5px) rotateY(7deg);
+    }
+
+    31.5% {
+        transform: translateX(-3px) rotateY(-5deg);
+    }
+
+    43.5% {
+        transform: translateX(2px) rotateY(3deg);
+    }
+
+    50% {
+        transform: translateX(0);
+    }
+}
+
+/* 按钮样式 */
+::deep .btn-primary {
+    transition: all 0.3s ease;
+    background-image: linear-gradient(135deg, var(--bs-primary) 0%, #2979FF 100%);
+    border: none;
+}
+
+    ::deep .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+    }
+
+/* 卡片容器渐变边框 */
+::deep .card-gradient-border {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+}
+
+/* 确保背景色应用于整个页面 */
+::deep .auth-bg {
+    background: linear-gradient(135deg, #032538 0%, #1565C0 100%);
+    min-height: 100vh;
+}
+
+/* 装饰图标样式 */
+::deep .decoration-icon {
+    opacity: 0.1;
+}

@@ -1,0 +1,71 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components.Messages.QuickSuggestions
+
+<div class="empty-chat" role="main" aria-label="空对话状态">
+    <div class="empty-chat-content">
+        <!-- 主要介绍区域 -->
+        <div class="empty-intro-section">
+            <div class="empty-animation" aria-hidden="true">
+                <div class="chat-bubbles">
+                    <div class="bubble bubble-1">
+                        <div class="bubble-inner">
+                            <div class="bubble-sparkle"></div>
+                        </div>
+                    </div>
+                    <div class="bubble bubble-2">
+                        <div class="bubble-inner">
+                            <div class="bubble-sparkle"></div>
+                        </div>
+                    </div>
+                    <div class="bubble bubble-3">
+                        <div class="bubble-inner">
+                            <div class="bubble-sparkle"></div>
+                        </div>
+                    </div>
+                    <div class="connection-lines">
+                        <div class="line line-1"></div>
+                        <div class="line line-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="empty-text-content">
+                <div class="content-wrapper">
+                    <h1 class="empty-title">
+                        <span class="title-gradient">@Title</span>
+                        <div class="title-underline"></div>
+                    </h1>
+                    <p class="empty-description">
+                        <span class="description-text">@Description</span>
+                        <div class="description-decoration">
+                            <div class="decoration-dot"></div>
+                            <div class="decoration-dot"></div>
+                            <div class="decoration-dot"></div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @if (ShowSuggestions)
+        {
+            <div class="suggestions-wrapper">
+                <QuickSuggestions Categories="@SuggestionCategories"
+                                 OnSuggestionClick="HandleSuggestionClick" />
+            </div>
+        }
+
+        <!-- 背景装饰元素 -->
+        <div class="background-decoration" aria-hidden="true">
+            <div class="decoration-circle circle-1"></div>
+            <div class="decoration-circle circle-2"></div>
+            <div class="decoration-circle circle-3"></div>
+            <div class="floating-particles">
+                <div class="particle particle-1"></div>
+                <div class="particle particle-2"></div>
+                <div class="particle particle-3"></div>
+                <div class="particle particle-4"></div>
+                <div class="particle particle-5"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="input-field">
+    <textarea class="chat-input-enhanced"
+              placeholder="@Placeholder"
+              @bind="CurrentValue"
+              @bind:event="oninput"
+              @onkeydown="HandleKeyDown"
+              @onmousedown="HandleTextSelectionStart"
+              @onmouseup="HandleTextSelectionEnd"
+              @ondblclick="HandleTextDoubleClick"
+              @ref="textareaRef"
+              rows="1"
+              maxlength="@MaxLength"
+              disabled="@IsDisabled"></textarea>
+    <div class="input-border"></div>
+    <div class="input-glow"></div>
+</div>

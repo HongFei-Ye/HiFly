@@ -1,0 +1,45 @@
+﻿@inject IDepartmentService DepartmentService
+@inject ITeamService TeamService
+
+@typeparam TContext where TContext : DbContext
+@typeparam TDepartmentTeam where TDepartmentTeam : class, IDepartmentTeam, new()
+@typeparam TDepartment where TDepartment : class, IDepartment, new()
+@typeparam TTeam where TTeam : class, ITeam, new()
+
+<PageTitle>部门小组关系</PageTitle>
+
+<TItemTable TContext="TContext" TItem="TDepartmentTeam">
+
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.DepartmentId" Text="机构名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@DepartmentService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <DepartmentVirtualizeSelect TContext="@TContext" TDepartment="@TDepartment" @bind-Value="@value.DepartmentId"></DepartmentVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <DepartmentIdFilter TContext="@TContext" TDepartment="@TDepartment"></DepartmentIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="@context.TeamId" Text="小组名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@TeamService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <TeamVirtualizeSelect TContext="@TContext" TTeam="@TTeam" @bind-Value="@value.TeamId"></TeamVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <TeamIdFilter TContext="@TContext" TTeam="@TTeam"></TeamIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+    </TableColumns>
+
+
+</TItemTable>

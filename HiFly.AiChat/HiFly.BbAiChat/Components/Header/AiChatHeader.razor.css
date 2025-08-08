@@ -1,0 +1,436 @@
+﻿/* AI聊天头部组件样式 - Web优化版（移除键盘显示） */
+.ai-chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0.75rem 1.5rem;
+    color: white;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.25);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 56px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-chat-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    animation: headerShine 4s infinite;
+}
+
+@keyframes headerShine {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+}
+
+.default-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    min-width: 100px;
+}
+
+/* 应用品牌区域 - 优化版 */
+.app-branding {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.app-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.app-icon:hover {
+    transform: scale(1.05);
+}
+
+.app-icon .icon-glow {
+    position: absolute;
+    inset: -2px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    border-radius: 10px;
+    animation: iconGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes iconGlow {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.6; transform: scale(1.02); }
+}
+
+.app-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+}
+
+.app-subtitle {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 400;
+    line-height: 1;
+}
+
+/* 头部操作按钮 - Web友好版 */
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.header-action-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    height: 32px;
+    min-width: 80px;
+    outline: none;
+}
+
+.header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.header-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-action-btn:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.header-action-btn .btn-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.header-action-btn:hover .btn-bg {
+    transform: translateX(100%);
+}
+
+.header-action-btn .btn-ripple {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transform: scale(0);
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.header-action-btn:active .btn-ripple {
+    transform: scale(1);
+}
+
+.btn-text {
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.header-action-btn i {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+/* 设置按钮特殊样式 */
+.settings-btn {
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* 设置按钮打开状态 - 齿轮图标 */
+.settings-btn .fa-cog {
+    animation: settingsRotate 4s infinite linear;
+}
+
+@keyframes settingsRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.settings-btn:hover .fa-cog {
+    animation-duration: 0.5s;
+}
+
+/* 设置按钮关闭状态 - X图标 */
+.settings-btn .fa-times {
+    animation: none;
+    color: #ff6b6b;
+    transition: all 0.3s ease;
+}
+
+.settings-btn:hover .fa-times {
+    color: #ff5252;
+    transform: rotate(90deg);
+}
+
+/* 设置按钮关闭状态的背景 */
+.settings-btn:has(.fa-times) {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+.settings-btn:has(.fa-times):hover {
+    background: rgba(255, 107, 107, 0.25);
+    border-color: rgba(255, 107, 107, 0.4);
+}
+
+/* 替代方案 - 使用CSS类 */
+.settings-btn.close-state {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+.settings-btn.close-state:hover {
+    background: rgba(255, 107, 107, 0.25);
+    border-color: rgba(255, 107, 107, 0.4);
+}
+
+.settings-btn.close-state i {
+    color: #ff6b6b;
+    animation: none;
+}
+
+.settings-btn.close-state:hover i {
+    color: #ff5252;
+    transform: rotate(90deg);
+}
+
+/* 暗色主题支持 */
+body.dark-theme .ai-chat-header {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .app-icon {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .header-action-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .settings-btn {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .settings-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .settings-btn.close-state {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+body.dark-theme .settings-btn.close-state:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.4);
+}
+
+/* 响应式设计 - 针对Web优化 */
+@media (max-width: 768px) {
+    .ai-chat-header {
+        padding: 0.5rem 1rem;
+        min-height: 48px;
+    }
+
+    .app-branding {
+        gap: 0.5rem;
+    }
+
+    .app-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+    }
+
+    .app-title {
+        font-size: 1.1rem;
+    }
+
+    .app-subtitle {
+        font-size: 0.7rem;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .header-action-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        justify-content: center;
+        min-width: 36px;
+    }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+    .ai-chat-header {
+        padding: 0.5rem 0.75rem;
+        min-height: 44px;
+    }
+
+    .app-title {
+        font-size: 1rem;
+    }
+
+    .app-subtitle {
+        display: none; /* 超小屏幕隐藏副标题 */
+    }
+
+    .header-action-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) {
+    .header-action-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .settings-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* 为触摸设备增加按钮尺寸 */
+    .header-action-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .ai-chat-header {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .header-action-btn {
+        border-width: 2px;
+    }
+}
+
+/* 动画优化 - 尊重用户的动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    .ai-chat-header::before,
+    .icon-glow,
+    .settings-btn i {
+        animation: none;
+    }
+
+    .header-action-btn,
+    .app-icon {
+        transition: none;
+    }
+}
+
+/* 性能优化 */
+.ai-chat-header,
+.header-action-btn,
+.app-icon {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Web应用专属优化 */
+.header-left {
+    max-width: calc(100% - 120px); /* 为右侧按钮预留空间 */
+}
+
+.app-info {
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+.app-title,
+.app-subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 无障碍支持 */
+.header-action-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+}

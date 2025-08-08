@@ -1,0 +1,86 @@
+/* AI聊天消息区域组件样式 - 重构后只包含容器样式 */
+
+/* 消息容器基础样式 */
+.chat-messages {
+    flex: 1;
+    padding: 1.2rem;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 3px;
+    transition: background 0.3s ease;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
+}
+
+/* 加载状态特殊样式 */
+.message.loading {
+    opacity: 0.8;
+}
+
+.message-bubble.loading .bubble-container {
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
+    border-color: rgba(102, 126, 234, 0.2);
+    padding: 1rem 1.25rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .chat-messages {
+        padding: 1rem;
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .message-bubble.loading .bubble-container {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 性能优化 */
+.chat-messages {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    .chat-messages {
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .chat-messages {
+        scroll-behavior: auto;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .chat-messages {
+        overflow: visible;
+        height: auto;
+    }
+}

@@ -1,0 +1,285 @@
+/* 单条消息组件样式 */
+.message {
+    display: flex;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+    animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message .message-avatar {
+    order: 2;
+    margin-left: 1rem;
+    margin-right: 0;
+}
+
+.ai-message .message-avatar {
+    margin-right: 1rem;
+}
+
+/* 消息气泡样式 */
+.message-bubble {
+    position: relative;
+    max-width: 75%;
+    min-width: 200px;
+}
+
+.bubble-container {
+    position: relative;
+    padding: 1.25rem 1.5rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.bubble-container:hover .message-actions {
+    opacity: 1;
+}
+
+.user-message .bubble-container {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ai-message .bubble-container {
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
+    border-color: rgba(102, 126, 234, 0.2);
+}
+
+.bubble-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.bubble-tail {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 20px;
+}
+
+.user-message .bubble-tail {
+    right: -8px;
+    border: 8px solid transparent;
+    border-left-color: #4299e1;
+}
+
+.ai-message .bubble-tail {
+    left: -8px;
+    border: 8px solid transparent;
+    border-right-color: rgba(255, 255, 255, 0.95);
+}
+
+/* 消息头部 */
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+}
+
+.message-sender {
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.message-time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* 消息内容 */
+.message-body {
+    margin-bottom: 1rem;
+}
+
+.user-message-text, .ai-message-text {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.ai-message-text {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ai-message-text h1, .ai-message-text h2, .ai-message-text h3,
+.ai-message-text h4, .ai-message-text h5, .ai-message-text h6 {
+    color: #2d3748;
+    margin: 1rem 0 0.5rem 0;
+    font-weight: 700;
+}
+
+.ai-message-text code {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.ai-message-text pre {
+    background: #1a202c;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+}
+
+.ai-message-text strong {
+    color: #2d3748;
+    font-weight: 700;
+}
+
+.ai-message-text em {
+    color: #4a5568;
+    font-style: italic;
+}
+
+.ai-message-text blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #4a5568;
+    font-style: italic;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1rem;
+}
+
+.ai-message-text ul, .ai-message-text ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.ai-message-text li {
+    margin-bottom: 0.25rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .message {
+        margin-bottom: 1.5rem;
+    }
+
+    .message-bubble {
+        max-width: 85%;
+        min-width: 150px;
+    }
+
+    .bubble-container {
+        padding: 1rem 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .bubble-container {
+        padding: 0.875rem 1rem;
+    }
+
+    .message-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .ai-message .bubble-container {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .ai-message .bubble-tail {
+    border-right-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .ai-message-text h1,
+body.dark-theme .ai-message-text h2,
+body.dark-theme .ai-message-text h3,
+body.dark-theme .ai-message-text h4,
+body.dark-theme .ai-message-text h5,
+body.dark-theme .ai-message-text h6 {
+    color: #e2e8f0;
+}
+
+body.dark-theme .ai-message-text strong {
+    color: #e2e8f0;
+}
+
+body.dark-theme .ai-message-text em {
+    color: #a0aec0;
+}
+
+body.dark-theme .ai-message-text code {
+    background: rgba(102, 126, 234, 0.2);
+    color: #a0d4f7;
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+body.dark-theme .ai-message-text blockquote {
+    border-left-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    color: #a0aec0;
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .message,
+    .message-bubble {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* 性能优化 */
+.message,
+.message-bubble {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* 打印样式 */
+@media print {
+    .message {
+        page-break-inside: avoid;
+    }
+
+    .bubble-container {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+}

@@ -1,0 +1,192 @@
+﻿@typeparam TContext where TContext : DbContext
+
+@inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@if (_isAuthorized)
+{
+    <BbDatabaseManagement TContext="TContext"></BbDatabaseManagement>
+}
+else
+{
+    <div class="container-fluid p-0 auth-bg">
+        <!-- 背景装饰效果 -->
+        <div class="position-fixed top-0 end-0 p-5 decoration-icon d-none d-lg-block">
+            <i class="fa fa-database fa-5x text-primary"></i>
+        </div>
+        <div class="position-fixed bottom-0 start-0 p-5 decoration-icon d-none d-lg-block">
+            <i class="fa fa-code-fork fa-4x text-primary"></i>
+        </div>
+
+        <div class="row justify-content-center min-vh-100 align-items-center mx-0">
+            <div class="col-11 col-md-8 col-lg-6 col-xl-5">
+                <!-- 卡片容器添加渐变边框效果 -->
+                <div class="p-1 rounded-4 card-gradient-border border-0 shadow-lg">
+                    <div class="card border-0 rounded-3 shadow-sm">
+                        <!-- 卡片头部 -->
+                        <div class="card-header bg-primary bg-gradient text-white py-3 rounded-top-3 border-0">
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-white p-2 rounded-circle text-primary me-3 shadow-sm">
+                                        <i class="fa fa-shield-alt fa-lg"></i>
+                                    </div>
+                                    <h4 class="mb-0 fw-bold">数据库管理控制</h4>
+                                </div>
+                                <div class="badge bg-white bg-opacity-25 px-3 py-2 fs-6">
+                                    <i class="fa fa-lock me-1"></i>安全验证
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片内容 -->
+                        <div class="card-body p-4">
+                            <div class="alert alert-info bg-info bg-opacity-10 border-0 rounded-3 shadow-sm mb-4">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-info bg-opacity-25 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fa fa-info fa-fw text-info"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="alert-heading text-info">安全访问</h5>
+                                        <p class="mb-0">请输入管理密钥以访问数据库配置页面。所有访问尝试将被记录。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            @if (!string.IsNullOrEmpty(_errorMessage))
+                            {
+                                <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 animate__animated animate__headShake">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <div class="bg-danger bg-opacity-25 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fa fa-exclamation-triangle fa-fw text-danger"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5 class="alert-heading text-danger">验证失败</h5>
+                                            <p class="mb-0">@_errorMessage</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- 密钥输入 -->
+                            <div class="mb-4">
+                                <label for="setupKey" class="form-label fw-semibold text-dark mb-2">
+                                    <i class="fa fa-key text-primary me-2"></i>管理密钥
+                                </label>
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="fa fa-lock text-primary"></i>
+                                    </span>
+                                    <input type="password"
+                                           class="form-control border-start-0 ps-0"
+                                           id="setupKey"
+                                           placeholder="请输入访问密钥..."
+                                           autocomplete="new-password"
+                                           @bind="_enteredKey"
+                                           @onkeypress="@HandleKeyPress" />
+                                </div>
+                                <div class="form-text text-muted mt-2">
+                                    <i class="fa fa-shield-alt me-1"></i>
+                                    密钥仅对管理员可用，用于保护数据库配置安全
+                                </div>
+                            </div>
+
+                            <!-- 按钮 -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary btn-lg shadow-sm px-5 py-3 position-relative overflow-hidden" @onclick="ValidateSetupKey">
+                                    <span class="position-relative d-inline-flex align-items-center justify-content-center w-100">
+                                        <i class="fa fa-unlock-alt me-2 fa-lg"></i>
+                                        <span class="fw-semibold">验证并继续</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 卡片底部 -->
+                        <div class="card-footer bg-light py-3 text-center text-muted small rounded-bottom-3">
+                            <i class="fa fa-user-shield me-2"></i>
+                            此页面受到访问保护，仅授权人员可访问
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 安全提示 -->
+                <div class="text-center mt-4 text-white text-opacity-75 small">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <i class="fa fa-shield-alt me-2"></i>
+                        <span>安全连接 | @DateTime.Now.ToString("yyyy年MM月dd日 HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isAuthorized = false;
+    private string _enteredKey = "";
+    private string _errorMessage = "";
+
+    protected override void OnInitialized()
+    {
+        // 检查URL中是否有setupKey参数
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("setupKey", out var keyFromUrl))
+        {
+            ValidateKey(keyFromUrl);
+        }
+    }
+
+    private void ValidateSetupKey()
+    {
+        ValidateKey(_enteredKey);
+    }
+
+    private void ValidateKey(string? keyToValidate)
+    {
+        // 检查是否启用密钥验证
+        bool enableSetupKeyValidation = Configuration.GetValue<bool>("DatabaseManagement:EnableSetupKeyValidation", true);
+        if (!enableSetupKeyValidation)
+        {
+            _isAuthorized = true;
+            _errorMessage = "";
+            return;
+        }
+
+        // 从配置文件或环境变量获取正确的密钥
+        var correctKey = Configuration["DatabaseManagement:SetupKey"];
+        if (string.IsNullOrEmpty(correctKey))
+        {
+            _errorMessage = "系统未配置管理密钥，无法访问数据库管理功能";
+            return;
+        }
+
+        if (keyToValidate == correctKey)
+        {
+            _isAuthorized = true;
+            _errorMessage = "";
+        }
+        else
+        {
+            _errorMessage = "密钥无效，请重试";
+            _isAuthorized = false;
+        }
+    }
+
+    // 添加按键事件处理函数
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            ValidateSetupKey();
+        }
+    }
+
+}
+
+

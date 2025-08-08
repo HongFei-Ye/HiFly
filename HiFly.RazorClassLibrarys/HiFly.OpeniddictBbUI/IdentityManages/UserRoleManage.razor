@@ -1,0 +1,69 @@
+﻿@inject IRoleService RoleService
+@inject IUserService UserService
+
+@typeparam TContext
+@typeparam TItem
+@typeparam TRole
+@typeparam TUser
+
+<PageTitle>用户角色数据</PageTitle>
+
+<TItemTable TContext="TContext" TItem="TItem"
+            @ref="TableRef" SelectedRows="@SelectedRows" IsDialog="@IsDialog"
+            PropertyFilterParameters="@PropertyFilterParameters">
+
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.UserId" Text="用户名" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@UserService.GetUserNameById(value.Value)</div>
+            </Template>
+             <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <UserVirtualizeSelect TContext="@TContext" TUser="@TUser" @bind-Value="@value.UserId"></UserVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <UserIdFilter TContext="@TContext" TUser="@TUser"></UserIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+        <TableColumn @bind-Field="@context.RoleId" Text="角色名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@RoleService.GetRoleShowNameById(value.Value ?? "")</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <RoleVirtualizeSelect TContext="TContext" TRole="TRole" @bind-Value="@value.RoleId"></RoleVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <RoleIdFilter TContext="TContext" TRole="TRole"></RoleIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+        <TableColumn @bind-Field="@context.SuperiorUserId" Text="上级用户" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@UserService.GetUserNameById(value.Value ?? "")</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <UserVirtualizeSelect TContext="@TContext" TUser="@TUser" @bind-Value="@value.SuperiorUserId" DisplayText="上级用户"></UserVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <UserIdFilter TContext="@TContext" TUser="@TUser"></UserIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+
+    </TableColumns>
+
+
+
+</TItemTable>
+
+
+
+
+

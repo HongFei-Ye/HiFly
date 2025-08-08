@@ -1,0 +1,362 @@
+/* 建议分类组件样式 - 现代化设计 */
+.suggestion-category {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: categorySlideIn 0.6s ease-out;
+}
+
+.suggestion-category:nth-child(even) {
+    animation-delay: 0.1s;
+}
+
+.suggestion-category:nth-child(odd) {
+    animation-delay: 0.2s;
+}
+
+.suggestion-category:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+        0 16px 40px rgba(0, 0, 0, 0.1),
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border-color: rgba(102, 126, 234, 0.2);
+}
+
+@keyframes categorySlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.header-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.header-icon i {
+    position: relative;
+    z-index: 1;
+}
+
+.icon-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.suggestion-category:hover .icon-glow {
+    opacity: 1;
+}
+
+.header-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #2d3748;
+    flex: 1;
+    line-height: 1.2;
+}
+
+.header-decoration {
+    flex: 1;
+    height: 1px;
+    position: relative;
+    margin-left: 1rem;
+}
+
+.decoration-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(102, 126, 234, 0.3), 
+        rgba(102, 126, 234, 0.1), 
+        transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: lineGrow 1s ease-out 0.5s forwards;
+}
+
+@keyframes lineGrow {
+    to { transform: scaleX(1); }
+}
+
+.category-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 2;
+}
+
+.category-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.background-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.02) 0%, 
+        rgba(118, 75, 162, 0.02) 50%, 
+        rgba(64, 153, 255, 0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.suggestion-category:hover .background-gradient {
+    opacity: 1;
+}
+
+.background-pattern {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 4px;
+}
+
+.pattern-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    animation: dotFloat 3s ease-in-out infinite;
+}
+
+.pattern-dot:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.pattern-dot:nth-child(3) {
+    animation-delay: 1s;
+}
+
+@keyframes dotFloat {
+    0%, 100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .suggestion-category {
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+    
+    .header-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+    
+    .header-title {
+        font-size: 0.95rem;
+    }
+    
+    .header-decoration {
+        margin-left: 0.75rem;
+    }
+    
+    .category-suggestions {
+        gap: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .suggestion-category {
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    
+    .category-header {
+        gap: 0.6rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .header-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+    
+    .header-title {
+        font-size: 0.9rem;
+    }
+    
+    .header-decoration {
+        margin-left: 0.5rem;
+    }
+    
+    .category-suggestions {
+        gap: 0.5rem;
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .suggestion-category {
+    background: rgba(45, 55, 72, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .suggestion-category:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 
+        0 16px 40px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .header-title {
+    color: #e2e8f0;
+}
+
+body.dark-theme .decoration-line {
+    background: linear-gradient(90deg, 
+        rgba(102, 126, 234, 0.4), 
+        rgba(102, 126, 234, 0.2), 
+        transparent);
+}
+
+body.dark-theme .background-gradient {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.05) 0%, 
+        rgba(118, 75, 162, 0.05) 50%, 
+        rgba(64, 153, 255, 0.05) 100%);
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .suggestion-category {
+        animation: none !important;
+    }
+    
+    .decoration-line {
+        transform: scaleX(1);
+        animation: none !important;
+    }
+    
+    .pattern-dot {
+        animation: none !important;
+        opacity: 0.5;
+    }
+    
+    .suggestion-category:hover {
+        transform: none;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .suggestion-category {
+        border: 2px solid #667eea;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .header-icon {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header-title {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-theme .suggestion-category {
+        border-color: #667eea;
+        background: rgba(45, 55, 72, 0.95);
+    }
+}
+
+/* 性能优化 */
+.suggestion-category {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* 焦点可访问性 */
+.suggestion-category:focus-within {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 打印样式 */
+@media print {
+    .suggestion-category {
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+    
+    .background-gradient,
+    .background-pattern {
+        display: none;
+    }
+    
+    .header-icon {
+        background: #667eea;
+        box-shadow: none;
+    }
+}

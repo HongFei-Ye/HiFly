@@ -1,0 +1,349 @@
+/* 建议芯片组件样式 - 现代化设计 */
+.suggestion-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    border-radius: 12px;
+    color: #4a5568;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.suggestion-chip:hover {
+    transform: translateX(4px);
+    background: rgba(102, 126, 234, 0.05);
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 
+        0 8px 24px rgba(102, 126, 234, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+    color: #667eea;
+}
+
+.suggestion-chip:active {
+    transform: translateX(2px) scale(0.98);
+}
+
+.suggestion-chip:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.chip-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.background-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.1) 0%, 
+        rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.suggestion-chip:hover .background-glow {
+    opacity: 1;
+}
+
+.background-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.suggestion-chip:hover .background-shine {
+    left: 100%;
+}
+
+.chip-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.suggestion-text {
+    flex: 1;
+    line-height: 1.4;
+    margin-right: 0.75rem;
+}
+
+.chip-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 0.75rem;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.suggestion-chip:hover .chip-icon {
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.icon-trail {
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea);
+    transition: width 0.3s ease;
+}
+
+.suggestion-chip:hover .icon-trail {
+    width: 8px;
+}
+
+.chip-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.suggestion-chip:active .chip-ripple {
+    width: 100px;
+    height: 100px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .suggestion-chip {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.85rem;
+        border-radius: 10px;
+    }
+    
+    .chip-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .suggestion-text {
+        margin-right: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .suggestion-chip {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    
+    .chip-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+    
+    .suggestion-text {
+        margin-right: 0.5rem;
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .suggestion-chip {
+    background: rgba(45, 55, 72, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #cbd5e0;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-theme .suggestion-chip:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.4);
+    color: #90cdf4;
+    box-shadow: 
+        0 8px 24px rgba(102, 126, 234, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-theme .background-glow {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.15) 0%, 
+        rgba(118, 75, 162, 0.15) 100%);
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .suggestion-chip {
+        transition: none !important;
+    }
+    
+    .suggestion-chip:hover {
+        transform: none;
+    }
+    
+    .suggestion-chip:active {
+        transform: none;
+    }
+    
+    .background-shine,
+    .chip-icon,
+    .icon-trail,
+    .chip-ripple {
+        transition: none !important;
+    }
+    
+    .suggestion-chip:hover .background-shine {
+        left: -100%;
+    }
+    
+    .suggestion-chip:hover .chip-icon {
+        transform: none;
+    }
+    
+    .suggestion-chip:hover .icon-trail {
+        width: 0;
+    }
+    
+    .suggestion-chip:active .chip-ripple {
+        width: 0;
+        height: 0;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .suggestion-chip {
+        background: white;
+        border: 2px solid #667eea;
+        color: #2d3748;
+    }
+    
+    .suggestion-chip:hover {
+        background: #f7fafc;
+        border-color: #4299e1;
+        color: #2b6cb0;
+    }
+    
+    .chip-icon {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.dark-theme .suggestion-chip {
+        background: #2d3748;
+        border-color: #667eea;
+        color: #e2e8f0;
+    }
+    
+    body.dark-theme .suggestion-chip:hover {
+        background: #4a5568;
+        border-color: #90cdf4;
+        color: #e2e8f0;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) {
+    .suggestion-chip:hover {
+        transform: none;
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(102, 126, 234, 0.1);
+        color: #4a5568;
+        box-shadow: 
+            0 2px 8px rgba(0, 0, 0, 0.04),
+            0 1px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .suggestion-chip:hover .background-glow {
+        opacity: 0;
+    }
+    
+    .suggestion-chip:hover .background-shine {
+        left: -100%;
+    }
+    
+    .suggestion-chip:hover .chip-icon {
+        transform: none;
+    }
+    
+    .suggestion-chip:hover .icon-trail {
+        width: 0;
+    }
+    
+    body.dark-theme .suggestion-chip:hover {
+        background: rgba(45, 55, 72, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #cbd5e0;
+    }
+}
+
+/* 性能优化 */
+.suggestion-chip {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* 打印样式 */
+@media print {
+    .suggestion-chip {
+        background: white;
+        border: 1px solid #ccc;
+        color: #000;
+        box-shadow: none;
+        break-inside: avoid;
+        margin-bottom: 0.5rem;
+    }
+    
+    .chip-background,
+    .chip-ripple {
+        display: none;
+    }
+    
+    .chip-icon {
+        background: #667eea;
+        box-shadow: none;
+    }
+}

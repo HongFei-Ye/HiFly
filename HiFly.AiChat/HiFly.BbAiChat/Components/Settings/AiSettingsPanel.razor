@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components
+@using BootstrapBlazor.Components
+
+<div class="ai-chat-right-panel" style="width: @Width">
+    @if (SettingsTemplate != null)
+    {
+        @SettingsTemplate
+    }
+    else
+    {
+        <div class="default-right-panel">
+            
+            <!-- 可滚动的设置内容区域 -->
+            <div class="settings-content">
+                <!-- 模型设置区域 -->
+                <ModelSettingsSection AvailableModels="@AvailableModels"
+                                       SelectedModel="@SelectedModel"
+                                       SelectedModelChanged="@SelectedModelChanged"
+                                       Temperature="@Temperature"
+                                       TemperatureChanged="@TemperatureChanged"
+                                       MaxTokens="@MaxTokens"
+                                       MaxTokensChanged="@MaxTokensChanged" />
+
+                <!-- 高级设置区域 -->
+                <AdvancedSettingsSection EnableMemory="@EnableMemory"
+                                          EnableMemoryChanged="@EnableMemoryChanged"
+                                          EnableStreaming="@EnableStreaming"
+                                          EnableStreamingChanged="@EnableStreamingChanged"
+                                          AdditionalSettings="@AdvancedSettingsTemplate" />
+                                          
+                @if (AdditionalSections != null)
+                {
+                    @AdditionalSections
+                }
+            </div>
+
+            <!-- 快捷操作区域 - 固定在底部 -->
+            <QuickActionsSection OnExportChat="@OnExportChat"
+                                 OnShareChat="@OnShareChat"
+                                 OnToggleTheme="@OnToggleTheme"
+                                 OnResetSettings="@OnResetSettings"
+                                 AdditionalActions="@QuickActionsTemplate" />
+
+        </div>
+    }
+</div>

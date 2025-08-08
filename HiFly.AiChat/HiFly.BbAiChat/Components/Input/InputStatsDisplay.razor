@@ -1,0 +1,14 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="input-stats @GetWarningClass()" @onclick="OnClick" @onclick:stopPropagation="true" title="@GetTooltipText()">
+    <span class="char-count">
+        @CurrentLength/@MaxLength
+    </span>
+    @if (ShowProgress)
+    {
+        <div class="char-progress">
+            <div class="char-progress-bar" style="width: @ProgressPercentage%"></div>
+        </div>
+    }
+</div>

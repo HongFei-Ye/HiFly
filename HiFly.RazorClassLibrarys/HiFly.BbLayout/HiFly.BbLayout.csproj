@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BootstrapBlazor" Version="9.8.1" />
+    <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HiFly.ClassLibrarys\HiFly.DatabaseManager\HiFly.DatabaseManager.csproj" />
+    <ProjectReference Include="..\..\HiFly.ClassLibrarys\HiFly.Openiddict\HiFly.Openiddict.csproj" />
+  </ItemGroup>
+
+</Project>

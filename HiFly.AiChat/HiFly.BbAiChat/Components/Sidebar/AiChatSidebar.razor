@@ -1,0 +1,64 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components
+@using HiFly.BbAiChat.Components.Sidebar
+
+<div @ref="_sidebarElement" 
+     class="ai-chat-left-panel @(IsCollapsed ? "collapsed" : "") @(EnableWidthResize ? "resizable" : "")" 
+     style="width: @_actualWidth; min-width: @(IsCollapsed ? CollapsedWidth : MinWidth + "px"); max-width: @(IsCollapsed ? CollapsedWidth : MaxWidth + "px");">
+    
+    @if (SidebarTemplate != null)
+    {
+        @SidebarTemplate
+    }
+    else
+    {
+        <div class="default-left-panel">
+            <!-- 顶部工具栏组件 -->
+            <SidebarToolbar IsCollapsed="IsCollapsed"
+                          OnNewChat="HandleNewChat"
+                          OnToggleCollapse="HandleToggleCollapse">
+                <!-- 宽度控制组件作为子内容 -->
+                <SidebarWidthControls EnableWidthResize="EnableWidthResize"
+                                    CurrentWidth="Width"
+                                    WidthPresets="WidthPresets"
+                                    OnWidthPresetSelected="HandleWidthPresetSelected" />
+            </SidebarToolbar>
+
+            @if (!IsCollapsed)
+            {
+                <!-- 展开状态：会话列表组件 -->
+                <SessionsList Sessions="Sessions"
+                            CurrentSessionId="CurrentSessionId"
+                            OnSessionSelected="HandleSessionSelected"
+                            OnEditSession="HandleEditSession"
+                            OnDeleteSession="HandleDeleteSession"
+                            OnNewChat="HandleNewChat" />
+
+                <!-- 底部统计信息组件 -->
+                <SidebarStats MessageCount="MessageCount"
+                            SessionCount="Sessions.Count"
+                            SessionDuration="@GetSessionDuration()"
+                            TokensUsed="@GetTokensUsed()" />
+            }
+            else
+            {
+                <!-- 折叠状态：紧凑视图组件 -->
+                <CollapsedSessionsView Sessions="Sessions"
+                                     CurrentSessionId="CurrentSessionId"
+                                     MaxVisibleSessions="_maxVisibleSessions"
+                                     OnSessionSelected="HandleSessionSelected"
+                                     OnNewChat="HandleNewChat" />
+            }
+        </div>
+    }
+    
+    <!-- 宽度调整手柄组件 -->
+    <SidebarResizeHandle EnableWidthResize="EnableWidthResize"
+                       ShowResizeHandle="ShowResizeHandle"
+                       IsCollapsed="IsCollapsed"
+                       MinWidth="MinWidth"
+                       MaxWidth="MaxWidth"
+                       SidebarElement="_sidebarElement"
+                       OnWidthChanged="HandleResizeWidthChanged"
+                       @ref="_resizeHandleComponent" />
+</div>

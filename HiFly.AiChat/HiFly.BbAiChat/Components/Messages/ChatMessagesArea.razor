@@ -1,0 +1,39 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components.Messages.MessageItem
+@using HiFly.BbAiChat.Components.Messages.EmptyState
+@using HiFly.BbAiChat.Components.Messages.LoadingIndicator
+@using HiFly.BbAiChat.Components.Messages.Avatar
+
+<!-- 对话消息区域 - 重构后使用子组件 -->
+<div class="chat-messages" @ref="messagesContainer">
+    @if (Messages.Any())
+    {
+        @foreach (var message in Messages)
+        {
+            <MessageItem Message="@message"
+                        IsLoading="false"
+                        OnCopyMessage="HandleCopyMessage"
+                        OnRegenerateResponse="HandleRegenerateResponse"
+                        OnLikeMessage="HandleLikeMessage" />
+        }
+    }
+    else
+    {
+        <EmptyMessage Title="开始新的对话"
+                     Description="我是您的AI助手，准备为您提供帮助"
+                     ShowSuggestions="true"
+                     OnSuggestionClick="HandleSetQuickMessage" />
+    }
+
+    @if (IsLoading)
+    {
+        <div class="message ai-message loading">
+            <MessageAvatar IsUser="false" IsLoading="true" />
+            <div class="message-bubble loading">
+                <div class="bubble-container">
+                    <TypingIndicator Text="AI正在思考中..." />
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="settings-group enhanced @GetCssClass()">
+    <label class="enhanced-label">
+        @if (!string.IsNullOrEmpty(IconClass))
+        {
+            <span class="label-icon">
+                <i class="@IconClass"></i>
+            </span>
+        }
+        <span class="label-text">@Label</span>
+        @if (!string.IsNullOrEmpty(BadgeText))
+        {
+            <span class="label-badge">@BadgeText</span>
+        }
+        @if (!string.IsNullOrEmpty(ValueText))
+        {
+            <span class="label-value">@ValueText</span>
+        }
+    </label>
+    
+    <div class="setting-control">
+        @ChildContent
+    </div>
+    
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <div class="setting-description">
+            @Description
+        </div>
+    }
+</div>
+

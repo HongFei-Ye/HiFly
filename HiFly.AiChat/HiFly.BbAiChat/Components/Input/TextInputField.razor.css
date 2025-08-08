@@ -1,0 +1,195 @@
+﻿/* ===========================================
+   智能文本输入框组件样式
+   =========================================== */
+
+.input-field {
+    flex: 1;
+    position: relative;
+    cursor: text;
+    min-height: 24px;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-input-enhanced {
+    width: 100%;
+    border: none;
+    background: transparent;
+    resize: none;
+    outline: none;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #2d3748;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 24px;
+    max-height: 144px; /* 6行的高度 */
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    pointer-events: auto;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    cursor: text;
+    -webkit-touch-callout: default;
+    -webkit-user-modify: read-write;
+    box-sizing: border-box;
+    transition: height 0.2s ease;
+    overflow-x: hidden;
+}
+
+.chat-input-enhanced::placeholder {
+    color: #a0aec0;
+    opacity: 1;
+}
+
+/* 自定义滚动条 */
+.chat-input-enhanced::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-input-enhanced::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-input-enhanced::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 3px;
+}
+
+.chat-input-enhanced::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
+}
+
+/* 在输入过程中的特殊样式 */
+.chat-input-enhanced:focus {
+    outline: none;
+    transition: height 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 文本选择样式 */
+.chat-input-enhanced::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: inherit;
+}
+
+.chat-input-enhanced::-moz-selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: inherit;
+}
+
+.chat-input-enhanced:focus::selection {
+    background: rgba(102, 126, 234, 0.4);
+    color: inherit;
+}
+
+.chat-input-enhanced:focus::-moz-selection {
+    background: rgba(102, 126, 234, 0.4);
+    color: inherit;
+}
+
+/* 输入框边框和光效 */
+.input-border,
+.input-glow {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    z-index: -1;
+}
+
+.input-border {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.1) 0%, 
+        rgba(102, 126, 234, 0.05) 50%, 
+        rgba(102, 126, 234, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.input-field:focus-within .input-border {
+    opacity: 1;
+}
+
+.input-glow {
+    background: radial-gradient(circle at center, 
+        rgba(102, 126, 234, 0.1) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.input-field:focus-within .input-glow {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ===========================================
+   暗色主题支持
+   =========================================== */
+
+body.dark-theme .chat-input-enhanced {
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-input-enhanced::placeholder {
+    color: #718096;
+}
+
+body.dark-theme .chat-input-enhanced::selection {
+    background: rgba(102, 126, 234, 0.4);
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-input-enhanced::-moz-selection {
+    background: rgba(102, 126, 234, 0.4);
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-input-enhanced:focus::selection {
+    background: rgba(102, 126, 234, 0.5);
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-input-enhanced:focus::-moz-selection {
+    background: rgba(102, 126, 234, 0.5);
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-input-enhanced::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .chat-input-enhanced::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===========================================
+   响应式设计
+   =========================================== */
+
+@media (max-width: 768px) {
+    .chat-input-enhanced {
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+}
+
+/* ===========================================
+   可访问性增强
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-input-enhanced,
+    .input-border,
+    .input-glow {
+        transition: none;
+        animation: none;
+    }
+}

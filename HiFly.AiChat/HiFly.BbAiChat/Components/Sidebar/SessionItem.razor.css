@@ -1,0 +1,277 @@
+/* 会话项组件样式 - 完全匹配原版设计 */
+.chat-session-item {
+    position: relative;
+    margin-bottom: 0.5rem;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    group: hover;
+}
+
+.session-item-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.chat-session-item:hover .session-item-bg {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.chat-session-item.active .session-item-bg {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: #667eea;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* 左侧活跃指示器 - 匹配原版设计 */
+.session-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 4px;
+    height: 0;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0 4px 4px 0;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+}
+
+.chat-session-item.active .session-indicator {
+    height: 60%;
+}
+
+.session-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.session-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.chat-session-item:hover .session-icon,
+.chat-session-item.active .session-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.1);
+    border-color: transparent;
+}
+
+.session-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.session-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+.chat-session-item.active .session-title {
+    color: #667eea;
+}
+
+.session-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.session-time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.session-time i {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+/* 会话操作按钮 */
+.session-actions {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.chat-session-item:hover .session-actions {
+    opacity: 1;
+}
+
+.session-action-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.2s ease;
+}
+
+.session-action-btn.edit-btn {
+    background: rgba(52, 144, 220, 0.1);
+    color: #3490dc;
+}
+
+.session-action-btn.edit-btn:hover {
+    background: #3490dc;
+    color: white;
+    transform: scale(1.1);
+}
+
+.session-action-btn.delete-btn {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.session-action-btn.delete-btn:hover {
+    background: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 暗色主题支持 */
+body.dark-theme .session-item-bg {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .chat-session-item:hover .session-item-bg {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .chat-session-item.active .session-item-bg {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border-color: #667eea;
+}
+
+body.dark-theme .session-title {
+    color: #e2e8f0;
+}
+
+body.dark-theme .chat-session-item.active .session-title {
+    color: #667eea;
+}
+
+body.dark-theme .session-time {
+    color: #a0aec0;
+}
+
+body.dark-theme .session-icon {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: rgba(102, 126, 234, 0.2);
+}
+
+body.dark-theme .chat-session-item:hover .session-icon,
+body.dark-theme .chat-session-item.active .session-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* 性能优化 */
+.chat-session-item {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    .session-indicator {
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .chat-session-item,
+    .session-icon,
+    .session-indicator {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* 焦点样式 */
+.chat-session-item:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: -2px;
+}
+
+.session-action-btn:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .session-content {
+        padding: 0.875rem 1rem;
+    }
+
+    .session-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .session-title {
+        font-size: 0.85rem;
+    }
+
+    .session-time {
+        font-size: 0.7rem;
+    }
+
+    .session-actions {
+        opacity: 1; /* 在移动端始终显示操作按钮 */
+    }
+
+    .session-action-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+}

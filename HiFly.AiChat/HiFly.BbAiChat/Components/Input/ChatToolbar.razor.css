@@ -1,0 +1,179 @@
+﻿/* ===========================================
+   工具栏组件样式
+   =========================================== */
+
+.chat-toolbar {
+    margin-bottom: 1rem;
+}
+
+.default-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 0 0 auto;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 0 0 auto;
+}
+
+/* 左侧工具栏子区域 */
+.toolbar-left-primary, 
+.toolbar-left-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* 左侧主要功能区 - 文件操作类 */
+.toolbar-left-primary {
+    position: relative;
+}
+
+.toolbar-left-primary::after {
+    content: '';
+    position: absolute;
+    right: -0.75rem;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(102, 126, 234, 0.2) 20%, 
+        rgba(102, 126, 234, 0.2) 80%, 
+        transparent 100%);
+}
+
+/* 工具栏按钮基础样式 */
+.toolbar-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.toolbar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.toolbar-btn:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+/* AI增强功能按钮特殊样式 */
+.toolbar-btn.deep-think-btn {
+    background: rgba(138, 43, 226, 0.1);
+    border-color: rgba(138, 43, 226, 0.2);
+    color: #8a2be2;
+}
+
+.toolbar-btn.deep-think-btn:hover:not(:disabled) {
+    background: rgba(138, 43, 226, 0.2);
+    border-color: rgba(138, 43, 226, 0.3);
+    box-shadow: 0 6px 20px rgba(138, 43, 226, 0.3);
+}
+
+.toolbar-btn.web-search-btn {
+    background: rgba(34, 139, 34, 0.1);
+    border-color: rgba(34, 139, 34, 0.2);
+    color: #228b22;
+}
+
+.toolbar-btn.web-search-btn:hover:not(:disabled) {
+    background: rgba(34, 139, 34, 0.2);
+    border-color: rgba(34, 139, 34, 0.3);
+    box-shadow: 0 6px 20px rgba(34, 139, 34, 0.3);
+}
+
+/* 工具栏按钮光效 */
+.toolbar-btn-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(102, 126, 234, 0.3) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    border-radius: 12px;
+}
+
+.toolbar-btn:hover .toolbar-btn-bg {
+    transform: translateX(100%);
+}
+
+/* 按钮提示工具栏 */
+.btn-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3748;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    margin-bottom: 0.5rem;
+}
+
+.btn-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #2d3748;
+}
+
+.toolbar-btn:hover .btn-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+/* 工具栏状态区域 */
+.toolbar-status {
+    display: flex;
+    align-items: center;
+}
+
+.input-hint {
+    font-size: 0.75rem;
+    color: #a0aec0;
+    font-style: italic;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.input-hint:hover {
+    opacity: 1;
+}

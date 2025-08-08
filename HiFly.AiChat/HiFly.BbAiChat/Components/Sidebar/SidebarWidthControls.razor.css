@@ -1,0 +1,417 @@
+/* SidebarWidthControls 组件样式 - 最终版本 + 增强优先级 */
+
+/* 基础样式 */
+.width-controls {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.width-preset-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.width-preset-btn:hover,
+.width-preset-btn.active {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+/* 添加动态指示器 */
+.width-preset-btn::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #667eea;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.width-preset-btn.active::before {
+    opacity: 1;
+    transform: scale(1);
+    animation: pulse-indicator 2s infinite;
+}
+
+@keyframes pulse-indicator {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+/* 宽度预设菜单 */
+.width-preset-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 220px;
+    overflow: hidden;
+    animation: slideIn 0.2s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 增强菜单头部样式 */
+.preset-menu-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+.preset-menu-header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.5) 50%, transparent 100%);
+}
+
+.preset-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preset-title::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M20.5 6H3.5C3.224 6 3 6.224 3 6.5S3.224 7 3.5 7H20.5C20.776 7 21 6.776 21 6.5S20.776 6 20.5 6zM20.5 11H3.5C3.224 11 3 11.224 3 11.5S3.224 12 3.5 12H20.5C20.776 12 21 11.776 21 11.5S20.776 11 20.5 11zM20.5 16H3.5C3.224 16 3 16.224 3 16.5S3.224 17 3.5 17H20.5C20.776 17 21 16.776 21 16.5S20.776 16 20.5 16z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+/* 增强当前宽度显示 */
+.current-width {
+    font-size: 0.8rem;
+    color: #667eea;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    position: relative;
+    overflow: hidden;
+    min-width: 55px;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
+}
+
+/* 添加闪烁效果 */
+.current-width::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* 增强预设选项样式 */
+.preset-options {
+    padding: 8px 0;
+}
+
+.preset-option {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #495057;
+    font-size: 0.85rem;
+    position: relative;
+    border-left: 3px solid transparent;
+}
+
+.preset-option:hover {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.02) 100%);
+    transform: translateX(2px);
+    border-left-color: rgba(102, 126, 234, 0.3);
+}
+
+/* ?? 关键的活跃状态样式 - 使用多重选择器确保最高优先级 */
+.width-controls .preset-option.active,
+.width-preset-menu .preset-option.active,
+.width-controls .width-preset-menu .preset-option.active,
+button.preset-option.active {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+    color: #667eea !important;
+    border-left: 4px solid #667eea !important;
+    font-weight: 600 !important;
+    transform: translateX(6px) !important;
+    box-shadow: inset 0 1px 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+/* 增强对勾标记 - 多重选择器 */
+.width-controls .preset-option.active::after,
+.width-preset-menu .preset-option.active::after,
+button.preset-option.active::after {
+    content: '?' !important;
+    margin-left: auto !important;
+    color: #667eea !important;
+    font-weight: bold !important;
+    font-size: 0.9rem !important;
+    animation: sparkle 1.5s infinite !important;
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.preset-name {
+    flex: 1;
+    text-align: left;
+    font-weight: 500;
+}
+
+/* 活跃状态下的preset-name样式 - 多重选择器 */
+.width-controls .preset-option.active .preset-name,
+.width-preset-menu .preset-option.active .preset-name,
+button.preset-option.active .preset-name {
+    font-weight: 600 !important;
+    color: #667eea !important;
+}
+
+.preset-width {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* 活跃状态下的preset-width样式 - 多重选择器 */
+.width-controls .preset-option.active .preset-width,
+.width-preset-menu .preset-option.active .preset-width,
+button.preset-option.active .preset-width {
+    background: rgba(102, 126, 234, 0.2) !important;
+    color: #667eea !important;
+    font-weight: 600 !important;
+}
+
+/* 添加图标增强 */
+.preset-option i {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+/* 活跃状态下的图标样式 - 多重选择器 */
+.width-controls .preset-option.active i,
+.width-preset-menu .preset-option.active i,
+button.preset-option.active i {
+    color: #667eea !important;
+    transform: scale(1.1) !important;
+}
+
+/* ?? 最强优先级的活跃状态样式 - 确保在各种情况下都能生效 */
+.width-controls .width-preset-menu .preset-options .preset-option.active,
+.ai-chat-left-panel .width-controls .preset-option.active,
+div.width-controls div.width-preset-menu button.preset-option.active {
+    border-left: 4px solid #667eea !important;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+    color: #667eea !important;
+    transform: translateX(6px) !important;
+    font-weight: 600 !important;
+    box-shadow: inset 0 1px 3px rgba(102, 126, 234, 0.1), 0 2px 8px rgba(102, 126, 234, 0.15) !important;
+}
+
+/* 暗色主题支持 */
+body.dark-theme .width-preset-menu {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+body.dark-theme .preset-menu-header {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .preset-menu-header::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.7) 50%, transparent 100%);
+}
+
+body.dark-theme .preset-title {
+    color: #e2e8f0;
+}
+
+body.dark-theme .current-width {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+    border-color: rgba(102, 126, 234, 0.4);
+    color: #90cdf4;
+    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.3);
+}
+
+body.dark-theme .preset-option {
+    color: #e2e8f0;
+}
+
+body.dark-theme .preset-option:hover {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+    border-left-color: rgba(102, 126, 234, 0.5);
+}
+
+/* 暗色主题下的活跃状态 - 多重选择器 */
+body.dark-theme .width-controls .preset-option.active,
+body.dark-theme .width-preset-menu .preset-option.active,
+body.dark-theme button.preset-option.active {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.2) 100%) !important;
+    color: #90cdf4 !important;
+    border-left-color: #90cdf4 !important;
+}
+
+body.dark-theme .width-controls .preset-option.active::after,
+body.dark-theme .width-preset-menu .preset-option.active::after,
+body.dark-theme button.preset-option.active::after {
+    color: #90cdf4 !important;
+}
+
+body.dark-theme .preset-width {
+    color: #a0aec0;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .width-controls .preset-option.active .preset-width,
+body.dark-theme .width-preset-menu .preset-option.active .preset-width,
+body.dark-theme button.preset-option.active .preset-width {
+    background: rgba(102, 126, 234, 0.2) !important;
+    color: #90cdf4 !important;
+}
+
+body.dark-theme .width-preset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+}
+
+body.dark-theme .width-preset-btn:hover,
+body.dark-theme .width-preset-btn.active {
+    background: rgba(102, 126, 234, 0.2);
+    color: #90cdf4;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+body.dark-theme .width-preset-btn.active::before {
+    background: #90cdf4;
+}
+
+body.dark-theme .preset-option i {
+    color: #a0aec0;
+}
+
+body.dark-theme .width-controls .preset-option.active i,
+body.dark-theme .width-preset-menu .preset-option.active i,
+body.dark-theme button.preset-option.active i {
+    color: #90cdf4 !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .width-preset-menu {
+        min-width: 180px;
+        right: -10px;
+    }
+    
+    .preset-option {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    
+    .current-width {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+}
+
+/* 无障碍支持 */
+.preset-option:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: -2px;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+/* 性能优化 */
+.preset-option,
+.width-preset-btn,
+.current-width {
+    will-change: transform, background-color;
+    backface-visibility: hidden;
+}

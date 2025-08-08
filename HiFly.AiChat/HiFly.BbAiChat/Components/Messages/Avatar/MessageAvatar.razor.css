@@ -1,0 +1,124 @@
+/* 消息头像组件样式 */
+.message-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-container {
+    position: relative;
+}
+
+.user-avatar, .ai-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-avatar {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+.ai-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.avatar-ring {
+    position: absolute;
+    inset: -3px;
+    border: 2px solid #4299e1;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: ring-pulse 2s infinite;
+}
+
+@keyframes ring-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.ai-glow {
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: ai-glow 3s linear infinite;
+    background-size: 300% 300%;
+}
+
+@keyframes ai-glow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.ai-pulse {
+    position: absolute;
+    inset: -8px;
+    border: 2px solid #667eea;
+    border-radius: 50%;
+    animation: ai-pulse 2s infinite;
+}
+
+@keyframes ai-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+.ai-avatar.loading .ai-pulse.loading-pulse {
+    animation: ai-pulse 1s infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .user-avatar, .ai-avatar {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .ai-glow,
+    .ai-pulse,
+    .avatar-ring {
+        animation: none !important;
+    }
+}
+
+/* 性能优化 */
+.ai-glow,
+.ai-pulse,
+.avatar-ring {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    .ai-glow,
+    .ai-pulse,
+    .avatar-ring {
+        transform-style: preserve-3d;
+    }
+}

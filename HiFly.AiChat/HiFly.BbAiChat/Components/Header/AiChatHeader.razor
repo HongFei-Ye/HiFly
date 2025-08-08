@@ -1,0 +1,38 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="ai-chat-header">
+    @if (HeaderTemplate != null)
+    {
+        @HeaderTemplate
+    }
+    else
+    {
+        <div class="default-header">
+            <div class="header-left">
+                <div class="app-branding">
+                    <div class="app-icon" title="@Title">
+                        <i class="fas fa-robot"></i>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <div class="app-info">
+                        <h4 class="app-title">@Title</h4>
+                        <span class="app-subtitle">@Subtitle</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="header-action-btn settings-btn @(ShowSettingsPanel ? "close-state" : "")" 
+                            @onclick="HandleToggleSettings" 
+                            title="@GetSettingsButtonTitle()">
+                        <div class="btn-bg"></div>
+                        <i class="@GetSettingsButtonIcon()"></i>
+                        <span class="btn-text">@GetSettingsButtonText()</span>
+                        <div class="btn-ripple"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

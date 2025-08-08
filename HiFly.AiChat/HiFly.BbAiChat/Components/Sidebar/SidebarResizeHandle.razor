@@ -1,0 +1,80 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+
+@if (EnableWidthResize && ShowResizeHandle && !IsCollapsed)
+{
+    <div class="sidebar-resize-handle" title="拖拽调整面板宽度" @ref="_resizeHandleElement">
+        <div class="resize-handle-bar"></div>
+        <div class="resize-handle-dots">
+            <div class="handle-dot"></div>
+            <div class="handle-dot"></div>
+            <div class="handle-dot"></div>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 是否启用宽度调整
+    /// </summary>
+    [Parameter]
+    public bool EnableWidthResize { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示调整手柄
+    /// </summary>
+    [Parameter]
+    public bool ShowResizeHandle { get; set; } = true;
+
+    /// <summary>
+    /// 是否处于折叠状态
+    /// </summary>
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+
+    /// <summary>
+    /// 最小宽度
+    /// </summary>
+    [Parameter]
+    public int MinWidth { get; set; } = 200;
+
+    /// <summary>
+    /// 最大宽度
+    /// </summary>
+    [Parameter]
+    public int MaxWidth { get; set; } = 500;
+
+    /// <summary>
+    /// 父容器元素引用
+    /// </summary>
+    [Parameter]
+    public ElementReference SidebarElement { get; set; }
+
+    /// <summary>
+    /// 宽度变化回调
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnWidthChanged { get; set; }
+
+    private ElementReference _resizeHandleElement;
+
+    /// <summary>
+    /// JavaScript 回调方法：处理宽度变化
+    /// </summary>
+    [JSInvokable]
+    public async Task HandleWidthChanged(int newWidth)
+    {
+        if (OnWidthChanged.HasDelegate)
+        {
+            await OnWidthChanged.InvokeAsync(newWidth);
+        }
+    }
+
+    /// <summary>
+    /// 获取组件的 DotNet 引用
+    /// </summary>
+    public DotNetObjectReference<SidebarResizeHandle> GetDotNetReference()
+    {
+        return DotNetObjectReference.Create(this);
+    }
+}

@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+@inject FullPicDataService FullPicDataService
+
+<link rel="stylesheet" href="./_content/HiFly.RippleSpa/css/style.css" />
+
+<div class="preloader loaded">
+    <div class="preloader-body">
+        <div class="cssload-container">
+            <div class="cssload-speeding-wheel"></div>
+        </div>
+        <p>@FullPicDataService.LoadingText</p>
+    </div>
+</div>
+
+<section class="section section-xxl context-dark bg-image section-context-styling section-ripples-full" id="section-ripples-1" style="background-image: url(@FullPicDataService.BackGroundImage);">
+        <div class="container ">
+            <div class="row justify-content-end">
+                <div class="col-lg-6 overflow-hidden">
+                    <h1 class="wow fadeInUp" data-wow-delay="100ms">@FullPicDataService.H1</h1>
+                    <h3 class="wow fadeInUp" data-wow-delay="250ms">
+
+                        <span>@FullPicDataService.H3_1 <strong>@FullPicDataService.H3_2</strong> @FullPicDataService.H3_3 <br> @FullPicDataService.H3_4</span>
+                        <span class="typed-text-wrap">
+                            <span class="typed-text"></span>
+                            <span class="typed-cursor"></span>
+                        </span>
+                        <span class="typed-strings">
+                            <span>@FullPicDataService.H3_5</span>
+                            <span>@FullPicDataService.H3_6</span>
+                            <span>@FullPicDataService.H3_7</span>
+                        </span>
+
+                    </h3>
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="group-sm">
+                                <a class="button button-primary button-nina fadeInUp wow" data-wow-delay="700ms" href="@FullPicDataService.BackstageUrl" data-custom-scroll-to="about"><span class="fa-solid fa-right-to-bracket"></span> 进入后台</a>
+                                <a class="button button-default-outline button-icon button-icon-left fadeInUp wow" href="@FullPicDataService.LogoutUrl" data-toggle="modal" data-target="#modalvideo" data-wow-delay="700ms"><span class="fa-solid fa-plus"></span> 注销登录</a>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="group-sm">
+                                <a class="button button-primary button-nina fadeInUp wow" data-wow-delay="700ms" href="@FullPicDataService.LoginUrl" data-custom-scroll-to="about"><span class="fa-solid fa-right-to-bracket"></span> 登录</a>
+                                <a class="button button-default-outline button-icon button-icon-left fadeInUp wow" href="@FullPicDataService.RegisterUrl" data-toggle="modal" data-target="#modalvideo" data-wow-delay="700ms"><span class="fa-solid fa-plus"></span> 注册</a>
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+<!-- Javascript-->
+<script src="./_content/HiFly.RippleSpa/js/core.min.js"></script>
+<script src="./_content/HiFly.RippleSpa/js/script.js"></script>
+<!-- coded by gel-->
+

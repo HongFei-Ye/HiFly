@@ -1,0 +1,20 @@
+@using Microsoft.AspNetCore.Components
+
+<button class="suggestion-chip" 
+        @onclick="HandleClick" 
+        type="button"
+        aria-label="发送建议: @Text"
+        title="点击发送: @Message">
+    <div class="chip-background">
+        <div class="background-glow"></div>
+        <div class="background-shine"></div>
+    </div>
+    <div class="chip-content">
+        <span class="suggestion-text">@Text</span>
+        <div class="chip-icon">
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            <div class="icon-trail"></div>
+        </div>
+    </div>
+    <div class="chip-ripple"></div>
+</button>

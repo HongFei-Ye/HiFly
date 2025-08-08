@@ -1,0 +1,412 @@
+﻿/* ===========================================
+   高级设置区域组件样式 - 行内布局版本
+   =========================================== */
+
+/* 高级设置专用行内布局 */
+.advanced-setting-item.inline-layout {
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advanced-setting-item.inline-layout:last-child {
+    margin-bottom: 0;
+}
+
+.advanced-setting-item.inline-layout:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.12);
+    border-color: rgba(102, 126, 234, 0.25);
+}
+
+.advanced-setting-item.inline-layout::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    border-radius: 12px 12px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.advanced-setting-item.inline-layout:hover::before {
+    opacity: 1;
+}
+
+/* 行内标签和开关容器 */
+.advanced-setting-item.inline-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* 第一行：标签和开关 */
+.advanced-setting-item.inline-layout > .setting-label-inline:first-child,
+.advanced-setting-item.inline-layout > .toggle-wrapper-inline:nth-child(2) {
+    display: flex;
+    align-items: center;
+}
+
+/* 创建标签和开关的水平布局 */
+.advanced-setting-item.inline-layout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 1rem;
+    align-items: start;
+}
+
+.setting-label-inline {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toggle-wrapper-inline {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.setting-description-inline {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.7rem;
+    color: #718096;
+    line-height: 1.4;
+    padding-top: 0.375rem;
+    border-top: 1px solid rgba(113, 128, 150, 0.1);
+    position: relative;
+}
+
+.setting-description-inline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, #667eea 0%, transparent 100%);
+}
+
+/* 标签样式 */
+.setting-label-inline .label-icon {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.setting-label-inline .label-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    flex: 1;
+}
+
+/* 自定义开关样式 */
+.enhanced-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px; /* 稍微缩小 */
+    height: 24px; /* 稍微缩小 */
+    cursor: pointer;
+}
+
+.enhanced-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.switch-slider::before {
+    position: absolute;
+    content: "";
+    height: 18px; /* 稍微缩小 */
+    width: 18px; /* 稍微缩小 */
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 开启状态 */
+.enhanced-switch input:checked + .switch-slider {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.enhanced-switch input:checked + .switch-slider::before {
+    transform: translateX(20px); /* 调整移动距离 */
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+/* 流式响应特殊颜色 */
+.advanced-setting-item:nth-child(2) .enhanced-switch input:checked + .switch-slider {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.advanced-setting-item:nth-child(2) .enhanced-switch input:checked + .switch-slider::before {
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+/* 悬停效果 */
+.enhanced-switch:hover .switch-slider {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.enhanced-switch:hover input:checked + .switch-slider {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(72, 187, 120, 0.15);
+}
+
+.advanced-setting-item:nth-child(2) .enhanced-switch:hover input:checked + .switch-slider {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+/* 聚焦状态 */
+.enhanced-switch input:focus + .switch-slider {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 记忆功能特殊样式 */
+.advanced-setting-item:nth-child(1) {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.05) 0%, rgba(56, 161, 105, 0.05) 100%);
+    border-color: rgba(72, 187, 120, 0.2);
+}
+
+.advanced-setting-item:nth-child(1):hover {
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.12);
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.advanced-setting-item:nth-child(1)::before {
+    background: linear-gradient(90deg, #48bb78 0%, #38a169 50%, #48bb78 100%);
+}
+
+/* 流式响应特殊样式 */
+.advanced-setting-item:nth-child(2) {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.05) 0%, rgba(49, 130, 206, 0.05) 100%);
+    border-color: rgba(66, 153, 225, 0.2);
+}
+
+.advanced-setting-item:nth-child(2):hover {
+    box-shadow: 0 6px 20px rgba(66, 153, 225, 0.12);
+    border-color: rgba(66, 153, 225, 0.3);
+}
+
+.advanced-setting-item:nth-child(2)::before {
+    background: linear-gradient(90deg, #4299e1 0%, #3182ce 50%, #4299e1 100%);
+}
+
+/* 切换动画 */
+@keyframes toggleOn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes toggleOff {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.enhanced-switch.toggle-on {
+    animation: toggleOn 0.3s ease;
+}
+
+.enhanced-switch.toggle-off {
+    animation: toggleOff 0.3s ease;
+}
+
+/* 暗色主题支持 */
+body.dark-theme .advanced-setting-item.inline-layout {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .advanced-setting-item.inline-layout:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .setting-label-inline .label-text {
+    color: #e2e8f0;
+}
+
+body.dark-theme .setting-description-inline {
+    color: #a0aec0;
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .setting-description-inline::before {
+    background: linear-gradient(90deg, #90cdf4 0%, transparent 100%);
+}
+
+body.dark-theme .enhanced-switch .switch-slider {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+body.dark-theme .enhanced-switch input:checked + .switch-slider {
+    background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+}
+
+body.dark-theme .advanced-setting-item:nth-child(2) .enhanced-switch input:checked + .switch-slider {
+    background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+}
+
+body.dark-theme .enhanced-switch .switch-slider::before {
+    background: #e2e8f0;
+}
+
+body.dark-theme .enhanced-switch:hover .switch-slider {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .advanced-setting-item:nth-child(1) {
+    background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 161, 105, 0.1) 100%);
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+body.dark-theme .advanced-setting-item:nth-child(1):hover {
+    border-color: rgba(72, 187, 120, 0.4);
+}
+
+body.dark-theme .advanced-setting-item:nth-child(2) {
+    background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(49, 130, 206, 0.1) 100%);
+    border-color: rgba(66, 153, 225, 0.3);
+}
+
+body.dark-theme .advanced-setting-item:nth-child(2):hover {
+    border-color: rgba(66, 153, 225, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .advanced-setting-item.inline-layout {
+        padding: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .enhanced-switch {
+        width: 48px;
+        height: 26px;
+    }
+    
+    .switch-slider::before {
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+    }
+    
+    .enhanced-switch input:checked + .switch-slider::before {
+        transform: translateX(22px);
+    }
+}
+
+@media (max-width: 480px) {
+    .advanced-setting-item.inline-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 0.5rem;
+    }
+    
+    .setting-label-inline {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .toggle-wrapper-inline {
+        grid-column: 1;
+        grid-row: 2;
+        justify-content: flex-start;
+        padding-left: 1.5rem; /* 与图标对齐 */
+    }
+    
+    .setting-description-inline {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    
+    .advanced-setting-item.inline-layout {
+        padding: 0.75rem;
+        margin-bottom: 0.375rem;
+    }
+}
+
+/* 可访问性增强 */
+@media (prefers-reduced-motion: reduce) {
+    .advanced-setting-item.inline-layout,
+    .enhanced-switch,
+    .switch-slider {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* 高对比度支持 */
+@media (prefers-contrast: high) {
+    .advanced-setting-item.inline-layout {
+        border-width: 2px;
+    }
+    
+    .enhanced-switch .switch-slider {
+        border: 2px solid #000;
+    }
+    
+    .enhanced-switch input:checked + .switch-slider {
+        border-color: #48bb78;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .advanced-setting-item.inline-layout {
+        border: 1px solid #000;
+        background: white;
+        box-shadow: none;
+    }
+    
+    .enhanced-switch {
+        display: none;
+    }
+    
+    .setting-description-inline::after {
+        content: " (已" attr(data-enabled) ")";
+        font-weight: bold;
+    }
+}

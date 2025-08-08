@@ -1,0 +1,98 @@
+/* SidebarStats 组件样式 */
+.left-panel-stats {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.stats-compact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.stat-compact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.stat-compact-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-compact-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.stat-compact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-compact-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.1rem;
+    line-height: 1;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-compact-label {
+    font-size: 0.65rem;
+    color: #718096;
+    font-weight: 500;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* 暗色主题支持 */
+body.dark-theme .left-panel-stats {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .stat-compact-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .stat-compact-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .stat-compact-value {
+    color: #e2e8f0;
+}
+
+body.dark-theme .stat-compact-label {
+    color: #a0aec0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .stats-compact-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}

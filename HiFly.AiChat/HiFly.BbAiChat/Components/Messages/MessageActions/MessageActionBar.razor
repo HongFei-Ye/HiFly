@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="message-actions">
+    <button class="message-action-btn copy-btn" @onclick="HandleCopy" title="复制内容">
+        <i class="fas fa-copy"></i>
+        <span>复制</span>
+    </button>
+    <button class="message-action-btn regenerate-btn" @onclick="HandleRegenerate" title="重新生成">
+        <i class="fas fa-redo-alt"></i>
+        <span>重生成</span>
+    </button>
+    <button class="message-action-btn like-btn" @onclick="HandleLike" title="点赞">
+        <i class="far fa-thumbs-up"></i>
+        <span>赞</span>
+    </button>
+</div>

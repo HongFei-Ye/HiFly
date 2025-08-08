@@ -1,0 +1,31 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="quick-actions">
+    <!-- 语音输入按钮 -->
+    <button class="quick-action-btn voice-btn @(IsVoiceRecording ? "recording" : "")" 
+            @onclick="OnToggleVoice" 
+            @onclick:stopPropagation="true"
+            disabled="@IsDisabled" 
+            title="@(IsVoiceRecording ? "停止录音" : "语音输入")">
+        <i class="fas @(IsVoiceRecording ? "fa-stop" : "fa-microphone")"></i>
+        @if (IsVoiceRecording)
+        {
+            <div class="recording-indicator"></div>
+        }
+    </button>
+    
+    <!-- 表情符号按钮 -->
+    <button class="quick-action-btn emoji-btn" 
+            @onclick="OnEmojiPicker"
+            @onclick:stopPropagation="true"
+            disabled="@IsDisabled" 
+            title="表情符号">
+        <i class="far fa-smile"></i>
+    </button>
+
+    @if (AdditionalActions != null)
+    {
+        @AdditionalActions
+    }
+</div>

@@ -1,0 +1,14 @@
+﻿@typeparam TContext
+@typeparam TOrganization
+
+@inject IDbContextFactory<TContext> DbFactory
+
+
+<Select IsVirtualize="true" DefaultVirtualizeItemText="@DefaultVirtualizeItemText"
+        @bind-Value="Value" ShowSearch="true" DisplayText="@DisplayText" IsClearable="true"
+        OnQueryAsync="OnQueryAsync" OnSelectedItemChanged="@OnSelectedItemChanged"  Color="@Color">
+
+
+</Select>
+
+

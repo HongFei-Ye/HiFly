@@ -1,0 +1,105 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components
+
+<div class="chat-history-list">
+    @if (Sessions.Any())
+    {
+        @foreach (var session in Sessions)
+        {
+            <SessionItem Session="session" 
+                       IsActive="@(session.Id == CurrentSessionId)"
+                       OnSessionClick="HandleSessionSelected"
+                       OnEditSession="HandleEditSession"
+                       OnDeleteSession="HandleDeleteSession" />
+        }
+    }
+    else
+    {
+        <div class="empty-sessions">
+            <div class="empty-sessions-content">
+                <div class="empty-icon">
+                    <i class="fas fa-comments"></i>
+                    <div class="empty-icon-shine"></div>
+                </div>
+                <h6 class="empty-title">暂无对话历史</h6>
+                <p class="empty-subtitle">点击上方按钮开始新的对话</p>
+                <div class="empty-action">
+                    <button class="btn-start-chat" @onclick="HandleNewChat">
+                        <i class="fas fa-rocket me-2"></i>
+                        开始对话
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// 会话列表
+    /// </summary>
+    [Parameter]
+    public List<ChatSession> Sessions { get; set; } = new();
+
+    /// <summary>
+    /// 当前会话ID
+    /// </summary>
+    [Parameter]
+    public string CurrentSessionId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 选择会话事件
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnSessionSelected { get; set; }
+
+    /// <summary>
+    /// 编辑会话事件
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnEditSession { get; set; }
+
+    /// <summary>
+    /// 删除会话事件
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnDeleteSession { get; set; }
+
+    /// <summary>
+    /// 新建对话事件
+    /// </summary>
+    [Parameter]
+    public EventCallback OnNewChat { get; set; }
+
+    private async Task HandleSessionSelected(string sessionId)
+    {
+        if (OnSessionSelected.HasDelegate)
+        {
+            await OnSessionSelected.InvokeAsync(sessionId);
+        }
+    }
+
+    private async Task HandleEditSession(string sessionId)
+    {
+        if (OnEditSession.HasDelegate)
+        {
+            await OnEditSession.InvokeAsync(sessionId);
+        }
+    }
+
+    private async Task HandleDeleteSession(string sessionId)
+    {
+        if (OnDeleteSession.HasDelegate)
+        {
+            await OnDeleteSession.InvokeAsync(sessionId);
+        }
+    }
+
+    private async Task HandleNewChat()
+    {
+        if (OnNewChat.HasDelegate)
+        {
+            await OnNewChat.InvokeAsync();
+        }
+    }
+}

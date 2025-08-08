@@ -1,0 +1,1451 @@
+﻿
+@typeparam TContext where TContext : DbContext
+
+@inject ToastService ToastService
+@inject SwalService SwalService
+@inject IDatabaseService DatabaseService
+@inject IConfiguration Configuration
+
+@* @inject IWebHostEnvironment HostEnvironment *@
+@inject IHostEnvironment HostEnvironment
+
+@inject DatabaseStateService DatabaseStateService
+
+<BootstrapBlazorRoot>
+    <div class="container-fluid">
+
+        <div class="row p-3">
+            <div class="col-12">
+                <div class="page-header py-3 bg-gradient-danger text-white position-relative overflow-hidden">
+                    <!-- 背景图形元素 -->
+                    <div class="position-absolute top-0 end-0 opacity-10">
+                        <i class="fa fa-database fa-5x me-3 mt-3"></i>
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 opacity-10">
+                        <i class="fa fa-code-fork fa-3x ms-3 mb-2"></i>
+                    </div>
+
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="header-icon bg-white text-danger rounded-circle p-3 shadow-sm d-flex align-items-center justify-content-center">
+                                    <i class="fa fa-database fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="col text-start">
+                                <h1 class="display-6 fw-bold mb-1">数据库管理中心</h1>
+                                <p class="lead m-0 opacity-90">在此页面您可以进行数据库初始化和基础管理操作</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部装饰线 -->
+                    <div class="position-absolute bottom-0 w-100">
+                        <div class="bg-white opacity-25" style="height: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row p-3">
+            <div class="col-12">
+                <Card Class="dashboard-stats">
+                    <HeaderTemplate>
+                        <i class="fa fa-server text-primary me-2"></i> 数据库连接与状态
+                    </HeaderTemplate>
+                    <BodyTemplate>
+                        <div class="row">
+
+                            <!-- 左侧：数据库状态、数据库创建、统计信息 -->
+                            <div class="col-md-4 border-end">
+
+                                <!-- 环境信息卡片 -->
+                                <div class="card shadow-sm mb-3 border-info border-opacity-25">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="m-0">
+                                                <i class="fa fa-info-circle text-info me-2"></i>
+                                                <span class="fw-semibold">环境信息</span>
+                                            </h5>
+                                            <span class="badge rounded-pill bg-info bg-opacity-75 text-white">系统配置</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <div class="row g-3">
+
+                                            <!-- 环境类型 -->
+                                            <div class="col-12 col-md-6">
+                                                <div class="d-flex align-items-center p-2 rounded border border-light-subtle bg-body-tertiary">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fa fa-globe text-primary fa-lg"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="text-muted small">当前环境</div>
+                                                        <div class="fw-medium">
+@*                                                             @if (!HostEnvironment.IsProduction())
+                                                            {
+                                                                <span class="text-info">
+                                                                    <i class="fa fa-code-fork me-1"></i>开发环境
+                                                                </span>
+                                                            } *@
+                                                            @if (!string.Equals(HostEnvironment.EnvironmentName, "Production", StringComparison.OrdinalIgnoreCase))
+                                                            {
+                                                                <span>开发环境</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="text-success">
+                                                                    <i class="fa fa-server me-1"></i>生产环境
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 环境名称 -->
+                                            <div class="col-12 col-md-6">
+                                                <div class="d-flex align-items-center p-2 rounded border border-light-subtle bg-body-tertiary">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fa fa-tag text-warning fa-lg"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="text-muted small">环境名称</div>
+                                                        <div class="fw-medium text-break">@HostEnvironment.EnvironmentName</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 连接字符串 -->
+                                            <div class="col-12">
+                                                <div class="p-2 rounded border border-light-subtle">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fa fa-plug text-success me-2"></i>
+                                                        <span class="text-muted">当前连接字符串</span>
+                                                    </div>
+                                                    <div class="position-relative">
+                                                        <div class="border rounded p-2 bg-body-tertiary small overflow-auto" style="max-height: 80px;">
+                                                            <code class="text-break user-select-all">@(Configuration.GetConnectionString("DefaultConnection") ?? "未设置")</code>
+                                                        </div>
+                                                        <div class="position-absolute top-0 end-0 m-1">
+                                                            <button class="btn btn-sm btn-outline-secondary border-0"
+                                                            onclick="navigator.clipboard.writeText('@(Configuration.GetConnectionString("DefaultConnection") ?? "")')"
+                                                            title="复制连接字符串">
+                                                                <i class="fa fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 统计信息卡片 -->
+                                <div class="card shadow-sm mb-3 border-info border-opacity-25">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="m-0">
+                                                <i class="fa fa-bar-chart text-info me-2"></i>
+                                                <span class="fw-semibold">统计信息</span>
+                                            </h5>
+                                            <span class="badge rounded-pill bg-info bg-opacity-75 text-white">数据洞察</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        @if (!string.IsNullOrEmpty(_statistics))
+                                        {
+                                            <!-- 有数据时的显示 -->
+                                            <div class="row g-3">
+                                                <!-- 数据统计信息 -->
+                                                <div class="col-12">
+                                                    <div class="p-0">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i class="fa fa-table text-primary me-2"></i>
+                                                            <span class="text-primary fw-medium">数据库结构统计</span>
+                                                        </div>
+                                                        <div class="position-relative">
+                                                            <div class="border rounded p-2 bg-body-tertiary overflow-auto" style="max-height: 300px;">
+                                                                <pre class="m-0 small text-dark user-select-all">@_statistics</pre>
+                                                            </div>
+                                                            <div class="position-absolute top-0 end-0 m-1">
+                                                                <button class="btn btn-sm btn-outline-secondary border-0"
+                                                                onclick="navigator.clipboard.writeText('@_statistics?.Replace("\r", "\\r")?.Replace("\n", "\\n")')"
+                                                                title="复制统计信息">
+                                                                    <i class="fa fa-copy"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 更新时间 -->
+                                                <div class="col-12">
+                                                    <div class="d-flex justify-content-between align-items-center small text-muted border-top pt-2">
+                                                        <div>
+                                                            <i class="fa fa-clock-o me-1"></i> 最后更新: @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                                                        </div>
+                                                        <div>
+                                                            <Button Color="Color.Info" Icon="fa fa-refresh" Text="刷新统计" Size="Size.Small" OnClick="@(() => GetStatistics())" IsOutline="true"></Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (_statisticsError != null)
+                                        {
+                                            <!-- 获取数据出错时的显示 -->
+                                            <div class="p-2 rounded border border-danger border-opacity-25 bg-danger bg-opacity-10">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fa fa-exclamation-circle text-danger fa-2x me-3"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1 text-danger">获取数据失败</h6>
+                                                        <p class="mb-0 small text-break">@_statisticsError</p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 text-end">
+                                                    <Button Color="Color.Info" Icon="fa fa-refresh" Text="重试" Size="Size.Small" OnClick="@(() => GetStatistics())"></Button>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <!-- 加载状态 -->
+                                            <div class="py-4 text-center">
+                                                <div class="d-inline-block p-3 rounded-circle bg-info bg-opacity-10 mb-3">
+                                                    <i class="fa fa-bar-chart fa-3x text-info"></i>
+                                                </div>
+                                                <h6 class="mb-2 text-info">数据库统计信息</h6>
+                                                <p class="text-muted mb-3">获取数据库表格、索引、记录数等结构统计</p>
+                                                <Button Color="Color.Info" Icon="fa fa-line-chart" Text="获取统计信息" OnClick="@(() => GetStatistics())" Class="px-4"></Button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- 状态信息卡片 -->
+                                <div class="card shadow-sm mb-3 border-primary border-opacity-25">
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="m-0">
+                                                <i class="fa fa-info-circle text-primary me-2"></i>
+                                                <span class="fw-semibold">状态信息</span>
+                                            </h5>
+                                            <span class="badge rounded-pill bg-primary bg-opacity-75 text-white">连接状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        @if (_dbStatusInfo != null)
+                                        {
+                                            <div class="row g-3">
+                                                <!-- 数据库存在状态 -->
+                                                <div class="col-12 col-lg-6">
+                                                    <div class="d-flex align-items-center p-2 rounded border border-light-subtle @(_dbStatusInfo.Exists ? "bg-success bg-opacity-10" : "bg-danger bg-opacity-10")">
+                                                        <div class="flex-shrink-0">
+                                                            <i class="fa fa-database @(_dbStatusInfo.Exists ? "text-success" : "text-danger") fa-lg"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <div class="text-muted small">数据库存在</div>
+                                                            <div class="fw-medium d-flex justify-content-between align-items-center">
+                                                                <span class="@(_dbStatusInfo.Exists ? "text-success" : "text-danger")">
+                                                                    @(_dbStatusInfo.Exists ? "已创建" : "未创建")
+                                                                </span>
+                                                                <Badge Color="@(_dbStatusInfo.Exists ? Color.Success : Color.Danger)" class="px-3 py-1 rounded-pill ms-2">
+                                                                    @(_dbStatusInfo.Exists ? "是" : "否")
+                                                                </Badge>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 连接状态 -->
+                                                <div class="col-12 col-lg-6">
+                                                    <div class="d-flex align-items-center p-2 rounded border border-light-subtle @(_dbStatusInfo.CanConnect ? "bg-success bg-opacity-10" : "bg-danger bg-opacity-10")">
+                                                        <div class="flex-shrink-0">
+                                                            <i class="fa fa-plug @(_dbStatusInfo.CanConnect ? "text-success" : "text-danger") fa-lg"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <div class="text-muted small">连接状态</div>
+                                                            <div class="fw-medium d-flex justify-content-between align-items-center">
+                                                                <span class="@(_dbStatusInfo.CanConnect ? "text-success" : "text-danger")">
+                                                                    @(_dbStatusInfo.CanConnect ? "正常" : "失败")
+                                                                </span>
+                                                                <Badge Color="@(_dbStatusInfo.CanConnect ? Color.Success : Color.Danger)" class="px-3 py-1 rounded-pill ms-2">
+                                                                    @(_dbStatusInfo.CanConnect ? "是" : "否")
+                                                                </Badge>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 错误信息显示 -->
+                                                @if (!string.IsNullOrEmpty(_dbStatusInfo.ErrorMessage))
+                                                {
+                                                    <div class="col-12">
+                                                        <div class="p-2 rounded border border-danger border-opacity-25 bg-danger bg-opacity-10">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-shrink-0">
+                                                                    <i class="fa fa-exclamation-triangle text-danger fa-lg me-3"></i>
+                                                                </div>
+                                                                <div class="flex-grow-1">
+                                                                    <div class="text-muted small">错误信息</div>
+                                                                    <p class="mb-0 small text-break text-danger">@_dbStatusInfo.ErrorMessage</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                <!-- 数据库创建按钮 - 样式优化 -->
+                                                <div class="col-12 mt-2">
+                                                    <div class="text-center">
+                                                        <div class="bg-body-tertiary rounded p-3 border border-light-subtle">
+                                                            <i class="fa fa-database text-success mb-2 fa-2x"></i>
+                                                            <h6 class="mb-2">数据库管理操作</h6>
+                                                            <p class="text-muted small mb-3">
+                                                                @if (!_dbStatusInfo.Exists)
+                                                                {
+                                                                    <span>数据库不存在，请点击下方按钮创建数据库</span>
+                                                                }
+                                                                else if (!_dbStatusInfo.CanConnect)
+                                                                {
+                                                                    <span>数据库已存在但无法连接，请检查连接设置或更新数据库</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span>数据库连接正常，可以进行更新或重建操作</span>
+                                                                }
+                                                            </p>
+                                                            <div class="d-flex justify-content-center">
+                                                                <Button Color="Color.Success" Icon="fa fa-database" Text="创建/更新数据库" OnClick="CreateDatabase" Class="px-4"></Button>
+                                                                <Button Color="Color.Primary" Icon="fa fa-refresh" Text="检查状态" OnClick="@(() => CheckDatabaseStatus())" IsOutline="true" Class="ms-2"></Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <!-- 加载状态美化 -->
+                                            <div class="text-center py-4">
+                                                <div class="d-inline-block p-3 rounded-circle bg-primary bg-opacity-10 mb-3">
+                                                    <i class="fa fa-database fa-3x text-primary"></i>
+                                                </div>
+                                                <h6 class="mb-2 text-primary">数据库状态</h6>
+                                                <p class="text-muted mb-3">获取数据库连接状态和基本信息</p>
+                                                <Button Color="Color.Primary" Icon="fa fa-refresh" Text="检查状态" OnClick="@(() => CheckDatabaseStatus())" Class="px-4"></Button>
+                                            </div>
+                                        }
+
+                                        <!-- 操作结果 -->
+                                        @if (_createResult != null)
+                                        {
+                                            <div class="mt-3 pt-3 border-top" key="@(_createResult.GetHashCode())">
+                                                <div class="p-2 rounded border @(_createResult?.Success == true ? "border-success bg-success" : "border-danger bg-danger") bg-opacity-10">
+                                                    <div class="d-flex align-items-center">
+                                                        @if (_createResult?.Success == true)
+                                                        {
+                                                            <div class="flex-shrink-0">
+                                                                <i class="fa fa-check-circle text-success fa-2x me-3"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-1 text-success">操作成功</h6>
+                                                                <p class="mb-0 small">数据库已成功创建或已存在</p>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="flex-shrink-0">
+                                                                <i class="fa fa-times-circle text-danger fa-2x me-3"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-1 text-danger">操作失败</h6>
+                                                                <p class="mb-0 small text-break">@_createResult?.ErrorMessage</p>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- 右侧：连接字符串配置 -->
+                            <div class="col-md-8">
+                                <div class="card shadow-sm mb-3 border-primary border-opacity-25">
+                                    <!-- 标题部分 -->
+                                    <div class="card-header bg-primary bg-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <h5 class="m-0">
+                                                <i class="fa fa-cog text-primary me-2"></i>
+                                                <span class="fw-semibold">数据库连接配置</span>
+                                            </h5>
+                                            <span class="badge rounded-pill bg-primary bg-opacity-75 text-white">连接设置</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <p class="text-danger text-center small mb-2">
+                                            <i class="fa fa-info-circle me-1"></i>
+                                            在此处修改应用程序使用的数据库连接字符串参数，更改后需要重启应用以生效
+                                        </p>
+
+                                        <!-- 数据库类型选择器 - 带图标 -->
+                                        <div class="mb-2">
+                                            <div class="form-group">
+                                                <label class="form-label d-flex align-items-center">
+                                                    <i class="fa fa-database text-primary me-2"></i>
+                                                    <span>数据库类型</span>
+                                                </label>
+                                                <Select TValue="string" Items="@_dbTypes" @bind-Value="@_connectionConfig.DbType"
+                                                ShowSearch="true" Class="border-primary-subtle" />
+                                            </div>
+                                        </div>
+
+                                        <!-- 服务器信息卡片 -->
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-header py-2 bg-light">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-server text-secondary me-2"></i>
+                                                    <span class="fw-medium">服务器信息</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-desktop me-1 text-muted"></i>
+                                                                <span>服务器</span>
+                                                            </label>
+                                                            <BootstrapInput @bind-Value="@_connectionConfig.Server"
+                                                            PlaceHolder="数据库服务器地址"
+                                                            ShowLabel="false" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-plug me-1 text-muted"></i>
+                                                                <span>端口</span>
+                                                            </label>
+                                                            <BootstrapInput @bind-Value="@_connectionConfig.Port"
+                                                            PlaceHolder="数据库端口"
+                                                            ShowLabel="false" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 数据库信息卡片 -->
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-header py-2 bg-light">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-database text-secondary me-2"></i>
+                                                    <span class="fw-medium">数据库信息</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-table me-1 text-muted"></i>
+                                                                <span>数据库名称</span>
+                                                            </label>
+                                                            <BootstrapInput @bind-Value="@_connectionConfig.Database"
+                                                            PlaceHolder="数据库名称"
+                                                            ShowLabel="false" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-sitemap me-1 text-muted"></i>
+                                                                <span>实例名</span>
+                                                            </label>
+                                                            <BootstrapInput @bind-Value="@_connectionConfig.Instance"
+                                                            PlaceHolder="SQL Server实例名(可选)"
+                                                            ShowLabel="false" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 认证信息卡片 -->
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-header py-2 bg-light">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-lock text-secondary me-2"></i>
+                                                    <span class="fw-medium">认证信息</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-user me-1 text-muted"></i>
+                                                                <span>用户名</span>
+                                                            </label>
+                                                            <BootstrapInput @bind-Value="@_connectionConfig.Username" PlaceHolder="数据库用户名" ShowLabel="false" autocomplete="new-password" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-label d-flex align-items-center">
+                                                                <i class="fa fa-key me-1 text-muted"></i>
+                                                                <span>密码</span>
+                                                            </label>
+                                                            <BootstrapPassword @bind-Value="@_connectionConfig.Password" PlaceHolder="数据库密码" ShowLabel="false" autocomplete="new-password" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 高级设置 -->
+                                        <div class="card bg-light mb-2">
+                                            <div class="card-header py-2 bg-light">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-sliders text-secondary me-2"></i>
+                                                    <span class="fw-medium">高级选项</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="form-group">
+                                                    <label class="form-label d-flex align-items-center">
+                                                        <i class="fa fa-cogs me-1 text-muted"></i>
+                                                        <span>附加参数</span>
+                                                    </label>
+                                                    <BootstrapInput @bind-Value="@_connectionConfig.AdditionalParams"
+                                                    PlaceHolder="其他连接参数，如Trusted_Connection=True"
+                                                    ShowLabel="false" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 连接字符串预览 -->
+                                        <div class="card bg-light border-success border-opacity-25 mb-4">
+                                            <div class="card-header py-2 bg-success bg-opacity-10">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-code text-success me-2"></i>
+                                                    <span class="fw-medium">生成的连接字符串</span>
+                                                </div>
+                                            </div>
+                                            <div class="card-body py-3">
+                                                <div class="position-relative">
+                                                    <div class="border rounded p-2 bg-body-tertiary overflow-auto" style="max-height: 100px;">
+                                                        <code class="text-break user-select-all">@GenerateConnectionString()</code>
+                                                    </div>
+                                                    <div class="position-absolute top-0 end-0 m-1">
+                                                        <button class="btn btn-sm btn-outline-secondary border-0"
+                                                        onclick="navigator.clipboard.writeText('@GenerateConnectionString()')"
+                                                        title="复制连接字符串">
+                                                            <i class="fa fa-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 操作按钮 -->
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <Button Icon="fa fa-save" Text="保存配置" Color="Color.Primary" OnClick="UpdateConnectionString" Class="me-2 px-4"></Button>
+                                                <Button Icon="fa fa-refresh" Text="重新加载" Color="Color.Primary" OnClick="LoadConnectionString" IsOutline="true"> </Button>
+                                            </div>
+                                            @*                                             <div>
+                                                <Button Color="Color.Info" IsOutline="true">
+                                                    <i class="fa fa-question-circle me-1"></i> 帮助
+                                                </Button>
+                                            </div> *@
+                                        </div>
+
+                                        @if (_connectionStringResult != null)
+                                        {
+                                            <div class="mt-4" key="@(_connectionStringResult.GetHashCode())">
+                                                <Alert Color="@(_connectionStringResult?.Success == true ? Color.Warning : Color.Danger)"
+                                                ShowDismiss="true" ShowIcon="true" Class="mb-0">
+                                                    <span class="d-flex align-items-center">
+                                                        @if (_connectionStringResult?.Success == true)
+                                                        {
+                                                            <i class="fa fa-check-circle fs-5 me-2"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fa fa-exclamation-triangle fs-5 me-2"></i>
+                                                        }
+                                                        <span>@($"{_connectionStringResult?.Message}")</span>
+                                                    </span>
+                                                </Alert>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </BodyTemplate>
+                </Card>
+            </div>
+        </div>
+
+        <div class="row p-3">
+
+            <!-- 迁移信息卡片 -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm mb-3 border-success border-opacity-25">
+                    <div class="card-header bg-success bg-opacity-10">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <h5 class="m-0">
+                                <i class="fa fa-code-fork text-success me-2"></i>
+                                <span class="fw-semibold">数据库迁移</span>
+                            </h5>
+                            <span class="badge rounded-pill bg-success bg-opacity-75 text-white">版本管理</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        @if (_migrationInfo != null)
+                        {
+                            <div class="row g-3">
+                                <!-- 当前版本信息卡片 -->
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center p-2 rounded border border-light-subtle bg-body-tertiary">
+                                        <div class="flex-shrink-0">
+                                            <i class="fa fa-tag text-primary fa-lg"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="text-muted small">当前数据库版本</div>
+                                            <div class="fw-medium">
+                                                @if (_migrationInfo.CurrentVersion != "未知")
+                                                {
+                                                    <span class="badge bg-info bg-opacity-25 text-info px-2 py-1">
+                                                        <i class="fa fa-bookmark me-1"></i>@_migrationInfo.CurrentVersion
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-secondary">
+                                                        <i class="fa fa-question-circle me-1"></i>尚未应用迁移
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 待处理迁移卡片 -->
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center p-2 rounded border border-light-subtle @(_migrationInfo.PendingCount > 0 ? "bg-warning bg-opacity-10" : "bg-body-tertiary")">
+                                        <div class="flex-shrink-0">
+                                            <i class="fa @(_migrationInfo.PendingCount > 0 ? "fa-exclamation-triangle text-warning" : "fa-check-circle text-success") fa-lg"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="text-muted small">待处理迁移</div>
+                                            <div class="fw-medium d-flex align-items-center">
+                                                <span class="badge rounded-pill px-3 py-2 @(_migrationInfo.PendingCount > 0 ? "bg-warning text-dark" : "bg-success text-white")">
+                                                    @_migrationInfo.PendingCount
+                                                </span>
+                                                @if (_migrationInfo.PendingCount > 0)
+                                                {
+                                                    <span class="ms-3 text-warning">需要更新数据库结构</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="ms-3 text-success">数据库架构已是最新</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (_migrationInfo.PendingCount > 0 && _migrationInfo.PendingMigrations.Count > 0)
+                                {
+                                    <!-- 待处理迁移列表 -->
+                                    <div class="col-12">
+                                        <div class="p-2 rounded border border-light-subtle">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fa fa-list text-secondary me-2"></i>
+                                                <span class="text-muted">待应用迁移列表</span>
+                                            </div>
+                                            <div class="border rounded p-2 bg-body-tertiary small overflow-auto" style="max-height: 100px;">
+                                                <ol class="ps-3 mb-0">
+                                                    @foreach (var migration in _migrationInfo.PendingMigrations)
+                                                    {
+                                                        <li class="mb-1 text-dark">@migration</li>
+                                                    }
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- 操作按钮 -->
+                                <div class="col-12 mt-3">
+                                    <div class="d-flex justify-content-between">
+                                        @if (_migrationInfo.PendingCount > 0)
+                                        {
+                                            <Button Color="Color.Success" Icon="fa fa-check-circle" Text="应用所有迁移" OnClick="ApplyMigrations" Class="px-3"></Button>
+                                        }
+                                        else
+                                        {
+                                            <Button Color="Color.Success" Icon="fa fa-check-circle" Text="数据库已是最新" Disabled="true" Class="px-3"></Button>
+                                        }
+                                        <Button Color="Color.Primary" Icon="fa fa-refresh" Text="检查迁移" OnClick="@(() => CheckMigrations())" IsOutline="true"></Button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- 加载状态 -->
+                            <div class="text-center py-4">
+                                <i class="fa fa-code-fork fa-3x mb-3 text-secondary"></i>
+                                <h6 class="text-secondary">正在获取迁移信息...</h6>
+                                <p class="small text-muted">如果长时间无响应，请点击"检查迁移"按钮</p>
+                                <Button Color="Color.Primary" Icon="fa fa-refresh" Text="检查迁移" OnClick="@(() => CheckMigrations())" IsOutline="true" Class="mt-2"></Button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- 备份数据库卡片 -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm mb-3 border-warning border-opacity-25">
+                    <div class="card-header bg-warning bg-opacity-10">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <h5 class="m-0">
+                                <i class="fa fa-save text-warning me-2"></i>
+                                <span class="fw-semibold">数据库备份</span>
+                            </h5>
+                            <span class="badge rounded-pill bg-warning bg-opacity-75 text-dark">数据保护</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-3">
+                            <!-- 备份信息卡片 -->
+                            <div class="col-12">
+                                <div class="d-flex align-items-center p-2 rounded border border-light-subtle bg-body-tertiary">
+                                    <div class="flex-shrink-0">
+                                        <i class="fa fa-hdd-o text-warning fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="text-muted small">备份操作说明</div>
+                                        <div class="fw-medium">
+                                            将当前数据库内容备份至服务器本地存储
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 备份路径信息 -->
+                            @if (_backupPath != null)
+                            {
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center p-2 rounded border border-light-subtle bg-body-tertiary">
+                                        <div class="flex-shrink-0">
+                                            <i class="fa fa-folder-open text-primary fa-lg"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="text-muted small">备份存储位置</div>
+                                            <div class="position-relative">
+                                                <div class="border rounded p-2 bg-light small overflow-auto" style="max-height: 60px;">
+                                                    <code class="text-break user-select-all">@_backupPath</code>
+                                                </div>
+                                                <div class="position-absolute top-0 end-0 m-1">
+                                                    <button class="btn btn-sm btn-outline-secondary border-0"
+                                                    onclick="navigator.clipboard.writeText('@_backupPath')"
+                                                    title="复制路径">
+                                                        <i class="fa fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- 备份结果显示 -->
+                            @if (_backupResult != null)
+                            {
+                                <div class="col-12">
+                                    <div class="p-2 rounded border @(_backupResult?.Success == true ? "border-success bg-success" : "border-danger bg-danger") bg-opacity-10">
+                                        <div class="d-flex align-items-center">
+                                            @if (_backupResult?.Success == true)
+                                            {
+                                                <div class="flex-shrink-0">
+                                                    <i class="fa fa-check-circle text-success fa-2x me-3"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1 text-success">备份成功</h6>
+                                                    <p class="mb-0 small">数据库已成功备份到指定位置</p>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="flex-shrink-0">
+                                                    <i class="fa fa-times-circle text-danger fa-2x me-3"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1 text-danger">备份失败</h6>
+                                                    <p class="mb-0 small text-break">@_backupResult?.ErrorMessage</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- 操作按钮 -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                        <span>定期备份数据库可以预防数据丢失</span>
+                                    </div>
+                                    <Button Color="Color.Warning" Icon="fa fa-download" Text="立即备份" OnClick="BackupDatabase"></Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 添加备份记录列表 - 可选部分 -->
+                        @if (_backupResult?.Success == true)
+                        {
+                            <div class="mt-3 border-top pt-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-history text-secondary me-2"></i>
+                                    <span class="text-secondary">备份时间</span>
+                                </div>
+                                <div class="bg-light rounded p-2 small">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="fa fa-calendar me-1"></i> @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                        <Badge Color="Color.Success">最新</Badge>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</BootstrapBlazorRoot>
+
+@code {
+    private class DbStatus
+    {
+        public bool Exists { get; set; }
+        public bool CanConnect { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+
+    private class MigrationInfo
+    {
+        public string CurrentVersion { get; set; } = "未知";
+        public int PendingCount { get; set; }
+        public List<string> PendingMigrations { get; set; } = new();
+    }
+
+    private DbStatus? _dbStatusInfo;
+    private MigrationInfo? _migrationInfo;
+    private (bool Success, string? ErrorMessage)? _createResult;
+    private (bool Success, string? ErrorMessage)? _backupResult;
+    private string? _statistics;
+    private string? _statisticsError;
+    private string? _backupPath;
+
+    // 新增用于连接字符串表单的模型类
+    private class ConnectionConfig
+    {
+        public string DbType { get; set; } = "SqlServer";
+        public string Server { get; set; } = "localhost";
+        public string Port { get; set; } = "";
+        public string Database { get; set; } = "";
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string Instance { get; set; } = "";
+        public string AdditionalParams { get; set; } = "";
+    }
+
+    private ConnectionConfig _connectionConfig = new();
+    private List<SelectedItem> _dbTypes = new()
+    {
+        new SelectedItem("SqlServer", "Microsoft SQL Server"),
+        new SelectedItem("MySQL", "MySQL"),
+        new SelectedItem("PostgreSQL", "PostgreSQL"),
+        new SelectedItem("SQLite", "SQLite")
+    };
+    private (bool Success, string Message)? _connectionStringResult;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // 加载检查数据库状态
+        await CheckDatabaseStatus();
+
+        // 加载检查数据库迁移
+        await CheckMigrations();
+
+        // 加载连接字符串
+        LoadConnectionString();
+
+        // 加载统计信息
+        await GetStatistics();
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (DatabaseStateService.NeedsRestart)
+        {
+            var op = new SwalOption()
+                {
+                    Category = SwalCategory.Warning,
+                    Title = "需要重启程序以应用配置更改",
+                    Content = $"上次修改配置的时间:{DatabaseStateService.LastConnectionStringChangeTime}",
+                    ShowClose = true,
+                    ShowFooter = true,
+                    FooterTemplate = BootstrapDynamicComponent.CreateComponent<RestartSwalFooter>().Render()
+                };
+            await SwalService.Show(op);
+        }
+
+    }
+
+    private async Task CheckDatabaseStatus(string? newConnectionString = null)
+    {
+        try
+        {
+            string? _connectionString;
+            if (string.IsNullOrEmpty(newConnectionString) == false)
+            {
+                _connectionString = newConnectionString;
+            }
+            else
+            {
+                // 获取最新的连接字符串，而不是使用可能缓存的连接字符串
+                _connectionString = Configuration.GetConnectionString("DefaultConnection");
+            }
+
+            // 指定使用最新的连接字符串
+            var result = await DatabaseService.CheckDatabaseExistsAsync<TContext>(_connectionString);
+
+            _dbStatusInfo = new DbStatus
+            {
+                Exists = result.Exists,
+                CanConnect = result.CanConnect,
+                ErrorMessage = result.ErrorMessage
+            };
+        }
+        catch (Exception ex)
+        {
+            _dbStatusInfo = new DbStatus
+            {
+                Exists = false,
+                CanConnect = false,
+                ErrorMessage = ex.Message
+            };
+        }
+        finally
+        {
+            if (_dbStatusInfo == null || _dbStatusInfo.Exists == false || _dbStatusInfo.CanConnect == false)
+            {
+                DatabaseStateService.NeedsDatabaseSetup = true;
+            }
+            else
+            {
+                DatabaseStateService.NeedsDatabaseSetup = false;
+            }
+        }
+    }
+
+    private async Task CheckMigrations(string? newConnectionString = null)
+    {
+        _migrationInfo = new MigrationInfo();
+
+        bool pendingResultSuccess = false;
+
+        try
+        {
+            string? _connectionString;
+            if (string.IsNullOrEmpty(newConnectionString) == false)
+            {
+                _connectionString = newConnectionString;
+
+            }
+            else
+            {
+                // 获取最新的连接字符串，而不是使用可能缓存的连接字符串
+                _connectionString = Configuration.GetConnectionString("DefaultConnection");
+            }
+
+            // 获取当前迁移版本
+            var versionResult = await DatabaseService.GetCurrentMigrationVersionAsync<TContext>(_connectionString);
+            if (versionResult.Success)
+            {
+                _migrationInfo.CurrentVersion = versionResult.Version;
+            }
+
+            // 获取待处理迁移
+            var pendingResult = await DatabaseService.GetPendingMigrationsAsync<TContext>(_connectionString);
+            if (pendingResult.Success)
+            {
+                _migrationInfo.PendingMigrations = pendingResult.PendingMigrations.ToList();
+                _migrationInfo.PendingCount = _migrationInfo.PendingMigrations.Count;
+            }
+
+            pendingResultSuccess = pendingResult.Success;
+        }
+        catch (Exception)
+        {
+            // 如果发生异常，保持默认值
+        }
+        finally
+        {
+            if (pendingResultSuccess && _migrationInfo.PendingMigrations.Any())
+            {
+                DatabaseStateService.HasPendingMigrations = true;
+            }
+            else
+            {
+                DatabaseStateService.HasPendingMigrations = false;
+            }
+        }
+    }
+
+    private async Task CreateDatabase()
+    {
+        try
+        {
+            // 先设置为 null 触发 UI 刷新
+            //_createResult = null;
+
+            await InvokeAsync(StateHasChanged);
+
+            // 执行数据库创建操作
+            _createResult = await DatabaseService.EnsureEmptyDatabaseCreatedAsync<TContext>();
+
+            // 创建后更新状态
+            await CheckDatabaseStatus();
+        }
+        catch (Exception ex)
+        {
+            _createResult = (false, ex.Message);
+        }
+        finally
+        {
+
+        }
+    }
+
+    private async Task GetStatistics(string? newConnectionString = null)
+    {
+        try
+        {
+            _statistics = null;
+            _statisticsError = null;
+
+            string? _connectionString;
+            if (string.IsNullOrEmpty(newConnectionString) == false)
+            {
+                _connectionString = newConnectionString;
+
+            }
+            else
+            {
+                // 获取最新的连接字符串，而不是使用可能缓存的连接字符串
+                _connectionString = Configuration.GetConnectionString("DefaultConnection");
+            }
+
+            // 指定使用最新的连接字符串
+            var result = await DatabaseService.GetDatabaseStatisticsAsync<TContext>(_connectionString);
+
+            if (result.Success)
+            {
+                // 美化JSON以便显示
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                _statistics = JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<object>(result.Statistics),
+                    options);
+            }
+            else
+            {
+                _statisticsError = $"获取统计信息失败: {result.ErrorMessage}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _statisticsError = $"获取统计信息失败: {ex.Message}";
+        }
+        finally
+        {
+
+        }
+    }
+
+    private async Task BackupDatabase()
+    {
+        try
+        {
+            // 设置备份路径
+            _backupPath = Path.Combine(Environment.CurrentDirectory, "Backups", $"backup_{DateTime.Now:yyyyMMdd_HHmmss}.bak");
+
+            // 获取最新的连接字符串，而不是使用可能缓存的连接字符串
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            _backupResult = await DatabaseService.BackupDatabaseAsync<TContext>(connectionString);
+        }
+        catch (Exception ex)
+        {
+            _backupResult = (false, ex.Message);
+        }
+        finally
+        {
+
+        }
+    }
+
+    private async Task ApplyMigrations()
+    {
+        try
+        {
+            // 获取最新的连接字符串，而不是使用可能缓存的连接字符串
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            var result = await DatabaseService.ApplyPendingMigrationsAsync<TContext>(connectionString);
+
+            var message = result.Success 
+                ? $"成功应用了 {result.MigrationsApplied} 个迁移" 
+                : $"应用迁移失败: {result.ErrorMessage}";
+
+            await CheckMigrations(); // 更新迁移信息
+
+            // 使用 ToastService 显示结果
+            if (result.Success)
+            {
+                await ToastService.Success("迁移结果", message);
+            }
+            else
+            {
+                await ToastService.Error("迁移结果", message);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ToastService.Error("迁移错误", $"应用迁移失败: {ex.Message}");
+        }
+        finally
+        {
+
+        }
+    }
+
+    private void LoadConnectionString()
+    {
+        try
+        {
+            // 从配置中获取连接字符串
+            var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? "";
+
+            // 解析连接字符串并填充表单
+            ParseConnectionString(connectionString);
+
+            _connectionStringResult = null;
+        }
+        catch (Exception ex)
+        {
+            _connectionStringResult = (false, $"加载连接字符串失败: {ex.Message}");
+        }
+        finally
+        {
+
+        }
+    }
+
+    private void ParseConnectionString(string connectionString)
+    {
+        _connectionConfig = new ConnectionConfig();
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            return;
+
+        // 确定数据库类型
+        if (connectionString.Contains("Server=") || connectionString.Contains("Data Source="))
+            _connectionConfig.DbType = "SqlServer";
+        else if (connectionString.Contains("Host="))
+            _connectionConfig.DbType = "PostgreSQL";
+        else if (connectionString.Contains("Server=") && connectionString.Contains("Port="))
+            _connectionConfig.DbType = "MySQL";
+        else if (connectionString.Contains("Data Source=") && !connectionString.Contains("Server="))
+            _connectionConfig.DbType = "SQLite";
+
+        // 解析连接字符串参数
+        var parts = connectionString.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var part in parts)
+        {
+            if (string.IsNullOrWhiteSpace(part)) continue;
+
+            var keyValue = part.Split('=', 2);
+            if (keyValue.Length != 2) continue;
+
+            var key = keyValue[0].Trim();
+            var value = keyValue[1].Trim();
+
+            switch (key.ToLowerInvariant())
+            {
+                case "server":
+                case "data source":
+                case "host":
+                    // 处理可能包含端口或实例名的情况
+                    if (value.Contains(","))
+                    {
+                        var serverParts = value.Split(',');
+                        _connectionConfig.Server = serverParts[0];
+                        if (serverParts.Length > 1 && int.TryParse(serverParts[1].Trim(), out var port))
+                            _connectionConfig.Port = port.ToString();
+                    }
+                    else if (value.Contains("\\"))
+                    {
+                        var instanceParts = value.Split('\\');
+                        _connectionConfig.Server = instanceParts[0];
+                        if (instanceParts.Length > 1)
+                            _connectionConfig.Instance = instanceParts[1];
+                    }
+                    else
+                    {
+                        _connectionConfig.Server = value;
+                    }
+                    break;
+                case "port":
+                    _connectionConfig.Port = value;
+                    break;
+                case "database":
+                case "initial catalog":
+                    _connectionConfig.Database = value;
+                    break;
+                case "user id":
+                case "uid":
+                case "username":
+                    _connectionConfig.Username = value;
+                    break;
+                case "password":
+                case "pwd":
+                    _connectionConfig.Password = value;
+                    break;
+                default:
+                    if (string.IsNullOrEmpty(_connectionConfig.AdditionalParams))
+                        _connectionConfig.AdditionalParams = part;
+                    else
+                        _connectionConfig.AdditionalParams += ";" + part;
+                    break;
+            }
+        }
+
+    }
+
+    private string GenerateConnectionString()
+    {
+        switch (_connectionConfig.DbType)
+        {
+            case "SqlServer":
+                var server = string.IsNullOrEmpty(_connectionConfig.Instance)
+                    ? _connectionConfig.Server
+                    : $"{_connectionConfig.Server}\\{_connectionConfig.Instance}";
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Port))
+                    server = $"{server},{_connectionConfig.Port}";
+
+                var sqlServerParts = new List<string>();
+                sqlServerParts.Add($"Server={server}");
+                if (!string.IsNullOrEmpty(_connectionConfig.Database))
+                    sqlServerParts.Add($"Database={_connectionConfig.Database}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Username) && !string.IsNullOrEmpty(_connectionConfig.Password))
+                {
+                    sqlServerParts.Add($"User Id={_connectionConfig.Username}");
+                    sqlServerParts.Add($"Password={_connectionConfig.Password}");
+                }
+
+                if (!string.IsNullOrEmpty(_connectionConfig.AdditionalParams))
+                    sqlServerParts.Add(_connectionConfig.AdditionalParams);
+
+                return string.Join(";", sqlServerParts);
+
+            case "MySQL":
+                var mysqlParts = new List<string>();
+                mysqlParts.Add($"Server={_connectionConfig.Server}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Port))
+                    mysqlParts.Add($"Port={_connectionConfig.Port}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Database))
+                    mysqlParts.Add($"Database={_connectionConfig.Database}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Username))
+                    mysqlParts.Add($"Uid={_connectionConfig.Username}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Password))
+                    mysqlParts.Add($"Pwd={_connectionConfig.Password}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.AdditionalParams))
+                    mysqlParts.Add(_connectionConfig.AdditionalParams);
+
+                return string.Join(";", mysqlParts);
+
+            case "PostgreSQL":
+                var pgsqlParts = new List<string>();
+                pgsqlParts.Add($"Host={_connectionConfig.Server}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Port))
+                    pgsqlParts.Add($"Port={_connectionConfig.Port}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Database))
+                    pgsqlParts.Add($"Database={_connectionConfig.Database}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Username))
+                    pgsqlParts.Add($"Username={_connectionConfig.Username}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.Password))
+                    pgsqlParts.Add($"Password={_connectionConfig.Password}");
+
+                if (!string.IsNullOrEmpty(_connectionConfig.AdditionalParams))
+                    pgsqlParts.Add(_connectionConfig.AdditionalParams);
+
+                return string.Join(";", pgsqlParts);
+
+            case "SQLite":
+                return $"Data Source={_connectionConfig.Database}";
+
+            default:
+                return "";
+        }
+    }
+
+    private async Task UpdateConnectionString()
+    {
+        try
+        {
+            // 生成新的连接字符串
+            var newConnectionString = GenerateConnectionString();
+
+            // 获取配置文件路径
+            var appSettingsPath = Path.Combine(HostEnvironment.ContentRootPath, "appsettings.json");
+            var appDevSettingsPath = Path.Combine(HostEnvironment.ContentRootPath, "appsettings.Development.json");
+
+            // 根据环境选择配置文件
+            var configPath = HostEnvironment.IsDevelopment() ? appDevSettingsPath : appSettingsPath;
+
+            // 读取当前配置
+            var jsonString = await File.ReadAllTextAsync(configPath);
+
+            // 使用 JsonDocument 进行解析并结构化处理
+            using var jsonDoc = JsonDocument.Parse(jsonString);
+            var element = jsonDoc.RootElement;
+
+            // 创建一个 JsonObject 以允许修改
+            var jsonObject = new Dictionary<string, object>();
+
+            // 复制现有的JSON属性
+            foreach (var property in element.EnumerateObject())
+            {
+                if (property.Name == "ConnectionStrings")
+                {
+                    // 处理连接字符串节点
+                    var connectionStrings = new Dictionary<string, string>();
+
+                    // 复制现有的连接字符串
+                    if (property.Value.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var conn in property.Value.EnumerateObject())
+                        {
+                            connectionStrings[conn.Name] = conn.Value.GetString() ?? "";
+                        }
+                    }
+
+                    // 更新或添加 DefaultConnection
+                    connectionStrings["DefaultConnection"] = newConnectionString;
+                    jsonObject["ConnectionStrings"] = connectionStrings;
+                }
+                else
+                {
+                    // 复制其他节点
+                    switch (property.Value.ValueKind)
+                    {
+                        case JsonValueKind.Object:
+                            jsonObject[property.Name] = JsonSerializer.Deserialize<object>(property.Value.GetRawText()) ?? new object();
+                            break;
+                        case JsonValueKind.Array:
+                            jsonObject[property.Name] = JsonSerializer.Deserialize<object[]>(property.Value.GetRawText()) ?? Array.Empty<object>();
+                            break;
+                        case JsonValueKind.String:
+                            jsonObject[property.Name] = property.Value.GetString() ?? "";
+                            break;
+                        case JsonValueKind.Number:
+                            jsonObject[property.Name] = property.Value.GetDouble();
+                            break;
+                        case JsonValueKind.True:
+                        case JsonValueKind.False:
+                            jsonObject[property.Name] = property.Value.GetBoolean();
+                            break;
+                        default:
+                            jsonObject[property.Name] = null!;
+                            break;
+                    }
+                }
+            }
+
+            // 如果没有找到现有的 ConnectionStrings 节点，则创建一个新的
+            if (!jsonObject.ContainsKey("ConnectionStrings"))
+            {
+                jsonObject["ConnectionStrings"] = new Dictionary<string, string> { ["DefaultConnection"] = newConnectionString };
+            }
+
+            // 写回配置文件
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var updatedJsonString = JsonSerializer.Serialize(jsonObject, options);
+            await File.WriteAllTextAsync(configPath, updatedJsonString);
+
+            _connectionStringResult = (true, "数据库连接字符串已成功更新。需重新启动应用程序以应用更改。");
+            await ToastService.Success("成功", "连接字符串已更新");
+
+            // 设置需要重启的状态
+            DatabaseStateService.SetRestartRequired();
+
+            // 加载检查数据库状态
+            await CheckDatabaseStatus(newConnectionString);
+
+            // 加载检查数据库迁移
+            await CheckMigrations(newConnectionString);
+
+            // 加载统计信息
+            await GetStatistics(newConnectionString);
+
+        }
+        catch (Exception ex)
+        {
+            _connectionStringResult = (false, $"更新连接字符串失败: {ex.Message}");
+            await ToastService.Error("错误", $"更新连接字符串失败: {ex.Message}");
+        }
+        finally
+        {
+
+        }
+    }
+
+}
+
+
+

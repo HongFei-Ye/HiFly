@@ -1,0 +1,4 @@
+﻿@using HiFly.DatabaseManager.Options
+@inject DatabaseStateService DatabaseStateService
+
+<div>@($"距离上次修改时间:{DatabaseStateService.GetTimeSinceLastChange()}")</div>

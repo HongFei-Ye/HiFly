@@ -1,0 +1,32 @@
+﻿@inject IRoleService RoleService
+
+@typeparam TContext
+@typeparam TRole
+
+
+<PageTitle>角色信息管理</PageTitle>
+
+<TItemTable TContext="TContext"
+            TItem="TRole"
+            PropertyFilterParameters="@PropertyFilterParameters">
+
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.SuperiorRoleId" Text="上级角色" >
+            <Template Context="value">
+                <div>@RoleService.GetRoleShowNameById(value.Value ?? "")</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <RoleVirtualizeSelect TContext="TContext" TRole="TRole" @bind-Value="@value.SuperiorRoleId" DisplayText="上级角色" IsCanNull="true"></RoleVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <RoleIdFilter TContext="TContext" TRole="TRole"></RoleIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+    </TableColumns>
+
+</TItemTable>
+

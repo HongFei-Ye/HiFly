@@ -1,0 +1,33 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components.Messages.QuickSuggestions
+
+<div class="suggestion-category" role="region" aria-labelledby="category-@Title.Replace(" ", "-")">
+    <div class="category-header" id="category-@Title.Replace(" ", "-")">
+        <div class="header-icon">
+            <i class="@IconClass" aria-hidden="true"></i>
+            <div class="icon-glow"></div>
+        </div>
+        <span class="header-title">@Title</span>
+        <div class="header-decoration">
+            <div class="decoration-line"></div>
+        </div>
+    </div>
+    <div class="category-suggestions" role="list">
+        @foreach (var suggestion in Suggestions)
+        {
+            <div role="listitem">
+                <SuggestionChip Text="@suggestion.Text" 
+                               Message="@suggestion.Message"
+                               OnClick="HandleSuggestionClick" />
+            </div>
+        }
+    </div>
+    <div class="category-background" aria-hidden="true">
+        <div class="background-gradient"></div>
+        <div class="background-pattern">
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+            <div class="pattern-dot"></div>
+        </div>
+    </div>
+</div>

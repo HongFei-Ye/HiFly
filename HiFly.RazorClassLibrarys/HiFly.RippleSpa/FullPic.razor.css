@@ -1,0 +1,6 @@
+﻿.section-ripples-full {
+    height: 100vh; /* 让section的高度等于视口的高度 */
+    display: flex; /* 如果需要让内容垂直居中，可以使用flex */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}

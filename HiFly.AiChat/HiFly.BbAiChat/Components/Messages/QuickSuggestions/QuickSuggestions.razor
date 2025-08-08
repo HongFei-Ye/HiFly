@@ -1,0 +1,18 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components.Messages.QuickSuggestions
+
+<div class="suggestions-section">
+    <div class="suggestions-title">
+        <i class="fas fa-lightbulb"></i>
+        <span>¿ì½Ý½¨Òé</span>
+    </div>
+    <div class="suggestion-categories">
+        @foreach (var category in Categories)
+        {
+            <SuggestionCategory Title="@category.Title"
+                               IconClass="@category.IconClass"
+                               Suggestions="@category.Suggestions"
+                               OnSuggestionClick="HandleSuggestionClick" />
+        }
+    </div>
+</div>

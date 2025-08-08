@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="message-avatar">
+    <div class="avatar-container">
+        @if (IsUser)
+        {
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+                <div class="avatar-ring"></div>
+            </div>
+        }
+        else
+        {
+            <div class="ai-avatar @(IsLoading ? "loading" : "")">
+                <i class="fas fa-robot"></i>
+                <div class="ai-glow"></div>
+                <div class="ai-pulse @(IsLoading ? "loading-pulse" : "")"></div>
+            </div>
+        }
+    </div>
+</div>

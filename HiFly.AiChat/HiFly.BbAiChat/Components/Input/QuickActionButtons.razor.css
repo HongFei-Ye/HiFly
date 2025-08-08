@@ -1,0 +1,259 @@
+﻿/* ===========================================
+   快捷操作按钮组件样式
+   =========================================== */
+
+.quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-action-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(102, 126, 234, 0.08);
+    color: #667eea;
+}
+
+.quick-action-btn:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.quick-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.quick-action-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===========================================
+   语音按钮特殊样式
+   =========================================== */
+
+.quick-action-btn.voice-btn.recording {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+    animation: recordingPulse 2s infinite;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { 
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 6px 20px rgba(229, 62, 62, 0.6);
+        transform: scale(1.05);
+    }
+}
+
+/* 录音指示器 */
+.recording-indicator {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    background: #f56565;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: recordingBlink 1.5s infinite;
+}
+
+@keyframes recordingBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* ===========================================
+   表情按钮特殊样式
+   =========================================== */
+
+.quick-action-btn.emoji-btn:hover {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+/* ===========================================
+   按钮状态样式
+   =========================================== */
+
+.quick-action-btn.active {
+    background: rgba(102, 126, 234, 0.2);
+    color: #4c51bf;
+}
+
+.quick-action-btn.warning {
+    background: rgba(255, 193, 7, 0.1);
+    color: #f6ad55;
+}
+
+.quick-action-btn.danger {
+    background: rgba(229, 62, 62, 0.1);
+    color: #f56565;
+}
+
+.quick-action-btn.success {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+}
+
+/* ===========================================
+   按钮光效
+   =========================================== */
+
+.quick-action-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    border-radius: 10px;
+}
+
+.quick-action-btn:hover::before {
+    transform: translateX(100%);
+}
+
+/* ===========================================
+   工具提示
+   =========================================== */
+
+.quick-action-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3748;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 0.25rem;
+    animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(4px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ===========================================
+   暗色主题支持
+   =========================================== */
+
+body.dark-theme .quick-action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+}
+
+body.dark-theme .quick-action-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .quick-action-btn.emoji-btn:hover {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffd700;
+}
+
+body.dark-theme .quick-action-btn.active {
+    background: rgba(102, 126, 234, 0.3);
+    color: #90cdf4;
+}
+
+body.dark-theme .quick-action-btn[title]:hover::after {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+/* ===========================================
+   响应式设计
+   =========================================== */
+
+@media (max-width: 768px) {
+    .quick-actions {
+        gap: 4px;
+    }
+    
+    .quick-action-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-action-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+    
+    .quick-action-btn[title]:hover::after {
+        display: none; /* 移动端隐藏工具提示 */
+    }
+}
+
+/* ===========================================
+   可访问性增强
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .quick-action-btn {
+        transition: none;
+        animation: none;
+    }
+    
+    .recording-indicator {
+        animation: none;
+    }
+    
+    @keyframes recordingPulse {
+        0%, 100% { 
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+            transform: none;
+        }
+    }
+}
+
+/* ===========================================
+   高对比度支持
+   =========================================== */
+
+@media (prefers-contrast: high) {
+    .quick-action-btn {
+        border: 1px solid currentColor;
+    }
+    
+    .quick-action-btn:hover:not(:disabled) {
+        border-width: 2px;
+    }
+}

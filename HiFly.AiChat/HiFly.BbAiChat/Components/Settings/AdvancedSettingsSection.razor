@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<SettingsSection Title="高级设置" IconClass="fas fa-cogs">
+    
+    <!-- 上下文记忆设置 -->
+    <div class="advanced-setting-item inline-layout">
+        <div class="setting-label-inline">
+            <span class="label-icon">
+                <i class="fas fa-memory"></i>
+            </span>
+            <span class="label-text">上下文记忆</span>
+        </div>
+        <div class="toggle-wrapper-inline">
+            <label class="enhanced-switch">
+                <input type="checkbox" 
+                       checked="@EnableMemory" 
+                       @onchange="HandleMemoryChanged" />
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+        <div class="setting-description-inline">
+            保持对话的上下文连贯性，AI会记住之前的对话内容
+        </div>
+    </div>
+
+    <!-- 流式响应设置 -->
+    <div class="advanced-setting-item inline-layout">
+        <div class="setting-label-inline">
+            <span class="label-icon">
+                <i class="fas fa-stream"></i>
+            </span>
+            <span class="label-text">流式响应</span>
+        </div>
+        <div class="toggle-wrapper-inline">
+            <label class="enhanced-switch">
+                <input type="checkbox" 
+                       checked="@EnableStreaming" 
+                       @onchange="HandleStreamingChanged" />
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+        <div class="setting-description-inline">
+            启用后AI回答会逐字显示，提供更好的实时体验
+        </div>
+    </div>
+
+    @if (AdditionalSettings != null)
+    {
+        @AdditionalSettings
+    }
+
+</SettingsSection>

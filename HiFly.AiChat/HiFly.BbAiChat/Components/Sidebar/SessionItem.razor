@@ -1,0 +1,35 @@
+@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components
+
+<div class="chat-session-item @(IsActive ? "active" : "")" @onclick="HandleSessionClick">
+    <div class="session-item-bg"></div>
+    <div class="session-indicator"></div>
+    <div class="session-content">
+        <div class="session-icon">
+            <i class="fas fa-comment-alt"></i>
+        </div>
+        <div class="session-info">
+            <div class="session-title">@Session.Title</div>
+            <div class="session-meta">
+                <span class="session-time">
+                    <i class="far fa-clock"></i>
+                    @GetRelativeTime(Session.CreateTime)
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="session-actions">
+        <button class="session-action-btn edit-btn" 
+                @onclick:stopPropagation="true"
+                @onclick="HandleEditSession"
+                title="编辑对话">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="session-action-btn delete-btn" 
+                @onclick:stopPropagation="true"
+                @onclick="HandleDeleteSession"
+                title="删除对话">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+</div>

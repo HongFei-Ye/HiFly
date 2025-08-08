@@ -1,0 +1,104 @@
+/* SidebarResizeHandle 组件样式 */
+.sidebar-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    width: 10px;
+    height: 100%;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.ai-chat-left-panel:hover .sidebar-resize-handle {
+    opacity: 1;
+}
+
+.sidebar-resize-handle:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 5px;
+    opacity: 1 !important;
+}
+
+.sidebar-resize-handle.active {
+    background: rgba(102, 126, 234, 0.2);
+    opacity: 1 !important;
+}
+
+.resize-handle-bar {
+    width: 2px;
+    height: 40px;
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-resize-handle:hover .resize-handle-bar {
+    background: rgba(102, 126, 234, 0.6);
+    width: 3px;
+}
+
+.resize-handle-dots {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-resize-handle:hover .resize-handle-dots {
+    opacity: 1;
+}
+
+.handle-dot {
+    width: 3px;
+    height: 3px;
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 50%;
+}
+
+/* 拖拽时的样式 */
+.sidebar-resizing {
+    user-select: none;
+    cursor: col-resize !important;
+}
+
+.sidebar-resizing * {
+    cursor: col-resize !important;
+}
+
+/* 暗色主题支持 */
+body.dark-theme .sidebar-resize-handle:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+body.dark-theme .resize-handle-bar {
+    background: rgba(102, 126, 234, 0.4);
+}
+
+body.dark-theme .sidebar-resize-handle:hover .resize-handle-bar {
+    background: rgba(102, 126, 234, 0.7);
+}
+
+body.dark-theme .handle-dot {
+    background: rgba(102, 126, 234, 0.6);
+}
+
+/* 焦点样式 */
+.sidebar-resize-handle:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: -2px;
+    opacity: 1;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar-resize-handle {
+        display: none; /* 移动设备隐藏拖拽手柄 */
+    }
+}

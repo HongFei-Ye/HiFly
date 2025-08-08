@@ -1,0 +1,77 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="left-panel-stats">
+    <div class="stats-compact-grid">
+        <div class="stat-compact-item" title="当前会话消息数">
+            <div class="stat-compact-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <div class="stat-compact-info">
+                <div class="stat-compact-value">@MessageCount</div>
+                <div class="stat-compact-label">消息</div>
+            </div>
+        </div>
+
+        <div class="stat-compact-item" title="总会话数">
+            <div class="stat-compact-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-compact-info">
+                <div class="stat-compact-value">@SessionCount</div>
+                <div class="stat-compact-label">会话</div>
+            </div>
+        </div>
+
+        <div class="stat-compact-item" title="当前会话时长">
+            <div class="stat-compact-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-compact-info">
+                <div class="stat-compact-value">@SessionDuration</div>
+                <div class="stat-compact-label">时长</div>
+            </div>
+        </div>
+
+        <div class="stat-compact-item" title="预估令牌使用量">
+            <div class="stat-compact-icon">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="stat-compact-info">
+                <div class="stat-compact-value">@TokensUsed</div>
+                <div class="stat-compact-label">令牌</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 消息数量
+    /// </summary>
+    [Parameter]
+    public int MessageCount { get; set; }
+
+    /// <summary>
+    /// 会话数量
+    /// </summary>
+    [Parameter]
+    public int SessionCount { get; set; }
+
+    /// <summary>
+    /// 会话时长
+    /// </summary>
+    [Parameter]
+    public string SessionDuration { get; set; } = "0分钟";
+
+    /// <summary>
+    /// 令牌使用量
+    /// </summary>
+    [Parameter]
+    public string TokensUsed { get; set; } = "0";
+
+    /// <summary>
+    /// 自定义统计项模板
+    /// </summary>
+    [Parameter]
+    public RenderFragment? CustomStatsTemplate { get; set; }
+}

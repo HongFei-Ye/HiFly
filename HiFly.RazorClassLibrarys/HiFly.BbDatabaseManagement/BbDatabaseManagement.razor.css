@@ -1,0 +1,39 @@
+﻿/* 卡片和内容样式 */
+::deep .dashboard-stats .card-header {
+    background-color: rgba(0,0,0,.03);
+    font-weight: 500;
+}
+
+::deep pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 圆角徽章样式 */
+::deep .rounded-pill {
+    border-radius: 50rem;
+}
+
+/* 页面头部样式 */
+.page-header {
+    border-radius: 0.5rem;
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.header-icon {
+    width: 70px;
+    height: 70px;
+}
+
+.opacity-90 {
+    opacity: 0.9 !important;
+}
+
+.opacity-10 {
+    opacity: 0.1 !important;
+}

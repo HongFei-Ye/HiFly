@@ -1,0 +1,188 @@
+/* 快捷建议组件样式 - 现代化设计 */
+.suggestions-section {
+    margin-top: 2.5rem;
+    position: relative;
+}
+
+.suggestions-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    color: #4a5568;
+    font-weight: 700;
+    font-size: 1.125rem;
+    position: relative;
+}
+
+.suggestions-title i {
+    color: #667eea;
+    font-size: 1.25rem;
+    animation: pulse-glow 3s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+}
+
+@keyframes pulse-glow {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scale(1);
+        filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.1);
+        filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.5));
+    }
+}
+
+.suggestions-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    animation: titleUnderline 2s ease-in-out infinite;
+}
+
+@keyframes titleUnderline {
+    0%, 100% { 
+        opacity: 0.3; 
+        width: 20px; 
+    }
+    50% { 
+        opacity: 1; 
+        width: 60px; 
+    }
+}
+
+.suggestion-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.suggestion-categories::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.03) 0%, 
+        rgba(118, 75, 162, 0.03) 50%, 
+        rgba(64, 153, 255, 0.03) 100%);
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0;
+    animation: backgroundFade 1s ease-out 0.5s forwards;
+}
+
+@keyframes backgroundFade {
+    to { opacity: 1; }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .suggestion-categories {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .suggestions-section {
+        margin-top: 2rem;
+    }
+    
+    .suggestions-title {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .suggestion-categories {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .suggestion-categories::before {
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .suggestions-section {
+        margin-top: 1.5rem;
+    }
+    
+    .suggestions-title {
+        font-size: 0.95rem;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .suggestions-title i {
+        font-size: 1.1rem;
+    }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .suggestions-title {
+    color: #e2e8f0;
+}
+
+body.dark-theme .suggestion-categories::before {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.08) 0%, 
+        rgba(118, 75, 162, 0.08) 50%, 
+        rgba(64, 153, 255, 0.08) 100%);
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .suggestions-title i,
+    .suggestions-title::after,
+    .suggestion-categories::before {
+        animation: none !important;
+    }
+    
+    .suggestions-title::after {
+        opacity: 1;
+        width: 40px;
+    }
+    
+    .suggestion-categories::before {
+        opacity: 1;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .suggestions-title {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .suggestions-title i {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .suggestions-title::after,
+    .suggestion-categories::before {
+        display: none;
+    }
+    
+    .suggestions-title i {
+        animation: none;
+        color: #000;
+    }
+}

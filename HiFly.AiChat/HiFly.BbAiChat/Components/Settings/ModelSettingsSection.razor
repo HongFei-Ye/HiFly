@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Components
+@using HiFly.BbAiChat.Components
+
+<SettingsSection Title="模型设置" IconClass="fas fa-brain">
+    
+    <!-- AI模型选择 -->
+    <SettingItem Label="AI模型" 
+                 IconClass="fas fa-microchip">
+        <div class="select-wrapper">
+            <select class="enhanced-select" 
+                    value="@SelectedModel" 
+                    @onchange="HandleModelChanged">
+                @foreach (var model in AvailableModels)
+                {
+                    <option value="@model.Id">@model.Name</option>
+                }
+            </select>
+            <div class="select-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </SettingItem>
+
+    <!-- 温度设置 -->
+    <SettingItem Label="创造性" 
+                 IconClass="fas fa-thermometer-half" 
+                 ValueText="@Temperature.ToString("F1")"
+                 Description="控制AI回答的创造性程度，值越高越有创意">
+        <div class="slider-wrapper">
+            <input type="range" 
+                   class="enhanced-slider"
+                   min="0" 
+                   max="1" 
+                   step="0.1" 
+                   value="@Temperature.ToString("0.0")"
+                   @oninput="HandleTemperatureInput"
+                   @onchange="HandleTemperatureChanged" />
+            <div class="slider-labels">
+                <span>保守</span>
+                <span>创新</span>
+            </div>
+        </div>
+    </SettingItem>
+
+    <!-- 最大令牌数设置 -->
+    <SettingItem Label="最大令牌数" 
+                 IconClass="fas fa-list-ol" 
+                 ValueText="@MaxTokens.ToString()"
+                 Description="控制AI单次回答的最大长度">
+        <div class="input-wrapper-right">
+            <input type="number" 
+                   class="enhanced-number-input" 
+                   value="@MaxTokens" 
+                   @onchange="HandleMaxTokensChanged"
+                   min="100" 
+                   max="4000" 
+                   step="100" />
+            <div class="input-suffix">tokens</div>
+        </div>
+    </SettingItem>
+
+</SettingsSection>

@@ -1,0 +1,430 @@
+﻿/* ===========================================
+   模型设置区域组件样式 - 超紧凑间距版本
+   =========================================== */
+
+/* 模型设置区域专用超紧凑间距 */
+.settings-section:has([class*="select-wrapper"]) .settings-group.enhanced,
+.settings-section:has([class*="slider-wrapper"]) .settings-group.enhanced,
+.settings-section:has([class*="input-wrapper-right"]) .settings-group.enhanced {
+    margin-bottom: 0.75rem; /* 从 1rem 进一步减少到 0.75rem */
+    padding: 0.75rem;       /* 从 0.875rem 减少到 0.75rem */
+}
+
+/* 模型设置最后一项移除底部间距 */
+.settings-section .settings-group.enhanced:last-child {
+    margin-bottom: 0;
+}
+
+/* 模型设置内部间距进一步优化 */
+.settings-section .enhanced-label {
+    margin-bottom: 0.5rem; /* 从 0.625rem 减少到 0.5rem */
+}
+
+.settings-section .setting-control {
+    margin-bottom: 0.25rem; /* 从 0.375rem 减少到 0.25rem */
+}
+
+.settings-section .setting-description {
+    margin-top: 0.25rem;  /* 从 0.375rem 减少到 0.25rem */
+    padding-top: 0.25rem; /* 从 0.375rem 减少到 0.25rem */
+    font-size: 0.68rem;   /* 从 0.7rem 减少到 0.68rem */
+    line-height: 1.25;    /* 从 1.3 减少到 1.25 */
+}
+
+/* 选择器包装器 */
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.enhanced-select {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: #2d3748;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    width: 100%;
+    font-family: inherit;
+}
+
+.enhanced-select:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.enhanced-select:hover:not(:focus) {
+    border-color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+}
+
+.enhanced-select option {
+    padding: 0.5rem;
+    background: white;
+    color: #2d3748;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    color: #667eea;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.enhanced-select:focus + .select-arrow {
+    transform: rotate(180deg);
+}
+
+/* 滑块包装器 */
+.slider-wrapper {
+    position: relative;
+    padding: 0.25rem 0; /* 从 0.375rem 减少到 0.25rem */
+}
+
+.enhanced-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    margin-bottom: 0.5rem; /* 从 0.625rem 减少到 0.5rem */
+    cursor: pointer;
+}
+
+.enhanced-slider:hover {
+    opacity: 1;
+}
+
+.enhanced-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.enhanced-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.enhanced-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.enhanced-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.enhanced-slider::-moz-range-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border-radius: 3px;
+    border: none;
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem; /* 从 0.65rem 减少到 0.6rem */
+    color: #718096;
+    font-weight: 600;
+    margin-top: 0.15rem; /* 从 0.2rem 减少到 0.15rem */
+}
+
+.slider-labels span {
+    padding: 0.15rem 0.4rem; /* 从 0.2rem 0.45rem 减少 */
+    background: rgba(113, 128, 150, 0.1);
+    border-radius: 8px; /* 从 10px 减少到 8px */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.55rem; /* 从 0.6rem 减少到 0.55rem */
+}
+
+.slider-labels span:hover {
+    background: rgba(113, 128, 150, 0.2);
+    color: #4a5568;
+}
+
+/* 数字输入包装器 */
+.input-wrapper-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.enhanced-number-input {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: #2d3748;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.enhanced-number-input::-webkit-outer-spin-button,
+.enhanced-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.enhanced-number-input:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.enhanced-number-input:hover:not(:focus) {
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.input-suffix {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* 模型徽章特殊样式 */
+.label-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.2rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* 创造性值显示特殊样式 */
+.label-value {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    padding: 0.2rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    min-width: 2.5rem;
+    text-align: center;
+}
+
+/* 动画效果 */
+.enhanced-select,
+.enhanced-number-input,
+.enhanced-slider {
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px); /* 从 8px 减少到 6px */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 悬停效果优化 */
+.settings-group.enhanced:hover {
+    transform: translateY(-0.5px); /* 从 -1px 减少到 -0.5px */
+    box-shadow: 0 3px 15px rgba(102, 126, 234, 0.1); /* 进一步减少阴影 */
+    border-color: rgba(102, 126, 234, 0.25);
+}
+
+/* 暗色主题支持 */
+body.dark-theme .enhanced-select {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+body.dark-theme .enhanced-select:focus {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-theme .enhanced-select:hover:not(:focus) {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .enhanced-select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+body.dark-theme .select-arrow {
+    color: #a0aec0;
+}
+
+body.dark-theme .enhanced-slider {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
+}
+
+body.dark-theme .enhanced-slider::-webkit-slider-thumb {
+    background: linear-gradient(135deg, #90cdf4 0%, #a78bfa 100%);
+}
+
+body.dark-theme .enhanced-slider::-moz-range-thumb {
+    background: linear-gradient(135deg, #90cdf4 0%, #a78bfa 100%);
+}
+
+body.dark-theme .enhanced-slider::-moz-range-track {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
+}
+
+body.dark-theme .slider-labels {
+    color: #a0aec0;
+}
+
+body.dark-theme .slider-labels span {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .slider-labels span:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #e2e8f0;
+}
+
+body.dark-theme .enhanced-number-input {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+body.dark-theme .enhanced-number-input:focus {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-theme .input-suffix {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a0aec0;
+}
+
+body.dark-theme .label-value {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #90cdf4;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .settings-section .settings-group.enhanced {
+        margin-bottom: 0.5rem; /* 移动端进一步紧凑 */
+        padding: 0.625rem;     /* 减少padding */
+    }
+    
+    .enhanced-select,
+    .enhanced-number-input {
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    .slider-labels {
+        font-size: 0.55rem;
+    }
+    
+    .slider-labels span {
+        padding: 0.1rem 0.3rem;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-section .settings-group.enhanced {
+        margin-bottom: 0.375rem; /* 小屏幕更紧凑 */
+        padding: 0.5rem;         /* 最小padding */
+    }
+    
+    .input-wrapper-right {
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+    
+    .enhanced-number-input {
+        width: 100%;
+    }
+    
+    .input-suffix {
+        align-self: flex-end;
+    }
+}
+
+/* 可访问性增强 */
+@media (prefers-reduced-motion: reduce) {
+    .enhanced-select,
+    .enhanced-number-input,
+    .enhanced-slider,
+    .select-arrow {
+        transition: none;
+        animation: none;
+    }
+    
+    .settings-group.enhanced:hover {
+        transform: none;
+    }
+}
+
+/* 高对比度支持 */
+@media (prefers-contrast: high) {
+    .enhanced-select,
+    .enhanced-number-input {
+        border-width: 2px;
+    }
+    
+    .enhanced-slider::-webkit-slider-thumb,
+    .enhanced-slider::-moz-range-thumb {
+        border: 2px solid #000;
+    }
+}

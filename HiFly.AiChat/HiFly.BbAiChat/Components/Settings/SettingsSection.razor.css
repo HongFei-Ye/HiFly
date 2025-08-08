@@ -1,0 +1,80 @@
+﻿/* ===========================================
+   设置区域容器组件样式
+   =========================================== */
+
+.settings-section {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0 1.25rem;
+}
+
+.settings-section:first-child {
+    margin-top: 0.5rem;
+}
+
+.settings-section.collapsed .settings-content {
+    display: none;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.section-header:hover {
+    color: #667eea;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.section-header:hover .section-icon {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    transform: scale(1.1);
+}
+
+.section-title {
+    margin: 0;
+    color: #2d3748;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.settings-content {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 暗色主题支持 */
+body.dark-theme .section-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .section-title {
+    color: #e2e8f0;
+}
+
+body.dark-theme .section-header:hover {
+    color: #90cdf4;
+}

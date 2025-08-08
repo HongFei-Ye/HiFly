@@ -1,0 +1,45 @@
+﻿@inject IInstitutionService InstitutionService
+@inject IDepartmentService DepartmentService
+
+@typeparam TContext where TContext : DbContext
+@typeparam TInstDepartment where TInstDepartment : class, IInstDepartment, new()
+@typeparam TInstitution where TInstitution : class, IInstitution, new()
+@typeparam TDepartment where TDepartment : class, IDepartment, new()
+
+<PageTitle>机构部门关系</PageTitle>
+
+<TItemTable TContext="TContext" TItem="TInstDepartment">
+
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.InstitutionId" Text="机构名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@InstitutionService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <InstVirtualizeSelect TContext="@TContext" TInstitution="@TInstitution" @bind-Value="@value.InstitutionId"></InstVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <InstIdFilter TContext="@TContext" TInstitution="@TInstitution"></InstIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="@context.DepartmentId" Text="部门名称" Filterable="true" Sortable="true">
+            <Template Context="value">
+                <div>@DepartmentService.GetShortNameById(value.Value)</div>
+            </Template>
+            <EditTemplate Context="value">
+                <div class="col-12 col-sm-6">
+                    <DepartmentVirtualizeSelect TContext="@TContext" TDepartment="@TDepartment" @bind-Value="@value.DepartmentId"></DepartmentVirtualizeSelect>
+                </div>
+            </EditTemplate>
+            <FilterTemplate>
+                <DepartmentIdFilter TContext="@TContext" TDepartment="@TDepartment"></DepartmentIdFilter>
+            </FilterTemplate>
+        </TableColumn>
+
+    </TableColumns>
+
+
+</TItemTable>

@@ -1,0 +1,144 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<!-- 底部输入区域 -->
+<div class="ai-chat-footer">
+
+    <!-- 工具栏 -->
+    <div class="chat-toolbar">
+        @if (ToolbarTemplate != null)
+        {
+            @ToolbarTemplate
+        }
+        else
+        {
+            <div class="default-toolbar">
+
+                <div class="toolbar-left">
+                    <!-- 左侧主要功能区 - 文件操作类 -->
+                    <div class="toolbar-left-primary">
+                        <button class="toolbar-btn attach-btn" @onclick="HandleAttachFile" disabled="@IsLoading" title="添加附件">
+                            <div class="toolbar-btn-bg"></div>
+                            <i class="fas fa-paperclip"></i>
+                            <span class="btn-tooltip">附件</span>
+                        </button>
+                        <button class="toolbar-btn template-btn" @onclick="HandleInsertTemplate" disabled="@IsLoading" title="插入模板">
+                            <div class="toolbar-btn-bg"></div>
+                            <i class="fas fa-file-alt"></i>
+                            <span class="btn-tooltip">模板</span>
+                        </button>
+                    </div>
+
+                    <!-- 左侧AI增强功能区 - AI能力类 -->
+                    <div class="toolbar-left-secondary">
+                        <button class="toolbar-btn deep-think-btn" @onclick="HandleDeepThink" disabled="@IsLoading" title="启用深度思考模式">
+                            <div class="toolbar-btn-bg"></div>
+                            <i class="fas fa-brain"></i>
+                            <span class="btn-tooltip">深度思考</span>
+                        </button>
+                        <button class="toolbar-btn web-search-btn" @onclick="HandleWebSearch" disabled="@IsLoading" title="启用联网搜索">
+                            <div class="toolbar-btn-bg"></div>
+                            <i class="fas fa-globe-americas"></i>
+                            <span class="btn-tooltip">联网搜索</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-right">
+                    <!-- 保留工具栏右侧用于将来扩展，移除重复的语音和发送按钮 -->
+                    <div class="toolbar-status">
+                        <span class="input-hint">使用 Enter 发送消息，Shift+Enter 换行</span>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <!-- 输入框区域 - 重新设计的一体化布局 -->
+    <div class="chat-input-container">
+        <div class="input-wrapper-enhanced" @onclick="HandleInputAreaClick">
+            <!-- 左侧功能区域 -->
+            <div class="input-left-section">
+                <!-- 字符计数 -->
+                <div class="input-stats" @onclick="HandleStatsClick" @onclick:stopPropagation="true">
+                    <span class="char-count">@(CurrentMessage?.Length ?? 0)/2000</span>
+                </div>
+            </div>
+            
+            <!-- 中间输入区域 -->
+            <div class="input-field">
+                <textarea class="chat-input-enhanced"
+                          placeholder="@Placeholder"
+                          @bind="CurrentMessage"
+                          @onkeydown="HandleKeyDown"
+                          @onmousedown="HandleTextSelectionStart"
+                          @onmouseup="HandleTextSelectionEnd"
+                          @ondblclick="HandleTextDoubleClick"
+                          @oninput="HandleTextInput"
+                          @ref="inputTextarea"
+                          rows="1"
+                          maxlength="2000"
+                          disabled="@IsLoading"></textarea>
+                <div class="input-border"></div>
+                <div class="input-glow"></div>
+            </div>
+
+            <!-- 右侧操作区域 -->
+            <div class="input-right-section">
+                <!-- 快捷操作按钮组 -->
+                <div class="quick-actions">
+                    <!-- 语音输入按钮 -->
+                    <button class="quick-action-btn voice-btn @(IsVoiceRecording ? "recording" : "")" 
+                            @onclick="HandleToggleVoice" 
+                            @onclick:stopPropagation="true"
+                            disabled="@IsLoading" 
+                            title="@(IsVoiceRecording ? "停止录音" : "语音输入")">
+                        <i class="fas @(IsVoiceRecording ? "fa-stop" : "fa-microphone")"></i>
+                        @if (IsVoiceRecording)
+                        {
+                            <div class="recording-indicator"></div>
+                        }
+                    </button>
+                    
+                    <!-- 可以添加更多快捷操作 -->
+                    <button class="quick-action-btn emoji-btn" 
+                            @onclick="HandleEmojiClick"
+                            @onclick:stopPropagation="true"
+                            disabled="@IsLoading" 
+                            title="表情符号">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+
+                <!-- 发送按钮 - 紧贴输入框 -->
+                <button class="send-button-integrated @(IsLoading ? "loading" : "") @(string.IsNullOrWhiteSpace(CurrentMessage) ? "disabled" : "active")"
+                        @onclick="HandleSendMessageClick"
+                        @onclick:stopPropagation="true"
+                        @oncontextmenu="@((MouseEventArgs e) => { /* 右键菜单处理 */ })"
+                        @oncontextmenu:preventDefault="true"
+                        disabled="@(IsLoading || string.IsNullOrWhiteSpace(CurrentMessage))"
+                        title="发送消息 (Enter)">
+                    <div class="send-btn-bg"></div>
+                    @if (IsLoading)
+                    {
+                        <div class="loading-spinner">
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="send-icon">
+                            <i class="fas fa-paper-plane"></i>
+                            <div class="send-trail"></div>
+                        </div>
+                    }
+                    <div class="send-ripple"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

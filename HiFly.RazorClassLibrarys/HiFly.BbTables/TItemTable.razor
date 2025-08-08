@@ -1,0 +1,62 @@
+﻿@typeparam TContext
+@typeparam TItem
+
+@inject IDbContextFactory<TContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject SwalService SwalService
+
+
+
+@if (IsAlreadyInitialize)
+{
+    <div class="@TopDivClass">
+
+        <Table TItem="TItem"
+               @ref="TableRef" @bind-SelectedRows="@SelectedRows" @bind-EditModel="@EditModel"
+               SetRowClassFormatter="@SetRowClassFormatter"
+               AutoGenerateColumns="@AutoGenerateColumns" EditMode="@EditMode"
+               TableColumns="@TableColumns" OnColumnCreating="@OnColumnCreating"
+               OnQueryAsync="@OnQueryAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync"
+               IsExcel="@IsExcel"
+               IsTree="IsTree" OnTreeExpand="@OnTreeExpand" TreeNodeConverter="@TreeNodeConverter" TreeIcon="fa-solid fa-chevron-circle-right"
+               IsFixedHeader="@IsFixedHeader"
+               IsExtendButtonsInRowHeader="@IsExtendButtonsInRowHeader"
+               ShowDefaultButtons="@ShowDefaultButtons" ShowAddButton="@ShowAddButton" ShowEditButton="@ShowEditButton" ShowDeleteButton="@ShowDeleteButton"
+               ShowExtendButtons="@ShowExtendButtons" ShowExtendEditButton="@ShowExtendEditButton" ShowExtendDeleteButton="@ShowExtendDeleteButton"
+               AddButtonText="@AddButtonText" EditButtonText="@EditButtonText"
+               AddModalTitle="@AddModalTitle" EditModalTitle="@EditModalTitle"
+               ShowAdvancedSearch="ShowAdvancedSearch"
+               EditTemplate="@EditTemplate" RowButtonTemplate="@RowButtonTemplate" BeforeRowButtonTemplate="@BeforeRowButtonTemplate"
+               CustomerSearchTemplate="@CustomerSearchTemplate" TableToolbarTemplate="@TableToolbarTemplate"
+               ExportButtonDropdownTemplate="@ExportButtonDropdownTemplate" ExportButtonText="@ExportButtonText"
+               RowTemplate="@RowTemplate" RowContentTemplate="@RowContentTemplate" DetailRowTemplate="@DetailRowTemplate"
+               SortString="@SortString"
+               ShowLoading="true"
+               ShowSearch="@ShowSearch" ShowSkeleton="true"
+               AllowResizing="true"
+               EditDialogIsDraggable="@EditDialogIsDraggable"
+               IsStriped="true"
+               IsBordered="true"
+               ShowEmpty="true" EmptyText="暂无数据" EmptyImage="./images/system/empty.svg"
+               ShowLineNo="@ShowLineNo"
+               ShowToolbar="@ShowToolbar" ShowRefresh="@ShowRefresh" ShowColumnList="@ShowColumnList" ShowCardView="@ShowCardView" ShowExportButton="@ShowExportButton"
+               IsMultipleSelect="@IsMultipleSelect" ClickToSelect="@ClickToSelect"
+               EditDialogSize="Size.ExtraLarge"
+               EditDialogShowMaximizeButton="true"
+               IsPagination="true"
+               HeaderTextWrap="@HeaderTextWrap"
+               AllowDragColumn="true"
+               PageItemsSource="@PageItemsSource">
+        </Table>
+
+    </div>
+}
+else
+{
+    <LoadingTip></LoadingTip>
+}
+
+
+
+
+

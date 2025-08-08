@@ -1,0 +1,301 @@
+﻿/* ===========================================
+   发送按钮组件样式
+   =========================================== */
+
+.send-button-integrated {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* ===========================================
+   按钮状态样式
+   =========================================== */
+
+.send-button-integrated.disabled {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+    color: #a0aec0;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.send-button-integrated.active {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
+}
+
+.send-button-integrated.active:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 25px rgba(72, 187, 120, 0.5);
+}
+
+.send-button-integrated.loading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    animation: sendingPulse 2s infinite;
+}
+
+@keyframes sendingPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6); }
+}
+
+/* ===========================================
+   按钮光效和动画
+   =========================================== */
+
+.send-btn-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    border-radius: 12px;
+}
+
+.send-button-integrated:hover .send-btn-bg {
+    transform: translateX(100%);
+}
+
+.send-icon {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-trail {
+    position: absolute;
+    inset: -2px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%);
+    border-radius: 12px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.send-button-integrated.active:hover .send-trail {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.send-ripple {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+    border-radius: 12px;
+    transform: scale(0);
+    transition: transform 0.3s ease;
+}
+
+.send-button-integrated:active .send-ripple {
+    transform: scale(1.5);
+}
+
+/* ===========================================
+   加载动画
+   =========================================== */
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.spinner-ring {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    position: absolute;
+}
+
+.spinner-ring:nth-child(1) {
+    border-top-color: white;
+    animation: spinnerRotate 1.2s linear infinite;
+}
+
+.spinner-ring:nth-child(2) {
+    border-right-color: white;
+    animation: spinnerRotate 1.2s linear infinite 0.4s;
+    width: 14px;
+    height: 14px;
+}
+
+.spinner-ring:nth-child(3) {
+    border-bottom-color: white;
+    animation: spinnerRotate 1.2s linear infinite 0.8s;
+    width: 10px;
+    height: 10px;
+}
+
+@keyframes spinnerRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===========================================
+   发送成功动画
+   =========================================== */
+
+.send-button-integrated.success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    animation: sendSuccess 0.6s ease;
+}
+
+@keyframes sendSuccess {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ===========================================
+   发送失败动画
+   =========================================== */
+
+.send-button-integrated.error {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    animation: sendError 0.6s ease;
+}
+
+@keyframes sendError {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* ===========================================
+   按钮状态图标
+   =========================================== */
+
+.send-icon .fa-paper-plane {
+    transition: transform 0.3s ease;
+}
+
+.send-button-integrated.active:hover .send-icon .fa-paper-plane {
+    transform: translateX(2px) translateY(-2px);
+}
+
+/* 成功状态图标 */
+.send-button-integrated.success .send-icon::before {
+    content: '\f00c'; /* FontAwesome check icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.send-button-integrated.success .send-icon .fa-paper-plane {
+    display: none;
+}
+
+/* 错误状态图标 */
+.send-button-integrated.error .send-icon::before {
+    content: '\f00d'; /* FontAwesome times icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.send-button-integrated.error .send-icon .fa-paper-plane {
+    display: none;
+}
+
+/* ===========================================
+   暗色主题支持
+   =========================================== */
+
+body.dark-theme .send-button-integrated.disabled {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    color: #718096;
+}
+
+body.dark-theme .send-button-integrated.active {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+body.dark-theme .send-button-integrated.loading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ===========================================
+   响应式设计
+   =========================================== */
+
+@media (max-width: 768px) {
+    .send-button-integrated {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .send-button-integrated {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+}
+
+/* ===========================================
+   可访问性增强
+   =========================================== */
+
+.send-button-integrated:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.send-button-integrated:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .send-button-integrated {
+        transition: none;
+        animation: none;
+    }
+    
+    .loading-spinner .spinner-ring {
+        animation: none;
+    }
+    
+    .send-btn-bg {
+        transition: none;
+    }
+}
+
+/* ===========================================
+   高对比度支持
+   =========================================== */
+
+@media (prefers-contrast: high) {
+    .send-button-integrated {
+        border: 2px solid currentColor;
+    }
+    
+    .send-button-integrated.disabled {
+        opacity: 0.7;
+    }
+}
+
+/* ===========================================
+   打印样式
+   =========================================== */
+
+@media print {
+    .send-button-integrated {
+        display: none;
+    }
+}

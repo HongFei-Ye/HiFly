@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<button class="send-button-integrated @CssClass"
+        @onclick="HandleClick"
+        @onclick:stopPropagation="true"
+        @oncontextmenu="@HandleContextMenu"
+        @oncontextmenu:preventDefault="true"
+        disabled="@IsDisabled"
+        title="@Title">
+    <div class="send-btn-bg"></div>
+    @if (IsLoading)
+    {
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+    }
+    else
+    {
+        <div class="send-icon">
+            <i class="fas fa-paper-plane"></i>
+            <div class="send-trail"></div>
+        </div>
+    }
+    <div class="send-ripple"></div>
+</button>

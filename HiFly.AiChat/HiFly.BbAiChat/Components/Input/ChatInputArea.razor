@@ -1,0 +1,54 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+
+<!-- 底部输入区域 -->
+<div class="ai-chat-footer">
+
+    <!-- 工具栏组件 -->
+    <ChatToolbar ToolbarTemplate="@ToolbarTemplate"
+                 IsDisabled="@IsLoading"
+                 InputHint="@InputHint"
+                 OnAttachFile="@OnAttachFile"
+                 OnInsertTemplate="@OnInsertTemplate"
+                 OnDeepThink="@OnDeepThink"
+                 OnWebSearch="@OnWebSearch" />
+
+    <!-- 输入框区域 - 重新设计的一体化布局 -->
+    <div class="chat-input-container">
+        <div class="input-wrapper-enhanced" @onclick="HandleInputAreaClick">
+            <!-- 左侧功能区域 -->
+            <div class="input-left-section">
+                <InputStatsDisplay CurrentLength="@GetSafeCurrentLength()"
+                                   MaxLength="@MaxLength"
+                                   ShowProgress="@ShowCharacterProgress"
+                                   OnClick="@HandleStatsClick" />
+            </div>
+            
+            <!-- 中间输入区域 -->
+            <TextInputField @ref="textInputField"
+                            CurrentValue="@CurrentMessage"
+                            CurrentValueChanged="@OnCurrentMessageChanged"
+                            Placeholder="@Placeholder"
+                            MaxLength="@MaxLength"
+                            IsDisabled="@IsLoading"
+                            OnSendMessage="@HandleSendMessage" />
+
+            <!-- 右侧操作区域 -->
+            <div class="input-right-section">
+                <!-- 快捷操作按钮组 -->
+                <QuickActionButtons IsDisabled="@IsLoading"
+                                    IsVoiceRecording="@IsVoiceRecording"
+                                    OnToggleVoice="@OnToggleVoice"
+                                    OnEmojiPicker="@OnEmojiPicker"
+                                    AdditionalActions="@QuickActionsTemplate" />
+
+                <!-- 发送按钮 -->
+                <SendButton IsLoading="@IsLoading"
+                            IsDisabled="@IsLoading"
+                            CanSend="@CanSendMessage()"
+                            OnClick="@HandleSendButtonClick" />
+            </div>
+        </div>
+    </div>
+
+</div>
