@@ -142,8 +142,12 @@ public partial class ChatInputArea : ComponentBase
 
     protected override void OnInitialized()
     {
-        // 简化初始化，确保 CurrentMessage 为空字符串
-        CurrentMessage = string.Empty;
+        // 确保 CurrentMessage 在初始化时为空字符串
+        if (CurrentMessage == "CurrentMessage" || string.IsNullOrWhiteSpace(CurrentMessage))
+        {
+            CurrentMessage = string.Empty;
+        }
+        
         base.OnInitialized();
     }
 
@@ -154,10 +158,10 @@ public partial class ChatInputArea : ComponentBase
         {
             CurrentMessage = string.Empty;
             
-            // 移除Task.Run，使用同步方式通知父组件值已清理
+            // 通知父组件值已清理
             if (CurrentMessageChanged.HasDelegate)
             {
-                _ = CurrentMessageChanged.InvokeAsync(CurrentMessage);
+                _ = Task.Run(async () => await CurrentMessageChanged.InvokeAsync(CurrentMessage));
             }
         }
         
@@ -168,27 +172,21 @@ public partial class ChatInputArea : ComponentBase
     {
         if (firstRender)
         {
-            // 启动UI状态实时同步，确保发送按钮和输入统计实时更新
+            // 强制刷新输入统计显示
             try
             {
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.startUIStateSync");
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.enhanceBlazorSync");
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.enhanceEnterKeyHandling");
+                await JSRuntime.InvokeVoidAsync("aiChatHelper.refreshInputStats");
                 
-                // 添加自定义发送消息事件监听器
-                await JSRuntime.InvokeVoidAsync("eval", @"
-                    const textarea = document.querySelector('textarea.chat-input-enhanced');
-                    if (textarea) {
-                        textarea.addEventListener('sendMessage', (event) => {
-                            console.log('📨 收到自定义发送消息事件:', event.detail.message);
-                            // 这里可以触发Blazor的发送消息逻辑
-                        });
-                    }
-                ");
+                // 调试信息
+                var debugInfo = await JSRuntime.InvokeAsync<object>("aiChatHelper.debugInputEvents");
+                var textareaState = await JSRuntime.InvokeAsync<object>("aiChatHelper.debugTextareaState");
+                
+                System.Console.WriteLine($"Input Debug info: {System.Text.Json.JsonSerializer.Serialize(debugInfo)}");
+                System.Console.WriteLine($"Textarea State: {System.Text.Json.JsonSerializer.Serialize(textareaState)}");
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine($"Failed to start UI state sync: {ex.Message}");
+                System.Console.WriteLine($"Debug failed: {ex.Message}");
             }
         }
         
@@ -261,12 +259,6 @@ public partial class ChatInputArea : ComponentBase
     /// </summary>
     private async Task OnCurrentMessageChanged(string message)
     {
-        // 防止循环更新
-        if (CurrentMessage == message) 
-        {
-            return;
-        }
-        
         // 过滤掉测试数据
         if (message == "CurrentMessage")
         {
@@ -275,17 +267,13 @@ public partial class ChatInputArea : ComponentBase
         
         CurrentMessage = message;
         
-        // 立即强制重新渲染，确保UI状态同步
+        // 强制重新渲染组件以更新UI状态
         StateHasChanged();
         
-        // 通知父组件
         if (CurrentMessageChanged.HasDelegate)
         {
             await CurrentMessageChanged.InvokeAsync(CurrentMessage);
         }
-        
-        // 再次确保状态同步（防止异步延迟）
-        await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>

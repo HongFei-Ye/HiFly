@@ -21,22 +21,22 @@ public class FullPicDataService
     /// <summary>
     /// H1标题
     /// </summary>
-    public string H1 { get; set; } = "HiFly工具库";
+    public string H1 { get; set; } = "帮联科技";
 
     /// <summary>
     /// H3标题 - 第一段
     /// </summary>
-    public string H3_1 { get; set; } = "HiFly";
+    public string H3_1 { get; set; } = "帮联";
 
     /// <summary>
     /// H3标题 - 第二段
     /// </summary>
-    public string H3_2 { get; set; } = "快速开发";
+    public string H3_2 { get; set; } = "数智";
 
     /// <summary>
     /// H3标题 - 第三段
     /// </summary>
-    public string H3_3 { get; set; } = "工具库";
+    public string H3_3 { get; set; } = "解决方案";
 
     /// <summary>
     /// H3标题 - 第四段
@@ -46,17 +46,17 @@ public class FullPicDataService
     /// <summary>
     /// H3标题 - 第五段
     /// </summary>
-    public string H3_5 { get; set; } = "快速 高效";
+    public string H3_5 { get; set; } = "数字化 智能化";
 
     /// <summary>
     /// H3标题 - 第六段
     /// </summary>
-    public string H3_6 { get; set; } = "便捷 通用";
+    public string H3_6 { get; set; } = "信息化 现代化";
 
     /// <summary>
     /// H3标题 - 第七段
     /// </summary>
-    public string H3_7 { get; set; } = "一站式工具链";
+    public string H3_7 { get; set; } = "中国特色数智工厂";
 
 
     /// <summary>

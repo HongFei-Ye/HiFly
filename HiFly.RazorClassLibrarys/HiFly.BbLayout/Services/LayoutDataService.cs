@@ -42,7 +42,7 @@ public class LayoutDataService : ILayoutDataService
     /// <summary>
     /// 侧面标题
     /// </summary>
-    public string SideTitle { get; set; } = "HiFly工具库";
+    public string SideTitle { get; set; } = "帮联数智方案";
 
     /// <summary>
     /// 页脚链接
@@ -52,7 +52,7 @@ public class LayoutDataService : ILayoutDataService
     /// <summary>
     /// 页脚标题
     /// </summary>
-    public string FooterText { get; set; } = "Copyright © 2025-HiFly工具库";
+    public string FooterText { get; set; } = "Copyright © 2025-帮联数智工厂解决方案";
 
 
 
