@@ -1,10 +1,11 @@
-/* ������Ϣ�����ʽ */
+﻿/* 消息整体样式 */
 .message {
     display: flex;
     margin-bottom: 2rem;
     align-items: flex-start;
     animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    gap: 1.25rem; /* 头像和气泡之间的间隔 */
 }
 
 @keyframes messageSlideIn {
@@ -18,25 +19,40 @@
     }
 }
 
+/* AI消息 - 头像在左侧，气泡在右侧，整体靠左 */
+.ai-message {
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+/* 用户消息 - 头像在右侧，气泡在左侧，整体靠右但保持更明显的边距 */
 .user-message {
     justify-content: flex-end;
+    flex-direction: row-reverse;
+    margin-left: auto; /* 整体靠右对齐 */
+    margin-right: 3rem; /* 增加右侧边距，确保不紧贴边缘 */
+    max-width: 82%; /* 稍微减少最大宽度，留出更多间距 */
 }
 
-.user-message .message-avatar {
-    order: 2;
-    margin-left: 1rem;
-    margin-right: 0;
+/* AI消息保持靠左但也增加左侧边距 */
+.ai-message {
+    margin-right: auto;
+    margin-left: 1.5rem; /* 增加左侧边距，保持对称 */
+    max-width: 82%; /* 对应调整最大宽度 */
 }
 
-.ai-message .message-avatar {
-    margin-right: 1rem;
+/* 确保头像容器有合适的间隔 */
+.message-avatar {
+    flex-shrink: 0;
+    z-index: 1; /* 确保头像在上层 */
 }
 
-/* ��Ϣ������ʽ */
+/* 消息气泡样式 */
 .message-bubble {
     position: relative;
-    max-width: 75%;
+    max-width: 100%; /* 气泡可以占满分配给它的空间 */
     min-width: 200px;
+    flex: 1;
 }
 
 .bubble-container {
@@ -53,23 +69,76 @@
     opacity: 1;
 }
 
+/* 用户消息气泡样式 - 超柔和清淡的渐变设计 */
 .user-message .bubble-container {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-    color: white;
-    border-color: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #93c5fd 0%, #c4b5fd 40%, #ddd6fe 100%);
+    color: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(147, 197, 253, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
 }
 
+/* 用户消息气泡的光泽效果 */
+.user-message .bubble-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.user-message .bubble-container:hover::before {
+    left: 100%;
+}
+
+/* 用户消息悬停效果增强 */
+.user-message .bubble-container:hover {
+    background: linear-gradient(135deg, #7dd3fc 0%, #a5b4fc 40%, #c4b5fd 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 48px rgba(147, 197, 253, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* AI消息气泡样式 - 现代化玻璃态设计 */
 .ai-message .bubble-container {
     background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     color: #2d3748;
-    border-color: rgba(102, 126, 234, 0.2);
+    position: relative;
 }
 
-.bubble-container:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+/* AI消息气泡的微妙渐变边框 */
+.ai-message .bubble-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.3), 
+        rgba(116, 75, 162, 0.2),
+        rgba(102, 126, 234, 0.1));
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
 }
 
+/* 气泡尾巴 - 更新颜色以匹配新设计 */
 .bubble-tail {
     position: absolute;
     width: 0;
@@ -77,19 +146,25 @@
     top: 20px;
 }
 
+/* 用户消息的尾巴指向右侧的用户头像 */
 .user-message .bubble-tail {
-    right: -8px;
-    border: 8px solid transparent;
-    border-left-color: #4299e1;
+    right: -10px;
+    border: 10px solid transparent;
+    border-left: 12px solid #93c5fd;
+    border-right: none;
+    filter: drop-shadow(2px 0 4px rgba(147, 197, 253, 0.15));
 }
 
+/* AI消息的尾巴指向左侧的AI头像 */
 .ai-message .bubble-tail {
-    left: -8px;
-    border: 8px solid transparent;
-    border-right-color: rgba(255, 255, 255, 0.95);
+    left: -10px;
+    border: 10px solid transparent;
+    border-right: 12px solid rgba(255, 255, 255, 0.95);
+    border-left: none;
+    filter: drop-shadow(-2px 0 4px rgba(0, 0, 0, 0.06));
 }
 
-/* ��Ϣͷ�� */
+/* 消息头部 */
 .message-header {
     display: flex;
     justify-content: space-between;
@@ -112,7 +187,7 @@
     opacity: 0.7;
 }
 
-/* ��Ϣ���� */
+/* 消息内容 */
 .message-body {
     margin-bottom: 1rem;
 }
@@ -185,23 +260,62 @@
     margin-bottom: 0.25rem;
 }
 
-/* ��Ӧʽ��� */
+/* 响应式设计 */
 @media (max-width: 768px) {
     .message {
         margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    /* 用户消息在中等屏幕上保持明显边距 */
+    .user-message {
+        margin-right: 1rem; /* 中等屏幕上保持充足右边距 */
+        max-width: 85%; /* 稍微增加最大宽度但保持间距 */
+    }
+
+    .ai-message {
+        margin-left: 1rem; /* 对应调整左边距 */
+        max-width: 85%;
     }
 
     .message-bubble {
-        max-width: 85%;
         min-width: 150px;
     }
 
     .bubble-container {
         padding: 1rem 1.25rem;
     }
+
+    /* 在小屏幕上调整尾巴大小 */
+    .user-message .bubble-tail {
+        right: -8px;
+        border-width: 8px;
+        border-left-width: 10px;
+    }
+
+    .ai-message .bubble-tail {
+        left: -8px;
+        border-width: 8px;
+        border-right-width: 10px;
+    }
 }
 
 @media (max-width: 480px) {
+    .message {
+        gap: 0.75rem;
+    }
+
+    /* 用户消息在小屏幕上仍然保持适当边距 */
+    .user-message {
+        margin-right: 0.75rem; /* 小屏幕上保持最小安全边距 */
+        max-width: 88%; /* 适当增加宽度利用率 */
+    }
+
+    .ai-message {
+        margin-left: 0.75rem;
+        max-width: 88%;
+    }
+
     .bubble-container {
         padding: 0.875rem 1rem;
     }
@@ -212,9 +326,25 @@
         gap: 0.25rem;
         margin-bottom: 0.5rem;
     }
+
+    /* 在最小屏幕上进一步调整尾巴 */
+    .user-message .bubble-tail,
+    .ai-message .bubble-tail {
+        border-width: 6px;
+    }
+
+    .user-message .bubble-tail {
+        border-left-width: 8px;
+        right: -6px;
+    }
+
+    .ai-message .bubble-tail {
+        border-right-width: 8px;
+        left: -6px;
+    }
 }
 
-/* ��ɫ����֧�� */
+/* 深色主题支持 */
 body.dark-theme .ai-message .bubble-container {
     background: rgba(255, 255, 255, 0.05);
     color: #e2e8f0;
@@ -223,6 +353,15 @@ body.dark-theme .ai-message .bubble-container {
 
 body.dark-theme .ai-message .bubble-tail {
     border-right-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .user-message .bubble-container {
+    /* 在深色主题下，用户消息可以有稍微不同的颜色 */
+    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+}
+
+body.dark-theme .user-message .bubble-tail {
+    border-left-color: #3182ce;
 }
 
 body.dark-theme .ai-message-text h1,
@@ -254,7 +393,7 @@ body.dark-theme .ai-message-text blockquote {
     color: #a0aec0;
 }
 
-/* ���ϰ�֧�� */
+/* 辅助功能支持 */
 @media (prefers-reduced-motion: reduce) {
     .message,
     .message-bubble {
@@ -263,17 +402,54 @@ body.dark-theme .ai-message-text blockquote {
     }
 }
 
-/* �����Ż� */
+/* 性能优化 */
 .message,
 .message-bubble {
     will-change: transform;
     backface-visibility: hidden;
 }
 
-/* ��ӡ��ʽ */
+/* 添加一些视觉提示，帮助区分用户和AI消息 */
+.user-message::before {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #60a5fa, #a78bfa);
+    border-radius: 1.5px;
+    opacity: 0.7;
+}
+
+.ai-message::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #667eea, #764ba2);
+    border-radius: 1.5px;
+    opacity: 0.6;
+}
+
+/* 打印样式 */
 @media print {
     .message {
         page-break-inside: avoid;
+        gap: 0.5rem;
+    }
+
+    .user-message,
+    .ai-message {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .user-message::before,
+    .ai-message::before {
+        display: none;
     }
 
     .bubble-container {
@@ -281,5 +457,73 @@ body.dark-theme .ai-message-text blockquote {
         color: black !important;
         border: 1px solid #ccc !important;
         box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .user-message .bubble-container::before,
+    .ai-message .bubble-container::after {
+        display: none !important;
+    }
+}
+
+/* 高质量渐变动画 - 调整为更温和的颜色 */
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 25% 25%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    75% {
+        background-position: 75% 75%;
+    }
+}
+
+.user-message .bubble-container {
+    background-size: 300% 300%;
+    animation: gradientShift 10s ease infinite;
+}
+
+/* 加载状态特殊样式 */
+.message.loading .bubble-container {
+    background: rgba(96, 165, 250, 0.12) !important;
+    border-color: rgba(96, 165, 250, 0.2) !important;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+}
+
+body.dark-theme .message.loading .bubble-container {
+    background: rgba(79, 70, 229, 0.15) !important;
+    border-color: rgba(79, 70, 229, 0.3) !important;
+    color: #cbd5e0 !important;
+}
+
+/* 提升打印样式的可读性 */
+@media print {
+    .user-message .bubble-container,
+    .ai-message .bubble-container {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .user-message .bubble-container::before,
+    .ai-message .bubble-container::after {
+        display: none !important;
     }
 }

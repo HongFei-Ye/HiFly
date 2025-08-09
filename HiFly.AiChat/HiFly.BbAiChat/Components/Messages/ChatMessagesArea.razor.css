@@ -3,14 +3,16 @@
 /* 消息容器基础样式 */
 .chat-messages {
     flex: 1;
-    padding: 1.2rem;
+    padding: 1.5rem 0.75rem; /* 增加左右内边距，提供更多缓冲空间 */
     overflow-y: auto;
     scroll-behavior: smooth;
     position: relative;
+    /* 使用自定义滚动条样式 */
     scrollbar-width: thin;
     scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
 }
 
+/* 自定义Webkit滚动条样式 */
 .chat-messages::-webkit-scrollbar {
     width: 6px;
 }
@@ -45,7 +47,13 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
     .chat-messages {
-        padding: 1rem;
+        padding: 1.25rem 0.5rem; /* 中等屏幕：保持适当的水平内边距 */
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-messages {
+        padding: 1rem 0.375rem; /* 小屏幕：减小但仍保持缓冲空间 */
     }
 }
 

@@ -1,18 +1,19 @@
-/* SidebarToolbar �����ʽ */
+﻿/* SidebarToolbar 组件样式 */
 .left-panel-toolbar {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
     flex-shrink: 0;
+    padding: 0 0.5rem; /* 添加左右内边距提供呼吸空间 */
 }
 
 .left-panel-toolbar .btn-new-chat {
-    flex: 1;
-    margin-right: 0.25rem;
+    flex: 1; /* 让新建对话按钮占用剩余空间 */
+    min-width: 0; /* 允许按钮收缩 */
 }
 
-/* �½��Ի���ť */
+/* 新建对话按钮 - 确保图标和文字完美居中 */
 .btn-new-chat {
     height: 44px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,13 +24,14 @@
     font-size: 0.9rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* 确保整体内容居中 */
     gap: 0.5rem;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    padding: 0 1rem; /* 添加左右内边距保持平衡 */
 }
 
 .btn-new-chat:hover {
@@ -51,6 +53,7 @@
     background: rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     transition: all 0.3s ease;
+    flex-shrink: 0; /* 防止图标被压缩 */
 }
 
 .btn-new-chat:hover .btn-new-chat-icon {
@@ -59,8 +62,10 @@
 }
 
 .btn-new-chat-text {
-    flex: 1;
-    text-align: left;
+    /* 移除 flex: 1，让文字自然居中 */
+    text-align: center; /* 确保文字居中 */
+    white-space: nowrap; /* 防止文字换行 */
+    font-weight: 600;
 }
 
 .btn-new-chat-shine {
@@ -78,7 +83,7 @@
     transform: translateX(100%) translateY(100%) rotate(45deg);
 }
 
-/* ����л���ť */
+/* 面板切换按钮 */
 .panel-toggle-btn {
     width: 44px;
     height: 44px;

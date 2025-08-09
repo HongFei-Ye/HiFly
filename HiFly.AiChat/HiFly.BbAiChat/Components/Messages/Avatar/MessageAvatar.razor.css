@@ -1,6 +1,11 @@
-/* ��Ϣͷ�������ʽ */
+﻿/* 消息头像组件样式 */
 .message-avatar {
     flex-shrink: 0;
+    z-index: 1;
+    /* 确保头像容器有足够的空间 */
+    width: 48px; /* 稍微增加容器宽度以提供更好的视觉间隔 */
+    display: flex;
+    justify-content: center;
 }
 
 .avatar-container {
@@ -17,6 +22,12 @@
     font-size: 1rem;
     position: relative;
     overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 添加悬停效果 */
+.user-avatar:hover, .ai-avatar:hover {
+    transform: scale(1.05);
 }
 
 .user-avatar {
@@ -25,12 +36,21 @@
     box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
 }
 
+.user-avatar:hover {
+    box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+}
+
 .ai-avatar {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
+.ai-avatar:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 用户头像的装饰环 */
 .avatar-ring {
     position: absolute;
     inset: -3px;
@@ -51,6 +71,7 @@
     }
 }
 
+/* AI头像的光环效果 */
 .ai-glow {
     position: absolute;
     inset: -4px;
@@ -59,6 +80,7 @@
     opacity: 0.6;
     animation: ai-glow 3s linear infinite;
     background-size: 300% 300%;
+    z-index: -1;
 }
 
 @keyframes ai-glow {
@@ -66,12 +88,14 @@
     50% { background-position: 100% 50%; }
 }
 
+/* AI头像的脉冲效果 */
 .ai-pulse {
     position: absolute;
     inset: -8px;
     border: 2px solid #667eea;
     border-radius: 50%;
     animation: ai-pulse 2s infinite;
+    z-index: -1;
 }
 
 @keyframes ai-pulse {
@@ -85,40 +109,144 @@
     }
 }
 
+/* 加载状态的特殊脉冲效果 */
 .ai-avatar.loading .ai-pulse.loading-pulse {
     animation: ai-pulse 1s infinite;
+    border-color: #4299e1;
 }
 
-/* ��Ӧʽ��� */
+.ai-avatar.loading {
+    animation: loading-bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* 响应式设计 */
 @media (max-width: 768px) {
+    .message-avatar {
+        width: 44px; /* 在小屏幕上稍微减小 */
+    }
+    
     .user-avatar, .ai-avatar {
         width: 36px;
         height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .avatar-ring {
+        inset: -2px;
+        border-width: 1.5px;
+    }
+
+    .ai-glow {
+        inset: -3px;
+    }
+
+    .ai-pulse {
+        inset: -6px;
+        border-width: 1.5px;
     }
 }
 
-/* ���ϰ�֧�� */
+@media (max-width: 480px) {
+    .message-avatar {
+        width: 40px;
+    }
+    
+    .user-avatar, .ai-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .avatar-ring {
+        inset: -2px;
+        border-width: 1px;
+    }
+
+    .ai-glow {
+        inset: -2px;
+    }
+
+    .ai-pulse {
+        inset: -4px;
+        border-width: 1px;
+    }
+}
+
+/* 深色主题支持 */
+body.dark-theme .user-avatar {
+    box-shadow: 0 4px 15px rgba(66, 153, 225, 0.4);
+}
+
+body.dark-theme .user-avatar:hover {
+    box-shadow: 0 6px 20px rgba(66, 153, 225, 0.5);
+}
+
+body.dark-theme .ai-avatar {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+body.dark-theme .ai-avatar:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+/* 无障碍支持 */
 @media (prefers-reduced-motion: reduce) {
     .ai-glow,
     .ai-pulse,
-    .avatar-ring {
+    .avatar-ring,
+    .user-avatar,
+    .ai-avatar {
         animation: none !important;
+        transition: none !important;
     }
 }
 
-/* �����Ż� */
+/* 性能优化 */
 .ai-glow,
 .ai-pulse,
 .avatar-ring {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+.user-avatar,
+.ai-avatar {
     will-change: transform;
     backface-visibility: hidden;
 }
 
-/* �߷ֱ�����Ļ�Ż� */
+/* 高分辨率屏幕优化 */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
     .ai-glow,
     .ai-pulse,
     .avatar-ring {
         transform-style: preserve-3d;
+    }
+}
+
+/* 焦点状态（对于可交互的头像） */
+.user-avatar:focus,
+.ai-avatar:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 打印样式 */
+@media print {
+    .ai-glow,
+    .ai-pulse,
+    .avatar-ring {
+        display: none; /* 打印时隐藏装饰效果 */
+    }
+
+    .user-avatar,
+    .ai-avatar {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
     }
 }
