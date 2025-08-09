@@ -372,7 +372,34 @@ public partial class AiChatComponentV2 : ComponentBase, IDisposable
 
         Messages.Add(message);
         StateHasChanged();
+        
+        // 等待DOM更新后滚动到底部
         await Task.Delay(100);
+        await ScrollToBottomIfPossible();
+    }
+
+    /// <summary>
+    /// 尝试滚动到底部（如果消息组件可用）
+    /// </summary>
+    private async Task ScrollToBottomIfPossible()
+    {
+        try
+        {
+            // 尝试通过JavaScript直接滚动消息容器
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const messagesContainer = document.querySelector('.chat-messages');
+                if (messagesContainer) {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            ");
+        }
+        catch
+        {
+            // 忽略JavaScript调用失败
+        }
     }
 
     /// <summary>

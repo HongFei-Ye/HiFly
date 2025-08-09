@@ -53,13 +53,63 @@
             }
         },
 
-        // 滚动到底部
+        // 滚动到底部 - 增强版
         scrollToBottom: function(element) {
             if (element) {
-                element.scrollTo({
-                    top: element.scrollHeight,
-                    behavior: 'smooth'
-                });
+                try {
+                    element.scrollTo({
+                        top: element.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                    return true;
+                } catch (error) {
+                    // 降级方案
+                    try {
+                        element.scrollTop = element.scrollHeight;
+                        return true;
+                    } catch (error2) {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        },
+
+        // 智能滚动到底部 - 只有在用户接近底部时才自动滚动
+        smartScrollToBottom: function(element, threshold = 100) {
+            if (!element) return false;
+            
+            try {
+                const scrollTop = element.scrollTop;
+                const scrollHeight = element.scrollHeight;
+                const clientHeight = element.clientHeight;
+                
+                // 检查用户是否接近底部
+                const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+                const isNearBottom = distanceFromBottom <= threshold;
+                
+                if (isNearBottom) {
+                    return this.scrollToBottom(element);
+                }
+                
+                return false; // 用户不在底部附近，不自动滚动
+            } catch (error) {
+                return false;
+            }
+        },
+
+        // 检查是否接近底部
+        isNearBottom: function(element, threshold = 100) {
+            if (!element) return true;
+            
+            try {
+                const scrollTop = element.scrollTop;
+                const scrollHeight = element.scrollHeight;
+                const clientHeight = element.clientHeight;
+                
+                return (scrollHeight - scrollTop - clientHeight) <= threshold;
+            } catch (error) {
+                return true;
             }
         },
 

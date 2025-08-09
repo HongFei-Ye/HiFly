@@ -1,10 +1,10 @@
-@using Microsoft.AspNetCore.Components
+ï»¿@using Microsoft.AspNetCore.Components
 @using HiFly.BbAiChat.Components.Messages.MessageItem
 @using HiFly.BbAiChat.Components.Messages.EmptyState
 @using HiFly.BbAiChat.Components.Messages.LoadingIndicator
 @using HiFly.BbAiChat.Components.Messages.Avatar
 
-<!-- ¶Ô»°ÏûÏ¢ÇøÓò - ÖØ¹¹ºóÊ¹ÓÃ×Ó×é¼þ -->
+<!-- å¯¹è¯æ¶ˆæ¯åŒºåŸŸ - é‡æž„åŽä½¿ç”¨ç‹¬ç«‹ç»„ä»¶ -->
 <div class="chat-messages" @ref="messagesContainer">
     @if (Messages.Any())
     {
@@ -19,8 +19,8 @@
     }
     else
     {
-        <EmptyMessage Title="¿ªÊ¼ÐÂµÄ¶Ô»°"
-                     Description="ÎÒÊÇÄúµÄAIÖúÊÖ£¬×¼±¸ÎªÄúÌá¹©°ïÖú"
+        <EmptyMessage Title="å¼€å§‹æ–°çš„å¯¹è¯"
+                     Description="æˆ‘æ˜¯æ‚¨çš„AIåŠ©æ‰‹ï¼Œå‡†å¤‡ä¸ºæ‚¨æä¾›å¸®åŠ©"
                      ShowSuggestions="true"
                      OnSuggestionClick="HandleSetQuickMessage" />
     }
@@ -31,9 +31,17 @@
             <MessageAvatar IsUser="false" IsLoading="true" />
             <div class="message-bubble loading">
                 <div class="bubble-container">
-                    <TypingIndicator Text="AIÕýÔÚË¼¿¼ÖÐ..." />
+                    <TypingIndicator Text="AIæ­£åœ¨æ€è€ƒä¸­..." />
                 </div>
             </div>
         </div>
     }
+
+    <!-- å›žåˆ°åº•éƒ¨æŒ‰é’® -->
+    <div class="scroll-to-bottom-container @(showScrollButton ? "visible" : "")" @onclick="HandleScrollToBottom">
+        <div class="scroll-to-bottom-btn">
+            <i class="fas fa-chevron-down"></i>
+            <span class="scroll-btn-tooltip">å›žåˆ°åº•éƒ¨</span>
+        </div>
+    </div>
 </div>
