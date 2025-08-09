@@ -135,6 +135,13 @@ public partial class ChatInputArea : ComponentBase
     #region 私有字段和引用
 
     private TextInputField? textInputField;
+    
+    // 调试相关字段
+    private bool _lastCanSendState = false;
+    
+    // 实时更新状态
+    private int _currentMessageLength = 0;
+    private bool _canSendMessage = false;
 
     #endregion
 
@@ -172,21 +179,16 @@ public partial class ChatInputArea : ComponentBase
     {
         if (firstRender)
         {
-            // 强制刷新输入统计显示
             try
             {
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.refreshInputStats");
-                
-                // 调试信息
-                var debugInfo = await JSRuntime.InvokeAsync<object>("aiChatHelper.debugInputEvents");
-                var textareaState = await JSRuntime.InvokeAsync<object>("aiChatHelper.debugTextareaState");
-                
-                System.Console.WriteLine($"Input Debug info: {System.Text.Json.JsonSerializer.Serialize(debugInfo)}");
-                System.Console.WriteLine($"Textarea State: {System.Text.Json.JsonSerializer.Serialize(textareaState)}");
+                // 仅在首次渲染后触发一次状态同步
+                _currentMessageLength = GetSafeCurrentLength();
+                _canSendMessage = CanSendMessage();
+                StateHasChanged();
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine($"Debug failed: {ex.Message}");
+                // 记录错误但不影响功能
             }
         }
         
@@ -213,12 +215,23 @@ public partial class ChatInputArea : ComponentBase
     /// </summary>
     public async Task ClearInput()
     {
+        // 1. 清空TextInputField组件
         if (textInputField != null)
         {
             await textInputField.ClearContent();
         }
         
+        // 2. 清空当前消息状态
         CurrentMessage = string.Empty;
+        
+        // 3. 重置内部实时状态
+        _currentMessageLength = 0;
+        _canSendMessage = false;
+        
+        // 4. 立即强制UI更新，确保InputStatsDisplay显示0/2000
+        StateHasChanged();
+        
+        // 5. 通知父组件状态变更
         if (CurrentMessageChanged.HasDelegate)
         {
             await CurrentMessageChanged.InvokeAsync(CurrentMessage);
@@ -247,34 +260,69 @@ public partial class ChatInputArea : ComponentBase
     /// </summary>
     private bool CanSendMessage()
     {
-        return !string.IsNullOrWhiteSpace(CurrentMessage) && CurrentMessage != "CurrentMessage";
+        var canSend = !string.IsNullOrWhiteSpace(CurrentMessage) && 
+                      CurrentMessage != "CurrentMessage" && 
+                      !IsLoading;
+        
+        return canSend;
+    }
+
+    /// <summary>
+    /// 强制启用发送功能 - 调试用
+    /// </summary>
+    public void ForceEnableSending()
+    {
+        // 如果输入框为空，添加测试内容
+        if (string.IsNullOrWhiteSpace(CurrentMessage))
+        {
+            CurrentMessage = "测试消息";
+        }
+        
+        // 重置状态
+        IsLoading = false;
+        
+        // 强制更新UI
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 处理实时状态更新 - 简化版
+    /// </summary>
+    private async Task HandleRealTimeUpdate(string value)
+    {
+        try
+        {
+            // 更新内部状态
+            var newLength = value?.Length ?? 0;
+            var newCanSend = !string.IsNullOrWhiteSpace(value) && !IsLoading;
+            
+            // 只有在值真正变化时才更新状态
+            if (_currentMessageLength != newLength || _canSendMessage != newCanSend)
+            {
+                _currentMessageLength = newLength;
+                _canSendMessage = newCanSend;
+                
+                // 立即强制UI更新
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            // 记录错误但不影响功能
+        }
+    }
+
+    /// <summary>
+    /// 通过JavaScript更新UI状态
+    /// </summary>
+    private async Task UpdateUIStateViaJavaScript()
+    {
+        // 这个方法已被简化的实时更新机制替代，暂时保留用于调试
     }
 
     #endregion
 
     #region 事件处理
-
-    /// <summary>
-    /// 处理消息变更
-    /// </summary>
-    private async Task OnCurrentMessageChanged(string message)
-    {
-        // 过滤掉测试数据
-        if (message == "CurrentMessage")
-        {
-            message = string.Empty;
-        }
-        
-        CurrentMessage = message;
-        
-        // 强制重新渲染组件以更新UI状态
-        StateHasChanged();
-        
-        if (CurrentMessageChanged.HasDelegate)
-        {
-            await CurrentMessageChanged.InvokeAsync(CurrentMessage);
-        }
-    }
 
     /// <summary>
     /// 处理发送消息

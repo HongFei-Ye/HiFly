@@ -53,7 +53,7 @@ public partial class InputStatsDisplay : ComponentBase
         }
         else
         {
-            return $"已输入 {CurrentLength} 个字符，限制 {MaxLength} 个字符";
+            return $"已输入 {CurrentLength} 个字符，还可输入 {remaining} 个字符";
         }
     }
 

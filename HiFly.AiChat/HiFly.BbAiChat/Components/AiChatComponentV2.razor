@@ -46,8 +46,7 @@
                             OnSetQuickMessage="HandleSetQuickMessage" />
 
             <!-- 底部输入和工具栏 -->
-            <ChatInputArea CurrentMessage="CurrentMessage"
-                          CurrentMessageChanged="@((message) => { CurrentMessage = message; StateHasChanged(); })"
+            <ChatInputArea @bind-CurrentMessage="CurrentMessage"
                           Placeholder="InputPlaceholder"
                           IsLoading="IsLoading"
                           IsVoiceRecording="IsVoiceRecording"

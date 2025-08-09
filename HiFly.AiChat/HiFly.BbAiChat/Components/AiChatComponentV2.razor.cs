@@ -839,6 +839,7 @@ public partial class AiChatComponentV2 : ComponentBase, IDisposable
 
         StateHasChanged();
     }
+
     #endregion
 
     #region 资源释放

@@ -18,7 +18,7 @@
         <div class="input-wrapper-enhanced" @onclick="HandleInputAreaClick">
             <!-- 左侧功能区域 -->
             <div class="input-left-section">
-                <InputStatsDisplay CurrentLength="@GetSafeCurrentLength()"
+                <InputStatsDisplay CurrentLength="@_currentMessageLength"
                                    MaxLength="@MaxLength"
                                    ShowProgress="@ShowCharacterProgress"
                                    OnClick="@HandleStatsClick" />
@@ -26,8 +26,8 @@
             
             <!-- 中间输入区域 -->
             <TextInputField @ref="textInputField"
-                            CurrentValue="@CurrentMessage"
-                            CurrentValueChanged="@OnCurrentMessageChanged"
+                            @bind-CurrentValue="CurrentMessage"
+                            OnRealTimeUpdate="@HandleRealTimeUpdate"
                             Placeholder="@Placeholder"
                             MaxLength="@MaxLength"
                             IsDisabled="@IsLoading"
@@ -45,7 +45,7 @@
                 <!-- 发送按钮 -->
                 <SendButton IsLoading="@IsLoading"
                             IsDisabled="@IsLoading"
-                            CanSend="@CanSendMessage()"
+                            CanSend="@(_canSendMessage || CanSendMessage())"
                             OnClick="@HandleSendButtonClick" />
             </div>
         </div>

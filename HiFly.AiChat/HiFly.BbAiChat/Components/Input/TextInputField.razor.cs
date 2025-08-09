@@ -6,9 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace HiFly.BbAiChat.Components.Input;
 
 /// <summary>
-/// 智能文本输入框组件
+/// 文本输入字段组件
 /// </summary>
-public partial class TextInputField : ComponentBase
+public partial class TextInputField : ComponentBase, IDisposable
 {
     [Inject]
     [NotNull]
@@ -18,51 +18,19 @@ public partial class TextInputField : ComponentBase
     /// 当前值
     /// </summary>
     [Parameter]
-    public string CurrentValue 
-    { 
-        get => _currentValue;
-        set
-        {
-            if (_currentValue != value)
-            {
-                // 防止设置为测试数据
-                if (value == "CurrentMessage")
-                {
-                    _currentValue = string.Empty;
-                }
-                else
-                {
-                    _currentValue = value ?? string.Empty;
-                }
-                
-                // 通知父组件值变化
-                _ = Task.Run(async () =>
-                {
-                    if (CurrentValueChanged.HasDelegate)
-                    {
-                        await CurrentValueChanged.InvokeAsync(_currentValue);
-                    }
-                    
-                    // 自动调整高度
-                    await AutoResizeTextarea();
-                });
-            }
-        }
-    }
-    
-    private string _currentValue = string.Empty;
+    public string CurrentValue { get; set; } = string.Empty;
 
     /// <summary>
-    /// 值变更事件
+    /// 当前值变更事件
     /// </summary>
     [Parameter]
     public EventCallback<string> CurrentValueChanged { get; set; }
 
     /// <summary>
-    /// 占位符文本
+    /// 占位符
     /// </summary>
     [Parameter]
-    public string Placeholder { get; set; } = "请输入您的消息...";
+    public string Placeholder { get; set; } = "请输入消息...";
 
     /// <summary>
     /// 最大字符长度
@@ -71,7 +39,7 @@ public partial class TextInputField : ComponentBase
     public int MaxLength { get; set; } = 2000;
 
     /// <summary>
-    /// 是否禁用输入
+    /// 是否禁用
     /// </summary>
     [Parameter]
     public bool IsDisabled { get; set; }
@@ -94,14 +62,21 @@ public partial class TextInputField : ComponentBase
     [Parameter]
     public EventCallback OnFocusRequested { get; set; }
 
+    /// <summary>
+    /// 实时状态更新事件
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnRealTimeUpdate { get; set; }
+
     private ElementReference textareaRef;
+    private Timer? _updateTimer;
 
     protected override async Task OnInitializedAsync()
     {
-        // 强制确保CurrentValue为空字符串，清除任何可能的测试数据
-        if (string.IsNullOrEmpty(_currentValue) || _currentValue == "CurrentMessage")
+        // 确保CurrentValue为空字符串，清除任何可能的测试数据
+        if (string.IsNullOrEmpty(CurrentValue) || CurrentValue == "CurrentMessage")
         {
-            _currentValue = string.Empty;
+            CurrentValue = string.Empty;
         }
         
         await base.OnInitializedAsync();
@@ -111,22 +86,224 @@ public partial class TextInputField : ComponentBase
     {
         if (firstRender)
         {
-            // 首次渲染时强制清空任何残留值
-            await ClearTextareaValue();
-            await InitializeTextarea();
+            try
+            {
+                // 首次渲染时强制清空任何残留值
+                await ClearTextareaValue();
+                await InitializeTextarea();
+                
+                // 首次渲染后，触发一次实时更新以同步当前状态
+                if (OnRealTimeUpdate.HasDelegate)
+                {
+                    await OnRealTimeUpdate.InvokeAsync(CurrentValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 记录错误但不影响功能
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
     protected override void OnParametersSet()
     {
-        // 确保CurrentValue不会是测试数据
-        if (_currentValue == "CurrentMessage" || (string.IsNullOrWhiteSpace(_currentValue) && _currentValue != string.Empty))
+        // 过滤测试数据
+        if (CurrentValue == "CurrentMessage")
         {
-            _currentValue = string.Empty;
+            CurrentValue = string.Empty;
+            if (CurrentValueChanged.HasDelegate)
+            {
+                // 使用Task.Run避免在预渲染期间的同步上下文问题
+                _ = Task.Run(async () => await CurrentValueChanged.InvokeAsync(CurrentValue));
+            }
         }
         
         base.OnParametersSet();
+    }
+
+    /// <summary>
+    /// 启动实时更新监听
+    /// </summary>
+    private async Task StartRealTimeUpdates()
+    {
+        try
+        {
+            // 等待DOM完全加载
+            await Task.Delay(200);
+            
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                (function() {
+                    console.log('🔄 开始启动实时更新监听器...');
+                    
+                    // 检查DOM是否准备就绪
+                    if (document.readyState !== 'complete') {
+                        console.log('⚠️ DOM未完全加载，延迟启动');
+                        setTimeout(arguments.callee, 100);
+                        return;
+                    }
+                    
+                    const textarea = document.querySelector('textarea.chat-input-enhanced');
+                    if (!textarea) {
+                        console.log('❌ 未找到textarea元素，1秒后重试');
+                        setTimeout(arguments.callee, 1000);
+                        return;
+                    }
+                    
+                    console.log('✅ 找到textarea元素:', textarea);
+                    
+                    // 安全地移除现有监听器
+                    try {
+                        if (textarea._realtimeHandler) {
+                            ['input', 'keyup', 'paste', 'cut'].forEach(eventType => {
+                                textarea.removeEventListener(eventType, textarea._realtimeHandler);
+                            });
+                            console.log('🧹 已清理旧的监听器');
+                        }
+                    } catch (e) {
+                        console.log('清理旧监听器时出现错误:', e);
+                    }
+                    
+                    // 创建新的实时更新处理器
+                    const realtimeHandler = function(e) {
+                        try {
+                            console.log('📝 输入事件触发:', e.type, 'value:', e.target.value);
+                            
+                            // 触发自定义事件
+                            const updateEvent = new CustomEvent('blazorRealTimeUpdate', {
+                                detail: { 
+                                    value: e.target.value,
+                                    length: e.target.value.length,
+                                    eventType: e.type,
+                                    timestamp: Date.now()
+                                },
+                                bubbles: true
+                            });
+                            
+                            document.dispatchEvent(updateEvent);
+                            console.log('✅ 实时更新事件已触发');
+                            
+                        } catch (error) {
+                            console.error('❌ 处理输入事件时出错:', error);
+                        }
+                    };
+                    
+                    // 保存处理器引用
+                    textarea._realtimeHandler = realtimeHandler;
+                    
+                    // 添加事件监听器
+                    try {
+                        ['input', 'keyup', 'paste', 'cut'].forEach(eventType => {
+                            textarea.addEventListener(eventType, realtimeHandler, { passive: true });
+                        });
+                        
+                        console.log('✅ 实时更新监听器启动成功');
+                        
+                        // 立即触发一次更新以同步当前状态
+                        if (textarea.value) {
+                            realtimeHandler({ target: textarea, type: 'init' });
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ 添加事件监听器失败:', error);
+                    }
+                    
+                })();
+            ");
+            
+            System.Console.WriteLine("✅ 实时更新监听器初始化完成");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"❌ 启动实时更新失败: {ex.Message}");
+            System.Console.WriteLine($"详细错误: {ex.StackTrace}");
+            
+            // 提供降级方案
+            await StartFallbackUpdate();
+        }
+    }
+
+    /// <summary>
+    /// 降级方案：使用定时器进行状态更新
+    /// </summary>
+    private async Task StartFallbackUpdate()
+    {
+        try
+        {
+            System.Console.WriteLine("🔄 启动降级更新方案...");
+            
+            // 每500ms检查一次输入框值的变化，延迟1秒启动以避免预渲染问题
+            _updateTimer?.Dispose();
+            _updateTimer = new Timer(async _ =>
+            {
+                try
+                {
+                    await InvokeAsync(async () =>
+                    {
+                        try
+                        {
+                            // 检查是否可以安全调用JavaScript
+                            var currentValue = await JSRuntime.InvokeAsync<string>("eval", 
+                                "document.querySelector('textarea.chat-input-enhanced')?.value || ''");
+                            
+                            if (currentValue != CurrentValue)
+                            {
+                                CurrentValue = currentValue;
+                                if (OnRealTimeUpdate.HasDelegate)
+                                {
+                                    await OnRealTimeUpdate.InvokeAsync(CurrentValue);
+                                }
+                                if (CurrentValueChanged.HasDelegate)
+                                {
+                                    await CurrentValueChanged.InvokeAsync(CurrentValue);
+                                }
+                                StateHasChanged();
+                            }
+                        }
+                        catch (JSException)
+                        {
+                            // JavaScript调用失败，可能是因为预渲染，忽略
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // 预渲染期间的无效操作，忽略
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine($"降级更新失败: {ex.Message}");
+                }
+            }, null, TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(500));
+            
+            System.Console.WriteLine("✅ 降级更新方案启动成功");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"❌ 降级更新方案启动失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 启动防抖更新
+    /// </summary>
+    private void StartDebounceUpdate()
+    {
+        // 取消之前的定时器
+        _updateTimer?.Dispose();
+        
+        // 启动新的定时器（100ms防抖）
+        _updateTimer = new Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                if (OnRealTimeUpdate.HasDelegate)
+                {
+                    await OnRealTimeUpdate.InvokeAsync(CurrentValue);
+                }
+                StateHasChanged();
+            });
+        }, null, 100, Timeout.Infinite);
     }
 
     /// <summary>
@@ -144,7 +321,7 @@ public partial class TextInputField : ComponentBase
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine($"Failed to initialize textarea: {ex.Message}");
+            // 记录错误但不影响功能
         }
     }
 
@@ -166,7 +343,7 @@ public partial class TextInputField : ComponentBase
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine($"Focus failed: {ex.Message}");
+            // 记录错误但不影响功能
         }
     }
 
@@ -181,7 +358,7 @@ public partial class TextInputField : ComponentBase
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine($"Reset height failed: {ex.Message}");
+            // 记录错误但不影响功能
         }
     }
 
@@ -190,8 +367,45 @@ public partial class TextInputField : ComponentBase
     /// </summary>
     public async Task ClearContent()
     {
+        // 1. 清空当前值
         CurrentValue = string.Empty;
+        
+        // 2. 立即强制清空DOM中的textarea
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (textarea) {
+                    textarea.value = '';
+                    textarea.defaultValue = '';
+                    
+                    // 立即触发input事件确保所有监听器知道值已清空
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            // 记录错误但不影响功能
+        }
+        
+        // 3. 重置高度
         await ResetHeight();
+        
+        // 4. 通知父组件
+        if (CurrentValueChanged.HasDelegate)
+        {
+            await CurrentValueChanged.InvokeAsync(CurrentValue);
+        }
+        
+        // 5. 强制立即触发实时更新事件
+        if (OnRealTimeUpdate.HasDelegate)
+        {
+            await OnRealTimeUpdate.InvokeAsync(CurrentValue);
+        }
+        
+        // 6. 强制UI更新
         StateHasChanged();
     }
 
@@ -202,71 +416,34 @@ public partial class TextInputField : ComponentBase
     {
         try
         {
-            // 首先尝试使用新的清理函数
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.forceCleanAllTextareas");
-            
-            // 然后针对当前元素再次确保清空
-            await JSRuntime.InvokeVoidAsync("eval", 
-                @"var textarea = document.querySelector('textarea.chat-input-enhanced'); 
-                  if(textarea) { 
-                      textarea.value = ''; 
-                      textarea.defaultValue = '';
-                      textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                  }");
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (textarea && (textarea.value === 'CurrentMessage' || textarea.defaultValue === 'CurrentMessage')) {
+                    textarea.value = '';
+                    textarea.defaultValue = '';
+                }
+            ");
         }
-        catch
+        catch (Exception ex)
         {
-            // 忽略错误，使用降级方案
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("eval", 
-                    "var textareas = document.querySelectorAll('textarea'); textareas.forEach(t => { if(t.value === 'CurrentMessage') t.value = ''; });");
-            }
-            catch
-            {
-                // 完全降级，忽略
-            }
+            // 记录错误但不影响功能
         }
     }
 
     /// <summary>
-    /// 处理键盘按下事件
+    /// 处理键盘按下
     /// </summary>
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        // 发送消息的快捷键处理
         if (e.Key == "Enter" && !e.ShiftKey)
         {
-            if (!string.IsNullOrWhiteSpace(CurrentValue))
+            // Enter键发送消息
+            if (!string.IsNullOrWhiteSpace(CurrentValue) && OnSendMessage.HasDelegate)
             {
                 await OnSendMessage.InvokeAsync(CurrentValue.Trim());
             }
-            return;
         }
-
-        // 全选快捷键
-        if (e.Key == "a" && e.CtrlKey)
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.selectAllText", textareaRef);
-            }
-            catch { /* 让浏览器处理 */ }
-            return;
-        }
-
-        // 选择当前词快捷键
-        if (e.Key == "d" && e.CtrlKey)
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("aiChatHelper.selectWordAtCursor", textareaRef);
-            }
-            catch { /* 忽略错误 */ }
-            return;
-        }
-
-        // 通知父组件键盘事件
+        
         if (OnKeyDown.HasDelegate)
         {
             await OnKeyDown.InvokeAsync(e);
@@ -274,31 +451,16 @@ public partial class TextInputField : ComponentBase
     }
 
     /// <summary>
-    /// 自动调整输入框高度
-    /// </summary>
-    private async Task AutoResizeTextarea()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.autoResizeTextarea", textareaRef);
-        }
-        catch (Exception ex)
-        {
-            System.Console.WriteLine($"Auto resize failed: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// 处理文本选择开始事件
+    /// 处理文本选择开始
     /// </summary>
     private async Task HandleTextSelectionStart(MouseEventArgs mouseArgs)
     {
         if (mouseArgs.Button != 0) return;
-        await FocusTextarea(preserveSelection: true);
+        await Task.CompletedTask;
     }
 
     /// <summary>
-    /// 处理文本选择结束事件
+    /// 处理文本选择结束
     /// </summary>
     private async Task HandleTextSelectionEnd(MouseEventArgs mouseArgs)
     {
@@ -307,7 +469,7 @@ public partial class TextInputField : ComponentBase
     }
 
     /// <summary>
-    /// 处理双击选择单词事件
+    /// 处理双击选择单词
     /// </summary>
     private async Task HandleTextDoubleClick(MouseEventArgs mouseArgs)
     {
@@ -315,11 +477,54 @@ public partial class TextInputField : ComponentBase
         
         try
         {
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.selectWordAtCursorWithDebounce", textareaRef);
+            await JSRuntime.InvokeVoidAsync("aiChatHelper.selectWordAtCursor", textareaRef);
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine($"Double-click selection failed: {ex.Message}");
+            // 记录错误但不影响功能
         }
+    }
+
+    /// <summary>
+    /// 处理输入事件 - 实时更新触发器
+    /// </summary>
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var newValue = e.Value?.ToString() ?? string.Empty;
+        
+        // 防止无意义的更新
+        if (CurrentValue == newValue)
+        {
+            return;
+        }
+        
+        // 过滤测试数据
+        if (newValue == "CurrentMessage")
+        {
+            newValue = string.Empty;
+        }
+        
+        // 更新当前值
+        CurrentValue = newValue;
+        
+        // 立即通知父组件值变更
+        if (CurrentValueChanged.HasDelegate)
+        {
+            await CurrentValueChanged.InvokeAsync(CurrentValue);
+        }
+        
+        // 立即触发实时更新
+        if (OnRealTimeUpdate.HasDelegate)
+        {
+            await OnRealTimeUpdate.InvokeAsync(CurrentValue);
+        }
+        
+        // 强制UI更新
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _updateTimer?.Dispose();
     }
 }

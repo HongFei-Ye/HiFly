@@ -4,8 +4,8 @@
 <div class="input-field">
     <textarea class="chat-input-enhanced"
               placeholder="@Placeholder"
-              @bind="CurrentValue"
-              @bind:event="oninput"
+              value="@CurrentValue"
+              @oninput="HandleInput"
               @onkeydown="HandleKeyDown"
               @onmousedown="HandleTextSelectionStart"
               @onmouseup="HandleTextSelectionEnd"
