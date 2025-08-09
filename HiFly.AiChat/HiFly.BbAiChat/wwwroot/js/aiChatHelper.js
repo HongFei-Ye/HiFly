@@ -10,6 +10,7 @@
         // 视口变化监听器的回调引用
         _viewportCallbackRef: null,
         _selectWordTimeout: null,  // 防抖定时器引用
+        _uiSyncInterval: null,     // UI状态同步定时器
 
         // 本地存储辅助函数
         storage: {
@@ -1032,7 +1033,401 @@
             } catch (error) {
                 return null;
             }
-        }
+        },
+
+        // 全面的输入框诊断工具 - 新增功能
+        comprehensiveInputDiagnostic: function() {
+            console.log('=== 输入框全面诊断开始 ===');
+            
+            const textarea = document.querySelector('textarea.chat-input-enhanced');
+            if (!textarea) {
+                console.error('❌ 没有找到输入框元素');
+                return {
+                    success: false,
+                    error: 'Textarea not found',
+                    timestamp: new Date().toISOString()
+                };
+            }
+            
+            const result = {
+                success: true,
+                timestamp: new Date().toISOString(),
+                element: {
+                    found: true,
+                    tagName: textarea.tagName,
+                    className: textarea.className,
+                    id: textarea.id
+                },
+                state: {
+                    value: textarea.value,
+                    valueLength: textarea.value.length,
+                    defaultValue: textarea.defaultValue,
+                    placeholder: textarea.placeholder,
+                    disabled: textarea.disabled,
+                    readOnly: textarea.readOnly,
+                    maxLength: textarea.maxLength,
+                    focused: document.activeElement === textarea
+                },
+                selection: {
+                    start: textarea.selectionStart,
+                    end: textarea.selectionEnd,
+                    hasSelection: textarea.selectionStart !== textarea.selectionEnd
+                },
+                events: {
+                    hasOninput: !!textarea.oninput,
+                    hasOnchange: !!textarea.onchange,
+                    hasOnkeydown: !!textarea.onkeydown,
+                    blazorBindings: !!textarea.getAttribute('_bl_')
+                },
+                style: {
+                    display: getComputedStyle(textarea).display,
+                    visibility: getComputedStyle(textarea).visibility,
+                    pointerEvents: getComputedStyle(textarea).pointerEvents,
+                    userSelect: getComputedStyle(textarea).userSelect
+                }
+            };
+            
+            console.log('✅ 输入框诊断结果:', result);
+            
+            // 测试基本输入功能
+            this.testBasicInput(textarea);
+            
+            return result;
+        },
+
+        // 测试基本输入功能
+        testBasicInput: function(textarea) {
+            console.log('--- 开始基本输入测试 ---');
+            
+            if (!textarea) {
+                console.error('❌ 没有输入框元素');
+                return false;
+            }
+            
+            try {
+                const originalValue = textarea.value;
+                const testValue = 'Test' + Date.now();
+                
+                console.log(`📝 原始值: "${originalValue}"`);
+                console.log(`📝 测试值: "${testValue}"`);
+                
+                // 设置测试值
+                textarea.value = testValue;
+                
+                // 触发input事件
+                const inputEvent = new Event('input', { bubbles: true });
+                textarea.dispatchEvent(inputEvent);
+                
+                console.log(`📝 设置后的值: "${textarea.value}"`);
+                
+                // 检查值是否保持
+                setTimeout(() => {
+                    const finalValue = textarea.value;
+                    console.log(`📝 延迟检查的值: "${finalValue}"`);
+                    
+                    if (finalValue === testValue) {
+                        console.log('✅ 基本输入测试成功');
+                    } else {
+                        console.log('❌ 基本输入测试失败 - 值被重置');
+                    }
+                    
+                    // 恢复原始值
+                    textarea.value = originalValue;
+                    textarea.dispatchEvent(inputEvent);
+                    
+                }, 200);
+                
+                return true;
+            } catch (error) {
+                console.error('❌ 基本输入测试出错:', error);
+                return false;
+            }
+        },
+
+        // 启动实时输入监控（调试版本）
+        startDebugInputMonitoring: function() {
+            const textarea = document.querySelector('textarea.chat-input-enhanced');
+            if (!textarea) {
+                console.error('❌ 没有找到输入框，无法启动监控');
+                return false;
+            }
+            
+            console.log('🔍 启动实时输入监控...');
+            
+            let lastValue = textarea.value;
+            let changeCount = 0;
+            
+            const logChange = (eventType, newValue) => {
+                if (newValue !== lastValue) {
+                    changeCount++;
+                    console.log(`🔄 [${changeCount}] ${eventType}: "${lastValue}" → "${newValue}"`);
+                    lastValue = newValue;
+                }
+            };
+            
+            // 监听各种事件
+            const events = ['input', 'change', 'keydown', 'keyup', 'paste', 'cut'];
+            events.forEach(eventType => {
+                textarea.addEventListener(eventType, (e) => {
+                    logChange(eventType, textarea.value);
+                });
+            });
+            
+            // 定期检查
+            const intervalId = setInterval(() => {
+                logChange('poll', textarea.value);
+            }, 500);
+            
+            console.log('✅ 输入监控已启动，将运行10秒');
+            
+            // 10秒后停止监控
+            setTimeout(() => {
+                clearInterval(intervalId);
+                console.log(`🏁 输入监控结束，共记录 ${changeCount} 次变化`);
+            }, 10000);
+            
+            return true;
+        },
+
+        // 重置输入框事件绑定 - 解决输入冲突问题
+        resetInputEventBindings: function() {
+            try {
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (!textarea) {
+                    console.warn('❌ 没有找到输入框，无法重置事件绑定');
+                    return false;
+                }
+                
+                console.log('🔄 重置输入框事件绑定...');
+                
+                // 移除所有可能的冲突事件监听器
+                const eventsToRemove = ['input', 'change', 'keydown', 'keyup', 'paste', 'cut'];
+                eventsToRemove.forEach(eventType => {
+                    // 创建新元素替换旧元素，这会移除所有事件监听器
+                    const clone = textarea.cloneNode(true);
+                    textarea.parentNode.replaceChild(clone, textarea);
+                });
+                
+                console.log('✅ 输入框事件绑定重置完成');
+                return true;
+            } catch (error) {
+                console.error('❌ 重置输入框事件绑定失败:', error);
+                return false;
+            }
+        },
+
+        // 验证输入框绑定状态
+        validateInputBindings: function() {
+            try {
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (!textarea) {
+                    return { valid: false, error: 'Textarea not found' };
+                }
+                
+                // 检查是否有Blazor绑定
+                const hasBlazorBinding = !!textarea.getAttribute('_bl_');
+                
+                // 检查基本属性
+                const validation = {
+                    valid: true,
+                    hasBlazorBinding: hasBlazorBinding,
+                    isDisabled: textarea.disabled,
+                    isReadOnly: textarea.readOnly,
+                    hasValue: !!textarea.value,
+                    valueLength: textarea.value.length,
+                    placeholder: textarea.placeholder,
+                    maxLength: textarea.maxLength,
+                    classList: Array.from(textarea.classList),
+                    computedStyles: {
+                        display: getComputedStyle(textarea).display,
+                        visibility: getComputedStyle(textarea).visibility,
+                        pointerEvents: getComputedStyle(textarea).pointerEvents
+                    }
+                };
+                
+                console.log('📋 输入框绑定验证结果:', validation);
+                return validation;
+            } catch (error) {
+                return { valid: false, error: error.message };
+            }
+        },
+
+        // 实时同步UI状态 - 新增功能
+        syncUIState: function() {
+            try {
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (!textarea) {
+                    return false;
+                }
+                
+                const currentLength = textarea.value.length;
+                const isEmpty = textarea.value.trim().length === 0;
+                
+                // 更新字符计数显示
+                const statsElements = document.querySelectorAll('.input-stats .char-count, .char-count');
+                statsElements.forEach(element => {
+                    element.textContent = `${currentLength}/2000`;
+                    
+                    // 添加状态CSS类
+                    const parent = element.closest('.input-stats');
+                    if (parent) {
+                        parent.className = parent.className.replace(/\b(normal|caution|warning|error)\b/g, '');
+                        const percentage = (currentLength / 2000) * 100;
+                        if (percentage >= 100) {
+                            parent.classList.add('error');
+                        } else if (percentage >= 90) {
+                            parent.classList.add('warning');
+                        } else if (percentage >= 75) {
+                            parent.classList.add('caution');
+                        } else {
+                            parent.classList.add('normal');
+                        }
+                    }
+                });
+                
+                // 更新发送按钮状态
+                const sendButtons = document.querySelectorAll('.send-button-integrated, button[class*="send"]');
+                sendButtons.forEach(button => {
+                    // 移除旧状态类
+                    button.classList.remove('active', 'disabled');
+                    
+                    if (isEmpty) {
+                        button.classList.add('disabled');
+                        button.disabled = true;
+                    } else {
+                        button.classList.add('active');
+                        button.disabled = false;
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.warn('UI状态同步失败:', error);
+                return false;
+            }
+        },
+
+        // 启动持续的UI状态同步
+        startUIStateSync: function() {
+            // 防止重复启动
+            if (this._uiSyncInterval) {
+                clearInterval(this._uiSyncInterval);
+            }
+            
+            // 每100ms同步一次UI状态
+            this._uiSyncInterval = setInterval(() => {
+                this.syncUIState();
+            }, 100);
+            
+            // 立即执行一次
+            this.syncUIState();
+            
+            console.log('🔄 UI状态实时同步已启动');
+            return true;
+        },
+
+        // 停止UI状态同步
+        stopUIStateSync: function() {
+            if (this._uiSyncInterval) {
+                clearInterval(this._uiSyncInterval);
+                this._uiSyncInterval = null;
+                console.log('⏹️ UI状态同步已停止');
+            }
+        },
+
+        // 增强Blazor状态同步 - 新增功能
+        enhanceBlazorSync: function() {
+            try {
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (!textarea) {
+                    return false;
+                }
+                
+                // 创建一个自定义事件来通知Blazor组件状态变化
+                const notifyBlazorUpdate = () => {
+                    // 触发自定义事件
+                    const event = new CustomEvent('blazorStateUpdate', {
+                        detail: {
+                            value: textarea.value,
+                            length: textarea.value.length,
+                            isEmpty: textarea.value.trim().length === 0
+                        },
+                        bubbles: true
+                    });
+                    textarea.dispatchEvent(event);
+                    
+                    // 同时更新UI状态
+                    this.syncUIState();
+                };
+                
+                // 监听所有可能的输入事件
+                const events = ['input', 'keyup', 'paste', 'cut', 'compositionend'];
+                events.forEach(eventType => {
+                    textarea.addEventListener(eventType, notifyBlazorUpdate, true);
+                });
+                
+                console.log('🔗 Blazor状态同步增强已启用');
+                return true;
+            } catch (error) {
+                console.error('Blazor状态同步增强失败:', error);
+                return false;
+            }
+        },
+
+        // 增强Enter键处理 - 新增功能
+        enhanceEnterKeyHandling: function() {
+            try {
+                const textarea = document.querySelector('textarea.chat-input-enhanced');
+                if (!textarea) {
+                    return false;
+                }
+                
+                // 移除现有的Enter键监听器
+                const existingHandler = textarea._enterKeyHandler;
+                if (existingHandler) {
+                    textarea.removeEventListener('keydown', existingHandler);
+                }
+                
+                // 创建新的Enter键处理器
+                const enterKeyHandler = (event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        // 阻止默认的换行行为
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // 检查是否有内容可以发送
+                        const trimmedValue = textarea.value.trim();
+                        if (trimmedValue.length > 0) {
+                            console.log('🚀 Enter键触发发送消息:', trimmedValue);
+                            
+                            // 触发Blazor的input事件以确保状态同步
+                            const inputEvent = new Event('input', { bubbles: true });
+                            textarea.dispatchEvent(inputEvent);
+                            
+                            // 触发自定义发送事件
+                            const sendEvent = new CustomEvent('sendMessage', {
+                                detail: { message: trimmedValue },
+                                bubbles: true
+                            });
+                            textarea.dispatchEvent(sendEvent);
+                        } else {
+                            console.log('⚠️ 输入为空，无法发送消息');
+                        }
+                    }
+                    // Shift+Enter 允许换行，不做任何处理
+                };
+                
+                // 添加事件监听器
+                textarea.addEventListener('keydown', enterKeyHandler, true);
+                textarea._enterKeyHandler = enterKeyHandler; // 保存引用以便后续移除
+                
+                console.log('✅ Enter键处理增强已启用');
+                return true;
+            } catch (error) {
+                console.error('❌ Enter键处理增强失败:', error);
+                return false;
+            }
+        },
     });
 
     // 页面加载完成后初始化主题

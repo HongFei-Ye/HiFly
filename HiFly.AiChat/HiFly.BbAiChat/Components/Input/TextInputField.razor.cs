@@ -25,27 +25,17 @@ public partial class TextInputField : ComponentBase
         {
             if (_currentValue != value)
             {
-                // 防止设置为测试数据
-                if (value == "CurrentMessage")
+                // 简化过滤逻辑，只过滤明确的测试数据
+                _currentValue = (value == "CurrentMessage") ? string.Empty : (value ?? string.Empty);
+                
+                // 使用同步方式通知变化，避免异步竞态条件
+                if (CurrentValueChanged.HasDelegate)
                 {
-                    _currentValue = string.Empty;
-                }
-                else
-                {
-                    _currentValue = value ?? string.Empty;
+                    _ = CurrentValueChanged.InvokeAsync(_currentValue);
                 }
                 
-                // 通知父组件值变化
-                _ = Task.Run(async () =>
-                {
-                    if (CurrentValueChanged.HasDelegate)
-                    {
-                        await CurrentValueChanged.InvokeAsync(_currentValue);
-                    }
-                    
-                    // 自动调整高度
-                    await AutoResizeTextarea();
-                });
+                // 强制触发状态更新，确保父组件能及时响应
+                StateHasChanged();
             }
         }
     }
@@ -98,12 +88,8 @@ public partial class TextInputField : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        // 强制确保CurrentValue为空字符串，清除任何可能的测试数据
-        if (string.IsNullOrEmpty(_currentValue) || _currentValue == "CurrentMessage")
-        {
-            _currentValue = string.Empty;
-        }
-        
+        // 简化初始化，只确保字段为空
+        _currentValue = string.Empty;
         await base.OnInitializedAsync();
     }
 
@@ -111,41 +97,27 @@ public partial class TextInputField : ComponentBase
     {
         if (firstRender)
         {
-            // 首次渲染时强制清空任何残留值
-            await ClearTextareaValue();
-            await InitializeTextarea();
+            // 移除可能干扰输入的清空操作和聚焦操作
+            // await ClearTextareaValue();
+            // await FocusTextarea();
+            
+            // 只进行基本的自动高度调整初始化
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("aiChatHelper.initAutoResize", textareaRef);
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"Failed to initialize auto resize: {ex.Message}");
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
     protected override void OnParametersSet()
     {
-        // 确保CurrentValue不会是测试数据
-        if (_currentValue == "CurrentMessage" || (string.IsNullOrWhiteSpace(_currentValue) && _currentValue != string.Empty))
-        {
-            _currentValue = string.Empty;
-        }
         
         base.OnParametersSet();
-    }
-
-    /// <summary>
-    /// 初始化输入框
-    /// </summary>
-    private async Task InitializeTextarea()
-    {
-        try
-        {
-            // 聚焦输入框
-            await FocusTextarea();
-            
-            // 初始化自动高度调整
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.initAutoResize", textareaRef);
-        }
-        catch (Exception ex)
-        {
-            System.Console.WriteLine($"Failed to initialize textarea: {ex.Message}");
-        }
     }
 
     /// <summary>
@@ -190,43 +162,13 @@ public partial class TextInputField : ComponentBase
     /// </summary>
     public async Task ClearContent()
     {
-        CurrentValue = string.Empty;
+        _currentValue = string.Empty;
+        if (CurrentValueChanged.HasDelegate)
+        {
+            await CurrentValueChanged.InvokeAsync(_currentValue);
+        }
         await ResetHeight();
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// 强制清空textarea的值
-    /// </summary>
-    private async Task ClearTextareaValue()
-    {
-        try
-        {
-            // 首先尝试使用新的清理函数
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.forceCleanAllTextareas");
-            
-            // 然后针对当前元素再次确保清空
-            await JSRuntime.InvokeVoidAsync("eval", 
-                @"var textarea = document.querySelector('textarea.chat-input-enhanced'); 
-                  if(textarea) { 
-                      textarea.value = ''; 
-                      textarea.defaultValue = '';
-                      textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                  }");
-        }
-        catch
-        {
-            // 忽略错误，使用降级方案
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("eval", 
-                    "var textareas = document.querySelectorAll('textarea'); textareas.forEach(t => { if(t.value === 'CurrentMessage') t.value = ''; });");
-            }
-            catch
-            {
-                // 完全降级，忽略
-            }
-        }
     }
 
     /// <summary>
@@ -239,7 +181,11 @@ public partial class TextInputField : ComponentBase
         {
             if (!string.IsNullOrWhiteSpace(CurrentValue))
             {
-                await OnSendMessage.InvokeAsync(CurrentValue.Trim());
+                // 调用发送消息事件
+                if (OnSendMessage.HasDelegate)
+                {
+                    await OnSendMessage.InvokeAsync(CurrentValue.Trim());
+                }
             }
             return;
         }
@@ -270,21 +216,6 @@ public partial class TextInputField : ComponentBase
         if (OnKeyDown.HasDelegate)
         {
             await OnKeyDown.InvokeAsync(e);
-        }
-    }
-
-    /// <summary>
-    /// 自动调整输入框高度
-    /// </summary>
-    private async Task AutoResizeTextarea()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("aiChatHelper.autoResizeTextarea", textareaRef);
-        }
-        catch (Exception ex)
-        {
-            System.Console.WriteLine($"Auto resize failed: {ex.Message}");
         }
     }
 
