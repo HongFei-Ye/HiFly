@@ -1,10 +1,18 @@
-/* ��Ϣ�����������ʽ */
+﻿/* 消息操作栏组件样式 */
 .message-actions {
     display: flex;
     gap: 0.5rem;
-    opacity: 0;
+    opacity: 0.3; /* 修改：默认显示淡色，而不是完全隐藏 */
     transition: all 0.3s ease;
     margin-top: 0.75rem;
+    position: relative; /* 确保操作栏有定位上下文 */
+    z-index: 10; /* 确保操作按钮在最上层 */
+    pointer-events: auto; /* 确保可以接收点击事件 */
+}
+
+/* 悬停时完全显示 */
+.message:hover .message-actions {
+    opacity: 1;
 }
 
 .message-action-btn {
@@ -22,6 +30,10 @@
     font-weight: 500;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     outline: none;
+    position: relative; /* 确保按钮有定位上下文 */
+    z-index: 11; /* 确保按钮在操作栏之上 */
+    pointer-events: auto; /* 明确指定按钮可以接收点击事件 */
+    user-select: none; /* 防止文本选择干扰点击 */
 }
 
 .message-action-btn:hover {
@@ -29,11 +41,17 @@
     color: #2d3748;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 12; /* 悬停时进一步提升层级 */
 }
 
 .message-action-btn:focus-visible {
     outline: 2px solid #667eea;
     outline-offset: 2px;
+}
+
+.message-action-btn:active {
+    transform: translateY(0); /* 点击时的反馈 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .copy-btn:hover {
@@ -54,19 +72,21 @@
     box-shadow: 0 4px 12px rgba(237, 137, 54, 0.2);
 }
 
-/* ��Ӧʽ��� */
+/* 响应式设计 */
 @media (max-width: 480px) {
     .message-actions {
         flex-direction: column;
         gap: 0.375rem;
+        opacity: 0.8; /* 在小屏幕上更明显，因为悬停不太适用 */
     }
 
     .message-action-btn {
         justify-content: center;
+        padding: 0.75rem 1rem; /* 增加移动设备上的点击区域 */
     }
 }
 
-/* ��ɫ����֧�� */
+/* 暗色主题支持 */
 body.dark-theme .message-action-btn {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.2);
@@ -78,20 +98,20 @@ body.dark-theme .message-action-btn:hover {
     color: #e2e8f0;
 }
 
-/* ���ϰ�֧�� */
+/* 无障碍支持 */
 @media (prefers-reduced-motion: reduce) {
     .message-action-btn {
         transition: none !important;
     }
 }
 
-/* �����Ż� */
+/* 性能优化 */
 .message-action-btn {
     will-change: transform;
     backface-visibility: hidden;
 }
 
-/* ��ӡ��ʽ */
+/* 打印样式 */
 @media print {
     .message-actions {
         display: none;

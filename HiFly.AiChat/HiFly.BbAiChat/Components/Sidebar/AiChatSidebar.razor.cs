@@ -8,7 +8,7 @@ using Microsoft.JSInterop;
 namespace HiFly.BbAiChat.Components.Sidebar;
 
 /// <summary>
-/// 左侧边栏组件 - 重构版本
+/// 左侧边栏组件
 /// </summary>
 public partial class AiChatSidebar : ComponentBase
 {

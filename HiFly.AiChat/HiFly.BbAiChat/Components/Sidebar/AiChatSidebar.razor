@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Components
+ï»¿@using Microsoft.AspNetCore.Components
 @using HiFly.BbAiChat.Components
 @using HiFly.BbAiChat.Components.Sidebar
 
@@ -13,11 +13,13 @@
     else
     {
         <div class="default-left-panel">
-            <!-- ¶¥²¿¹¤¾ßÀ¸×é¼þ -->
+            <!-- é¡¶éƒ¨å·¥å…·æ ç»„ä»¶ -->
             <SidebarToolbar IsCollapsed="IsCollapsed"
+                          CurrentWidth="@Width"
                           OnNewChat="HandleNewChat"
-                          OnToggleCollapse="HandleToggleCollapse">
-                <!-- ¿í¶È¿ØÖÆ×é¼þ×÷Îª×ÓÄÚÈÝ -->
+                          OnToggleCollapse="HandleToggleCollapse"
+                          EnableDynamicText="true">
+                <!-- å®½åº¦æŽ§åˆ¶ç»„ä»¶ä½œä¸ºå­å†…å®¹ -->
                 <SidebarWidthControls EnableWidthResize="EnableWidthResize"
                                     CurrentWidth="Width"
                                     WidthPresets="WidthPresets"
@@ -26,7 +28,7 @@
 
             @if (!IsCollapsed)
             {
-                <!-- Õ¹¿ª×´Ì¬£º»á»°ÁÐ±í×é¼þ -->
+                <!-- å±•å¼€çŠ¶æ€ï¼šä¼šè¯åˆ—è¡¨ç»„ä»¶ -->
                 <SessionsList Sessions="Sessions"
                             CurrentSessionId="CurrentSessionId"
                             OnSessionSelected="HandleSessionSelected"
@@ -34,7 +36,7 @@
                             OnDeleteSession="HandleDeleteSession"
                             OnNewChat="HandleNewChat" />
 
-                <!-- µ×²¿Í³¼ÆÐÅÏ¢×é¼þ -->
+                <!-- åº•éƒ¨ç»Ÿè®¡ä¿¡æ¯ç»„ä»¶ -->
                 <SidebarStats MessageCount="MessageCount"
                             SessionCount="Sessions.Count"
                             SessionDuration="@GetSessionDuration()"
@@ -42,7 +44,7 @@
             }
             else
             {
-                <!-- ÕÛµþ×´Ì¬£º½ô´ÕÊÓÍ¼×é¼þ -->
+                <!-- æŠ˜å çŠ¶æ€ï¼šç´§å‡‘è§†å›¾ç»„ä»¶ -->
                 <CollapsedSessionsView Sessions="Sessions"
                                      CurrentSessionId="CurrentSessionId"
                                      MaxVisibleSessions="_maxVisibleSessions"
@@ -52,7 +54,7 @@
         </div>
     }
     
-    <!-- ¿í¶Èµ÷ÕûÊÖ±ú×é¼þ -->
+    <!-- å®½åº¦è°ƒæ•´æ‰‹æŸ„ç»„ä»¶ -->
     <SidebarResizeHandle EnableWidthResize="EnableWidthResize"
                        ShowResizeHandle="ShowResizeHandle"
                        IsCollapsed="IsCollapsed"

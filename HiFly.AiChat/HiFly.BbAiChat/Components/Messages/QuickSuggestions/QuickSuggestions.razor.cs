@@ -62,7 +62,6 @@ public partial class QuickSuggestions : ComponentBase
                 {
                     new() { Text = "打个招呼", Message = "你好，请介绍一下自己" },
                     new() { Text = "了解功能", Message = "你能帮我做什么？" },
-                    new() { Text = "随意聊聊", Message = "我想开始一个有趣的对话" }
                 }
             },
             new CategoryData

@@ -1,7 +1,7 @@
-/* AiChatSidebar ��������ʽ - �ع��汾 */
+﻿/* AiChatSidebar 组件样式 - 重构版本 */
 
 /* ============================================
-   ����������ʽ
+   基础面板样式
    ============================================ */
 .ai-chat-left-panel {
     background: #fafafa;
@@ -16,12 +16,12 @@
     position: relative;
 }
 
-/* �ɵ������ȵĲ���� */
+/* 可调整宽度的面板 */
 .ai-chat-left-panel.resizable {
-    transition: none; /* ��קʱ���ù��� */
+    transition: none; /* 拖拽时禁用过渡 */
 }
 
-/* �Ҳཥ��߽��� */
+/* 右侧分隔线 */
 .ai-chat-left-panel::before {
     content: '';
     position: absolute;
@@ -55,18 +55,27 @@
 }
 
 /* ============================================
-   ��Ӧʽ���
+   响应式优化 - 保持宽度调整功能
    ============================================ */
 @media (max-width: 768px) {
     .ai-chat-left-panel {
-        position: absolute;
-        z-index: 1000;
+        /* 移除绝对定位，保持flex布局 */
+        /* position: absolute; - 移除这行 */
+        /* 保持正常的flex行为，允许宽度调整 */
+        position: relative;
+        z-index: 100; /* 降低层级，避免覆盖问题 */
         height: 100%;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.12);
+        
+        /* 确保在小屏幕上也能正常显示 */
+        min-width: 200px; /* 设置最小宽度 */
+        max-width: 90vw; /* 限制最大宽度为视口宽度的90% */
     }
 
     .ai-chat-left-panel.collapsed {
-        transform: translateX(-100%);
+        /* 保持原有的折叠行为 */
+        min-width: 60px;
+        max-width: 60px;
     }
 
     .default-left-panel {
@@ -74,8 +83,25 @@
     }
 }
 
+/* 更小屏幕的特殊处理 */
+@media (max-width: 480px) {
+    .ai-chat-left-panel {
+        min-width: 180px; /* 进一步减小最小宽度 */
+        max-width: 85vw; /* 更严格的最大宽度限制 */
+    }
+    
+    .ai-chat-left-panel.collapsed {
+        min-width: 50px;
+        max-width: 50px;
+    }
+    
+    .default-left-panel {
+        padding: 0.8rem 0.6rem;
+    }
+}
+
 /* ============================================
-   ��ɫ����֧��
+   暗色主题支持
    ============================================ */
 body.dark-theme .ai-chat-left-panel {
     background: #2d3748;
@@ -85,14 +111,33 @@ body.dark-theme .ai-chat-left-panel.collapsed {
     background: #2d3748;
 }
 
+body.dark-theme .ai-chat-left-panel::before {
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+}
+
 /* ============================================
-   �����Ż������ϰ�֧��
+   性能优化和无障碍支持
    ============================================ */
 
-/* ���ϰ�֧�� */
+/* 减少动画偏好支持 */
 @media (prefers-reduced-motion: reduce) {
     .ai-chat-left-panel {
         transition: none !important;
         animation: none !important;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .ai-chat-left-panel {
+        max-width: 40vw; /* 横屏时限制更严格 */
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .ai-chat-left-panel {
+        /* 确保触摸设备上的交互体验 */
+        -webkit-overflow-scrolling: touch;
     }
 }

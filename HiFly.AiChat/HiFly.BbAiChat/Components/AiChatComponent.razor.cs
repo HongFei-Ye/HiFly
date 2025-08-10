@@ -3,12 +3,14 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 
 namespace HiFly.BbAiChat.Components;
 
+/// <summary>
+/// AI聊天主组件 - 重构版本
+/// </summary>
 public partial class AiChatComponent : ComponentBase, IDisposable
 {
     #region 依赖注入
@@ -17,7 +19,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     private IJSRuntime? JSRuntime { get; set; }
     #endregion
 
-    #region 参数
+    #region 基本参数
     /// <summary>
     /// 聊天标题
     /// </summary>
@@ -37,10 +39,10 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     public bool ShowLeftPanel { get; set; } = true;
 
     /// <summary>
-    /// 是否显示右侧面板
+    /// 是否显示右侧面板 - 修改默认值为false，避免异常开启
     /// </summary>
     [Parameter]
-    public bool ShowRightPanel { get; set; } = true;
+    public bool ShowRightPanel { get; set; } = false;
 
     /// <summary>
     /// 左侧面板是否折叠
@@ -59,31 +61,35 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     /// </summary>
     [Parameter]
     public string RightPanelWidth { get; set; } = "320px";
+    #endregion
 
+    #region 模板参数
     /// <summary>
     /// 顶部面板模板
     /// </summary>
     [Parameter]
-    public RenderFragment? TopPanelTemplate { get; set; }
+    public RenderFragment? HeaderTemplate { get; set; }
 
     /// <summary>
     /// 左侧面板模板
     /// </summary>
     [Parameter]
-    public RenderFragment? LeftPanelTemplate { get; set; }
+    public RenderFragment? SidebarTemplate { get; set; }
 
     /// <summary>
     /// 右侧面板模板
     /// </summary>
     [Parameter]
-    public RenderFragment? RightPanelTemplate { get; set; }
+    public RenderFragment? SettingsTemplate { get; set; }
 
     /// <summary>
     /// 工具栏模板
     /// </summary>
     [Parameter]
     public RenderFragment? ToolbarTemplate { get; set; }
+    #endregion
 
+    #region 事件参数
     /// <summary>
     /// 发送消息回调
     /// </summary>
@@ -127,6 +133,12 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     public EventCallback<bool> OnLeftPanelCollapsedChanged { get; set; }
 
     /// <summary>
+    /// 右侧面板显示状态变更回调
+    /// </summary]
+    [Parameter]
+    public EventCallback<bool> OnRightPanelVisibilityChanged { get; set; }
+
+    /// <summary>
     /// 删除会话回调
     /// </summary>
     [Parameter]
@@ -134,12 +146,24 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     #endregion
 
     #region 私有字段和属性
-    private ElementReference messagesContainer;
-    private ElementReference inputTextarea;
-
     private string CurrentMessage { get; set; } = string.Empty;
     private bool IsLoading { get; set; } = false;
     private bool IsVoiceRecording { get; set; } = false;
+    
+    // 添加一个内部状态追踪，防止状态意外重置
+    private bool _hasUserToggledPanel = false;
+    private bool _initialPanelState = false;
+
+    /// <summary>
+    /// 确保CurrentMessage始终为空字符串（除非有实际内容）
+    /// </summary>
+    private void EnsureCurrentMessageIsEmpty()
+    {
+        if (CurrentMessage == "CurrentMessage" || string.IsNullOrWhiteSpace(CurrentMessage))
+        {
+            CurrentMessage = string.Empty;
+        }
+    }
 
     /// <summary>
     /// 当前会话ID
@@ -180,11 +204,27 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     /// 最大令牌数
     /// </summary>
     public int MaxTokens { get; set; } = 2048;
+
+    /// <summary>
+    /// 是否启用上下文记忆
+    /// </summary>
+    public bool EnableMemory { get; set; } = true;
+
+    /// <summary>
+    /// 是否启用流式响应
+    /// </summary>
+    public bool EnableStreaming { get; set; } = true;
     #endregion
 
     #region 生命周期方法
     protected override async Task OnInitializedAsync()
     {
+        // 记录初始面板状态（不调用JavaScript）
+        _initialPanelState = ShowRightPanel;
+        
+        // 确保CurrentMessage为空
+        EnsureCurrentMessageIsEmpty();
+
         // 初始化默认会话
         if (!ChatSessions.Any())
         {
@@ -204,26 +244,112 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         if (firstRender)
         {
+            // 首次渲染后，尝试从localStorage恢复面板状态
             try
             {
-                await JSRuntime.InvokeVoidAsync("initTheme");
+                // 先恢复面板状态
+                await RestorePanelStateFromStorage();
+                
+                // 然后初始化主题
+                await JSRuntime.InvokeVoidAsync("aiChatHelper.initTheme");
             }
             catch (JSException)
             {
-                // 如果JavaScript函数不可用，忽略错误
-                System.Console.WriteLine("initTheme function not available, using default theme");
+                // 提供降级方案
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("eval", @"
+                        const savedTheme = localStorage.getItem('theme');
+                        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                        
+                        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                            document.body.classList.add('dark-theme');
+                        } else {
+                            document.body.classList.remove('dark-theme');
+                        }
+                    ");
+                }
+                catch (JSException)
+                {
+                    // 完全降级，不做任何操作
+                }
             }
-
-            await FocusInput();
-        }
-
-        // 滚动到底部
-        if (Messages.Any())
-        {
-            await ScrollToBottom();
         }
 
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    /// <summary>
+    /// 从localStorage恢复面板状态 - 增强版本，包含重试机制
+    /// </summary>
+    private async Task RestorePanelStateFromStorage()
+    {
+        const int maxRetries = 3;
+        const int delayMs = 100;
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                var savedPanelState = await JSRuntime.InvokeAsync<bool>("aiChatHelper.storage.getRightPanelState");
+                
+                // 只有在用户未手动切换过面板状态且保存的状态与当前状态不同时才更新
+                if (!_hasUserToggledPanel && savedPanelState != ShowRightPanel)
+                {
+                    ShowRightPanel = savedPanelState;
+                    StateHasChanged(); // 触发重新渲染以更新UI
+                }
+                return; // 成功，退出重试循环
+            }
+            catch (JSException)
+            {
+                if (attempt < maxRetries)
+                {
+                    await Task.Delay(delayMs);
+                }
+                else
+                {
+                    // 最后一次尝试失败，使用降级方案
+                    try
+                    {
+                        // 尝试使用基础的localStorage访问
+                        var result = await JSRuntime.InvokeAsync<string>("eval", 
+                            "localStorage.getItem('aiChat_rightPanelOpen') || 'false'");
+
+                        if (bool.TryParse(result, out bool fallbackState) && 
+                            !_hasUserToggledPanel && fallbackState != ShowRightPanel)
+                        {
+                            ShowRightPanel = fallbackState;
+                            StateHasChanged();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // 完全降级，使用默认状态
+                    }
+                }
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // 增强参数设置逻辑，防止外部参数意外覆盖用户操作
+        
+        // 确保CurrentMessage为空（防止测试数据残留）
+        EnsureCurrentMessageIsEmpty();
+        
+        // 只有在首次设置或者用户未手动切换过面板时，才允许外部参数影响面板状态
+        if (!_hasUserToggledPanel)
+        {
+            // 如果这是首次参数设置，记录初始状态
+            if (_initialPanelState == false && ShowRightPanel == true)
+            {
+                _initialPanelState = true;
+            }
+        }
+        
+        base.OnParametersSet();
     }
     #endregion
 
@@ -246,9 +372,34 @@ public partial class AiChatComponent : ComponentBase, IDisposable
 
         Messages.Add(message);
         StateHasChanged();
+        
+        // 等待DOM更新后滚动到底部
+        await Task.Delay(100);
+        await ScrollToBottomIfPossible();
+    }
 
-        await Task.Delay(100); // 确保DOM更新
-        await ScrollToBottom();
+    /// <summary>
+    /// 尝试滚动到底部（如果消息组件可用）
+    /// </summary>
+    private async Task ScrollToBottomIfPossible()
+    {
+        try
+        {
+            // 尝试通过JavaScript直接滚动消息容器
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const messagesContainer = document.querySelector('.chat-messages');
+                if (messagesContainer) {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            ");
+        }
+        catch
+        {
+            // 忽略JavaScript调用失败
+        }
     }
 
     /// <summary>
@@ -268,7 +419,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         Messages.Clear();
         StateHasChanged();
-        await FocusInput();
+        await Task.CompletedTask;
     }
 
     /// <summary>
@@ -286,28 +437,176 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         Messages = messages ?? new List<ChatMessage>();
         StateHasChanged();
         await Task.Delay(100);
-        await ScrollToBottom();
+    }
+
+    /// <summary>
+    /// 调试模式：启用详细日志
+    /// </summary>
+    [Parameter]
+    public bool EnableDebugLogging { get; set; } = false;
+
+    /// <summary>
+    /// 输出调试信息
+    /// </summary>
+    private void LogDebugInfo(string message)
+    {
+        if (EnableDebugLogging)
+        {
+            System.Console.WriteLine($"[AiChatPanel] {DateTime.Now:HH:mm:ss.fff} - {message}");
+        }
+    }
+
+    /// <summary>
+    /// 切换右侧面板显示状态 - 增强版本，包含状态持久化和错误处理
+    /// </summary>
+    public async Task ToggleRightPanel()
+    {
+        _hasUserToggledPanel = true; // 标记用户已手动切换
+        ShowRightPanel = !ShowRightPanel;
+        
+        // 保存状态到localStorage（包含错误处理）
+        await SavePanelStateToStorage();
+
+        StateHasChanged();
+
+        if (OnRightPanelVisibilityChanged.HasDelegate)
+        {
+            await OnRightPanelVisibilityChanged.InvokeAsync(ShowRightPanel);
+        }
+    }
+
+    /// <summary>
+    /// 强制设置右侧面板状态 - 增强版本
+    /// </summary>
+    /// <param name="show">是否显示</param>
+    /// <param name="saveToStorage">是否保存到本地存储</param>
+    public async Task SetRightPanelState(bool show, bool saveToStorage = true)
+    {
+        if (ShowRightPanel == show) return; // 状态相同，无需切换
+
+        ShowRightPanel = show;
+        
+        if (saveToStorage)
+        {
+            await SavePanelStateToStorage();
+        }
+
+        StateHasChanged();
+
+        if (OnRightPanelVisibilityChanged.HasDelegate)
+        {
+            await OnRightPanelVisibilityChanged.InvokeAsync(ShowRightPanel);
+        }
+    }
+
+    /// <summary>
+    /// 保存面板状态到localStorage - 包含错误处理和降级方案
+    /// </summary>
+    private async Task SavePanelStateToStorage()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("aiChatHelper.storage.setRightPanelState", ShowRightPanel);
+        }
+        catch (JSException)
+        {
+            // 尝试降级方案
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("eval", 
+                    $"localStorage.setItem('aiChat_rightPanelOpen', '{ShowRightPanel.ToString().ToLower()}')");
+            }
+            catch (Exception)
+            {
+                // 静默处理错误
+            }
+        }
+    }
+
+    /// <summary>
+    /// 调试用：获取右侧面板状态信息
+    /// </summary>
+    public async Task<object> GetPanelDebugInfo()
+    {
+        try
+        {
+            var localStorageState = await JSRuntime.InvokeAsync<bool>("aiChatHelper.storage.getRightPanelState");
+            
+            return new
+            {
+                CurrentShowRightPanel = ShowRightPanel,
+                LocalStorageState = localStorageState,
+                HasUserToggled = _hasUserToggledPanel,
+                InitialPanelState = _initialPanelState,
+                Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new
+            {
+                Error = ex.Message,
+                CurrentShowRightPanel = ShowRightPanel,
+                HasUserToggled = _hasUserToggledPanel,
+                InitialPanelState = _initialPanelState,
+                Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+        }
+    }
+
+    /// <summary>
+    /// 调试用：重置面板状态
+    /// </summary>
+    public async Task ResetPanelState()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("aiChatHelper.storage.clearPanelStates");
+            ShowRightPanel = false; // 重置为默认关闭状态
+            _hasUserToggledPanel = false;
+            _initialPanelState = false;
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            // 静默处理错误
+        }
+    }
+
+    /// <summary>
+    /// 清空输入框内容
+    /// </summary>
+    public async Task ClearCurrentMessage()
+    {
+        CurrentMessage = string.Empty;
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+    
+    /// <summary>
+    /// 重置组件状态（包括清空输入框）
+    /// </summary>
+    public async Task ResetComponentState()
+    {
+        CurrentMessage = string.Empty;
+        IsLoading = false;
+        IsVoiceRecording = false;
+        StateHasChanged();
+        await Task.CompletedTask;
     }
     #endregion
 
-    #region 私有方法
-    private async Task OnSendMessage()
+    #region 事件处理方法
+    private async Task HandleSendMessage(string message)
     {
-        if (string.IsNullOrWhiteSpace(CurrentMessage) || IsLoading)
-            return;
-
-        var userMessage = CurrentMessage.Trim();
-        CurrentMessage = string.Empty;
-
-        await AddMessage(userMessage, true);
-
         SetLoading(true);
+        await AddMessage(message, true);
 
         try
         {
             if (OnMessageSent.HasDelegate)
             {
-                await OnMessageSent.InvokeAsync(userMessage);
+                await OnMessageSent.InvokeAsync(message);
             }
         }
         catch (Exception ex)
@@ -317,32 +616,10 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         finally
         {
             SetLoading(false);
-            await FocusInput();
         }
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !e.ShiftKey)
-        {
-            await OnSendMessage();
-        }
-    }
-
-    private bool ShouldPreventEnter(KeyboardEventArgs e)
-    {
-        return e.Key == "Enter" && !e.ShiftKey;
-    }
-
-    private async Task OnTemperatureSliderChanged(double value)
-    {
-        if (OnTemperatureChanged.HasDelegate)
-        {
-            await OnTemperatureChanged.InvokeAsync(value);
-        }
-    }
-
-    private async Task OnClearChat()
+    private async Task HandleClearChat()
     {
         await ClearMessages();
 
@@ -352,7 +629,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnNewChat()
+    private async Task HandleNewChat()
     {
         CurrentSessionId = Guid.NewGuid().ToString();
         var newSession = new ChatSession
@@ -371,7 +648,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnSelectSession(string sessionId)
+    private async Task HandleSessionSelected(string sessionId)
     {
         CurrentSessionId = sessionId;
 
@@ -381,66 +658,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnToggleSettings()
-    {
-        // 实现设置面板切换逻辑
-        await Task.CompletedTask;
-    }
-
-    private async Task OnCopyMessage(string content)
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", content);
-            // 可以添加复制成功的提示
-        }
-        catch
-        {
-            // 降级处理，使用传统方式复制
-        }
-    }
-
-    private async Task OnRegenerateResponse(ChatMessage message)
-    {
-        // 重新生成响应的逻辑
-        if (Messages.Contains(message))
-        {
-            Messages.Remove(message);
-            StateHasChanged();
-        }
-    }
-
-    private async Task OnAttachFile()
-    {
-        // 实现文件附件功能
-        await Task.CompletedTask;
-    }
-
-    private async Task OnInsertTemplate()
-    {
-        // 实现模板插入功能
-        await Task.CompletedTask;
-    }
-
-    private async Task OnToggleVoice()
-    {
-        IsVoiceRecording = !IsVoiceRecording;
-        // 实现语音输入功能
-        await Task.CompletedTask;
-    }
-
-    private async Task OnToggleLeftPanel()
-    {
-        IsLeftPanelCollapsed = !IsLeftPanelCollapsed;
-        StateHasChanged();
-
-        if (OnLeftPanelCollapsedChanged.HasDelegate)
-        {
-            await OnLeftPanelCollapsedChanged.InvokeAsync(IsLeftPanelCollapsed);
-        }
-    }
-
-    private async Task OnDeleteSession(string sessionId)
+    private async Task HandleSessionDeleted(string sessionId)
     {
         // 如果删除的是当前会话，需要切换到其他会话或创建新会话
         if (sessionId == CurrentSessionId)
@@ -448,17 +666,14 @@ public partial class AiChatComponent : ComponentBase, IDisposable
             var remainingSessions = ChatSessions.Where(s => s.Id != sessionId).ToList();
             if (remainingSessions.Any())
             {
-                // 切换到最新的会话
-                await OnSelectSession(remainingSessions.First().Id);
+                await HandleSessionSelected(remainingSessions.First().Id);
             }
             else
             {
-                // 没有其他会话了，创建新会话
-                await OnNewChat();
+                await HandleNewChat();
             }
         }
 
-        // 移除会话
         ChatSessions.RemoveAll(s => s.Id == sessionId);
         StateHasChanged();
 
@@ -468,214 +683,189 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         }
     }
 
-    private string FormatAiMessage(string content)
+    private async Task HandleCollapsedChanged(bool isCollapsed)
     {
-        // 简单的Markdown格式处理
-        content = content.Replace("\n", "<br/>");
-        content = System.Text.RegularExpressions.Regex.Replace(
-            content,
-            @"\*\*(.*?)\*\*",
-            "<strong>$1</strong>");
-        content = System.Text.RegularExpressions.Regex.Replace(
-            content,
-            @"\*(.*?)\*",
-            "<em>$1</em>");
-        content = System.Text.RegularExpressions.Regex.Replace(
-            content,
-            @"`(.*?)`",
-            "<code>$1</code>");
+        IsLeftPanelCollapsed = isCollapsed;
+        StateHasChanged();
 
-        return content;
+        if (OnLeftPanelCollapsedChanged.HasDelegate)
+        {
+            await OnLeftPanelCollapsedChanged.InvokeAsync(isCollapsed);
+        }
     }
 
-    private async Task ScrollToBottom()
+    private async Task HandleModelChanged(string modelId)
+    {
+        SelectedModel = modelId;
+        if (OnModelChanged.HasDelegate)
+        {
+            await OnModelChanged.InvokeAsync(modelId);
+        }
+    }
+
+    private async Task HandleTemperatureChanged(double temperature)
+    {
+        Temperature = temperature;
+        if (OnTemperatureChanged.HasDelegate)
+        {
+            await OnTemperatureChanged.InvokeAsync(temperature);
+        }
+    }
+
+    /// <summary>
+    /// 处理设置面板切换
+    /// </summary>
+    private async Task HandleToggleSettings()
+    {
+        await ToggleRightPanel();
+    }
+
+    private async Task HandleCopyMessage(string content)
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("scrollToBottom", messagesContainer);
+            await JSRuntime.InvokeVoidAsync("copyToClipboard", content);
         }
         catch
         {
-            // 忽略JS调用失败
+            // 降级处理
         }
     }
 
-    private async Task FocusInput()
+    private async Task HandleRegenerateResponse(ChatMessage message)
     {
-        try
+        if (Messages.Contains(message))
         {
-            await JSRuntime.InvokeVoidAsync("focusElement", inputTextarea);
-        }
-        catch
-        {
-            // 忽略焦点设置失败
+            Messages.Remove(message);
+            StateHasChanged();
         }
     }
 
-    private string GetRelativeTime(DateTime dateTime)
+    private async Task HandleLikeMessage(ChatMessage message)
     {
-        var timeSpan = DateTime.Now - dateTime;
-
-        if (timeSpan.TotalMinutes < 1)
-            return "刚刚";
-        if (timeSpan.TotalMinutes < 60)
-            return $"{(int)timeSpan.TotalMinutes}分钟前";
-        if (timeSpan.TotalHours < 24)
-            return $"{(int)timeSpan.TotalHours}小时前";
-        if (timeSpan.TotalDays < 7)
-            return $"{(int)timeSpan.TotalDays}天前";
-        if (timeSpan.TotalDays < 30)
-            return $"{(int)(timeSpan.TotalDays / 7)}周前";
-
-        return dateTime.ToString("MM-dd");
+        // 实现点赞功能
+        await Task.CompletedTask;
     }
 
-    private void SetQuickMessage(string message)
+    private async Task HandleSetQuickMessage(string message)
     {
         CurrentMessage = message;
         StateHasChanged();
+        await Task.CompletedTask;
     }
 
-    private string GetSessionDuration()
+    private async Task HandleAttachFile()
     {
-        if (!Messages.Any()) return "0分钟";
-
-        var firstMessage = Messages.MinBy(m => m.Timestamp);
-        var lastMessage = Messages.MaxBy(m => m.Timestamp);
-
-        if (firstMessage == null || lastMessage == null) return "0分钟";
-
-        var duration = lastMessage.Timestamp - firstMessage.Timestamp;
-        if (duration.TotalMinutes < 1) return "1分钟";
-        if (duration.TotalHours < 1) return $"{(int)duration.TotalMinutes}分钟";
-        return $"{(int)duration.TotalHours}小时";
+        await Task.CompletedTask;
     }
 
-    private string GetTokensUsed()
+    private async Task HandleInsertTemplate()
     {
-        // 简单估算：平均每个字符约0.75个token
-        var totalChars = Messages.Sum(m => m.Content.Length);
-        var estimatedTokens = (int)(totalChars * 0.75);
-
-        if (estimatedTokens < 1000) return estimatedTokens.ToString();
-        if (estimatedTokens < 1000000) return $"{estimatedTokens / 1000:F1}K";
-        return $"{estimatedTokens / 1000000:F1}M";
+        await Task.CompletedTask;
     }
 
-    private async Task OnExportChat()
+    private async Task HandleToggleVoice()
     {
-        if (Messages.Any())
-        {
-            try
-            {
-                var messagesData = Messages.Select(m => new
-                {
-                    content = m.Content,
-                    isUser = m.IsUser,
-                    timestamp = m.Timestamp.ToString("O")
-                }).ToArray();
-
-                await JSRuntime.InvokeVoidAsync("exportChat", messagesData, Title);
-            }
-            catch (JSException ex)
-            {
-                System.Console.WriteLine($"Export failed: {ex.Message}");
-                // 可以添加用户提示
-            }
-        }
+        IsVoiceRecording = !IsVoiceRecording;
+        await Task.CompletedTask;
     }
 
-    private async Task OnShareChat()
+    private async Task HandleDeepThink()
     {
-        if (Messages.Any())
-        {
-            try
-            {
-                var messagesData = Messages.Select(m => new
-                {
-                    content = m.Content,
-                    isUser = m.IsUser,
-                    timestamp = m.Timestamp.ToString("O")
-                }).ToArray();
-
-                var success = await JSRuntime.InvokeAsync<bool>("shareChat", messagesData, Title);
-                if (!success)
-                {
-                    // 可以添加提示信息，告知用户分享失败或已取消
-                    System.Console.WriteLine("分享失败或已取消");
-                }
-            }
-            catch (JSException ex)
-            {
-                System.Console.WriteLine($"Share failed: {ex.Message}");
-                // 降级到简单的复制功能
-                await OnCopyMessage(string.Join("\n\n", Messages.Select(m =>
-                    $"{(m.IsUser ? "用户" : "AI")}: {m.Content}")));
-            }
-        }
+        // 实现深度思考功能
+        // TODO: 添加深度思考逻辑
+        await Task.CompletedTask;
     }
 
-    private async Task OnToggleTheme()
+    private async Task HandleWebSearch()
+    {
+        // 实现联网搜索功能
+        // TODO: 添加联网搜索逻辑
+        await Task.CompletedTask;
+    }
+
+    private async Task HandleExportChat()
     {
         try
         {
-            var newTheme = await JSRuntime.InvokeAsync<string>("toggleTheme");
-            System.Console.WriteLine($"主题已切换到: {newTheme}");
-            StateHasChanged();
+            var messagesData = Messages.Select(m => new
+            {
+                content = m.Content,
+                isUser = m.IsUser,
+                timestamp = m.Timestamp.ToString("O")
+            }).ToArray();
+
+            await JSRuntime.InvokeVoidAsync("exportChat", messagesData, Title);
         }
-        catch (JSException ex)
+        catch (JSException)
         {
-            System.Console.WriteLine($"Theme toggle failed: {ex.Message}");
+            // 静默处理错误
         }
     }
 
-    private async Task OnResetSettings()
+    private async Task HandleShareChat()
     {
         try
         {
-            // 重置所有设置到默认值
-            Temperature = 0.7;
-            MaxTokens = 2048;
-            SelectedModel = AvailableModels.FirstOrDefault()?.Id ?? "gpt-3.5-turbo";
-            EnableMemory = true;
-            EnableStreaming = true;
+            var messagesData = Messages.Select(m => new
+            {
+                content = m.Content,
+                isUser = m.IsUser,
+                timestamp = m.Timestamp.ToString("O")
+            }).ToArray();
 
-            // 可以添加用户提示
-            System.Console.WriteLine("设置已重置为默认值");
+            await JSRuntime.InvokeAsync<bool>("shareChat", messagesData, Title);
+        }
+        catch (JSException)
+        {
+            // 静默处理错误
+        }
+    }
+
+    private async Task HandleToggleTheme()
+    {
+        try
+        {
+            var newTheme = await JSRuntime.InvokeAsync<string>("aiChatHelper.toggleTheme");
             StateHasChanged();
         }
-        catch (Exception ex)
+        catch (JSException)
         {
-            System.Console.WriteLine($"重置设置失败: {ex.Message}");
+            // 提供降级方案
+            try
+            {
+                // 尝试直接操作DOM
+                await JSRuntime.InvokeVoidAsync("eval", @"
+                    const body = document.body;
+                    const isDark = body.classList.contains('dark-theme');
+                    if (isDark) {
+                        body.classList.remove('dark-theme');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        body.classList.add('dark-theme');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                ");
+                StateHasChanged();
+            }
+            catch (JSException)
+            {
+                // 完全降级，不做任何操作
+            }
         }
     }
 
-    #endregion
-
-    #region 模型数据类
-    public class ChatMessage
+    private async Task HandleResetSettings()
     {
-        public string Id { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
-        public bool IsUser { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string SessionId { get; set; } = string.Empty;
+        Temperature = 0.7;
+        MaxTokens = 2048;
+        SelectedModel = AvailableModels.FirstOrDefault()?.Id ?? "gpt-3.5-turbo";
+        EnableMemory = true;
+        EnableStreaming = true;
+
+        StateHasChanged();
     }
 
-    public class ChatSession
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public DateTime CreateTime { get; set; }
-        public DateTime LastActiveTime { get; set; }
-    }
-
-    public class AiModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-    }
     #endregion
 
     #region 资源释放
@@ -683,19 +873,5 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         // 清理资源
     }
-    #endregion
-
-    #region 高级设置属性
-    /// <summary>
-    /// 是否启用上下文记忆
-    /// </summary>
-    [Parameter]
-    public bool EnableMemory { get; set; } = true;
-
-    /// <summary>
-    /// 是否启用流式响应
-    /// </summary>
-    [Parameter]
-    public bool EnableStreaming { get; set; } = true;
     #endregion
 }

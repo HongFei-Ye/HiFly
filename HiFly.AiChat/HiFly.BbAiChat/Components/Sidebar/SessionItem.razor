@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Components
+ï»¿@using Microsoft.AspNetCore.Components
 @using HiFly.BbAiChat.Components
 
 <div class="chat-session-item @(IsActive ? "active" : "")" @onclick="HandleSessionClick">
@@ -22,13 +22,13 @@
         <button class="session-action-btn edit-btn" 
                 @onclick:stopPropagation="true"
                 @onclick="HandleEditSession"
-                title="±à¼­¶Ô»°">
+                title="ç¼–è¾‘å¯¹è¯">
             <i class="fas fa-edit"></i>
         </button>
         <button class="session-action-btn delete-btn" 
                 @onclick:stopPropagation="true"
                 @onclick="HandleDeleteSession"
-                title="É¾³ý¶Ô»°">
+                title="åˆ é™¤å¯¹è¯">
             <i class="fas fa-trash-alt"></i>
         </button>
     </div>

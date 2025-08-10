@@ -1,66 +1,62 @@
-@using Microsoft.AspNetCore.Components
+ï»¿@using Microsoft.AspNetCore.Components
 
-<div class="left-panel-toolbar">
+<div class="@GetToolbarClass()" style="@GetDynamicSpacingStyle()">
     @if (!IsCollapsed)
     {
-        <button class="btn-new-chat" @onclick="HandleNewChat">
-            <div class="btn-new-chat-icon">
-                <i class="fas fa-plus"></i>
-            </div>
-            <span class="btn-new-chat-text">ÐÂ½¨¶Ô»°</span>
-            <div class="btn-new-chat-shine"></div>
-        </button>
+        <!-- å·¦ä¾§åŒºåŸŸï¼šä¸»è¦æ“ä½œ -->
+        <div class="toolbar-left">
+            @if (NewChatButtonTemplate != null)
+            {
+                @NewChatButtonTemplate
+            }
+            else
+            {
+                <!-- é»˜è®¤çš„æ–°å»ºå¯¹è¯æŒ‰é’® - æ”¯æŒåŠ¨æ€æ–‡å­—åˆ‡æ¢ -->
+                <button class="@GetButtonClass()" 
+                        @onclick="HandleNewChat"
+                        title="æ–°å»ºå¯¹è¯">
+                    <div class="btn-new-chat-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    @if (ShouldShowButtonText())
+                    {
+                        <span class="btn-new-chat-text">@GetDynamicButtonText()</span>
+                    }
+                    <div class="btn-new-chat-shine"></div>
+                </button>
+            }
+        </div>
         
-        <!-- ¿í¶Èµ÷Õû¿Ø¼þ²å²Û -->
-        @ChildContent
+        <!-- å³ä¾§åŒºåŸŸï¼šæ¬¡è¦æŽ§ä»¶ -->
+        <div class="toolbar-right">
+            <!-- å®½åº¦è°ƒæ•´æŽ§ä»¶æ’æ§½ -->
+            <div class="width-controls-wrapper">
+                @ChildContent
+            </div>
+            
+            @if (ShowToggleButton)
+            {
+                <button class="panel-toggle-btn @(IsCollapsed ? "collapsed" : "")" 
+                        @onclick="HandleToggleCollapse"
+                        title="@(IsCollapsed ? "å±•å¼€ä¾§è¾¹æ " : "æŠ˜å ä¾§è¾¹æ ")">
+                    <div class="toggle-btn-bg"></div>
+                    <i class="@GetToggleIcon()"></i>
+                </button>
+            }
+        </div>
     }
-    
-    <button class="panel-toggle-btn @(IsCollapsed ? "collapsed" : "")" 
-            @onclick="HandleToggleCollapse"
-            title="@(IsCollapsed ? "Õ¹¿ª²à±ßÀ¸" : "ÕÛµþ²à±ßÀ¸")">
-        <div class="toggle-btn-bg"></div>
-        <i class="fas @(IsCollapsed ? "fa-angle-right" : "fa-angle-left")"></i>
-    </button>
+    else
+    {
+        <!-- æŠ˜å çŠ¶æ€ï¼šåªæ˜¾ç¤ºåˆ‡æ¢æŒ‰é’® -->
+        @if (ShowToggleButton)
+        {
+            <button class="panel-toggle-btn @(IsCollapsed ? "collapsed" : "")" 
+                    @onclick="HandleToggleCollapse"
+                    title="@(IsCollapsed ? "å±•å¼€ä¾§è¾¹æ " : "æŠ˜å ä¾§è¾¹æ ")">
+                <div class="toggle-btn-bg"></div>
+                <i class="@GetToggleIcon()"></i>
+            </button>
+        }
+    }
 </div>
 
-@code {
-    /// <summary>
-    /// ÊÇ·ñÕÛµþ×´Ì¬
-    /// </summary>
-    [Parameter]
-    public bool IsCollapsed { get; set; }
-
-    /// <summary>
-    /// ÐÂ½¨¶Ô»°ÊÂ¼þ
-    /// </summary>
-    [Parameter]
-    public EventCallback OnNewChat { get; set; }
-
-    /// <summary>
-    /// ÕÛµþÇÐ»»ÊÂ¼þ
-    /// </summary>
-    [Parameter]
-    public EventCallback OnToggleCollapse { get; set; }
-
-    /// <summary>
-    /// ×ÓÄÚÈÝ£¨ÓÃÓÚ²åÈë¿í¶È¿ØÖÆ×é¼þ£©
-    /// </summary>
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    private async Task HandleNewChat()
-    {
-        if (OnNewChat.HasDelegate)
-        {
-            await OnNewChat.InvokeAsync();
-        }
-    }
-
-    private async Task HandleToggleCollapse()
-    {
-        if (OnToggleCollapse.HasDelegate)
-        {
-            await OnToggleCollapse.InvokeAsync();
-        }
-    }
-}

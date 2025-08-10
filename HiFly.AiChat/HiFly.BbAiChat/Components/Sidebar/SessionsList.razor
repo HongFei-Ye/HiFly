@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Components
+ï»¿@using Microsoft.AspNetCore.Components
 @using HiFly.BbAiChat.Components
 
 <div class="chat-history-list">
@@ -21,12 +21,12 @@
                     <i class="fas fa-comments"></i>
                     <div class="empty-icon-shine"></div>
                 </div>
-                <h6 class="empty-title">ÔİÎŞ¶Ô»°ÀúÊ·</h6>
-                <p class="empty-subtitle">µã»÷ÉÏ·½°´Å¥¿ªÊ¼ĞÂµÄ¶Ô»°</p>
+                <h6 class="empty-title">æš‚æ— å¯¹è¯å†å²</h6>
+                <p class="empty-subtitle">ç‚¹å‡»ä¸Šæ–¹æŒ‰é’®å¼€å§‹æ–°çš„å¯¹è¯</p>
                 <div class="empty-action">
                     <button class="btn-start-chat" @onclick="HandleNewChat">
                         <i class="fas fa-rocket me-2"></i>
-                        ¿ªÊ¼¶Ô»°
+                        å¼€å§‹å¯¹è¯
                     </button>
                 </div>
             </div>
@@ -36,37 +36,37 @@
 
 @code {
     /// <summary>
-    /// »á»°ÁĞ±í
+    /// ä¼šè¯åˆ—è¡¨
     /// </summary>
     [Parameter]
     public List<ChatSession> Sessions { get; set; } = new();
 
     /// <summary>
-    /// µ±Ç°»á»°ID
+    /// å½“å‰ä¼šè¯ID
     /// </summary>
     [Parameter]
     public string CurrentSessionId { get; set; } = string.Empty;
 
     /// <summary>
-    /// Ñ¡Ôñ»á»°ÊÂ¼ş
+    /// é€‰æ‹©ä¼šè¯äº‹ä»¶
     /// </summary>
     [Parameter]
     public EventCallback<string> OnSessionSelected { get; set; }
 
     /// <summary>
-    /// ±à¼­»á»°ÊÂ¼ş
+    /// ç¼–è¾‘ä¼šè¯äº‹ä»¶
     /// </summary>
     [Parameter]
     public EventCallback<string> OnEditSession { get; set; }
 
     /// <summary>
-    /// É¾³ı»á»°ÊÂ¼ş
+    /// åˆ é™¤ä¼šè¯äº‹ä»¶
     /// </summary>
     [Parameter]
     public EventCallback<string> OnDeleteSession { get; set; }
 
     /// <summary>
-    /// ĞÂ½¨¶Ô»°ÊÂ¼ş
+    /// æ–°å»ºå¯¹è¯äº‹ä»¶
     /// </summary>
     [Parameter]
     public EventCallback OnNewChat { get; set; }

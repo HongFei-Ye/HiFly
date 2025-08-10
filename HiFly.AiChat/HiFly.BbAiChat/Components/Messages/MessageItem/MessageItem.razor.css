@@ -63,6 +63,8 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    /* 确保容器内的内容可以正常交互 */
+    isolation: isolate; /* 创建新的堆叠上下文，避免z-index冲突 */
 }
 
 .bubble-container:hover .message-actions {
@@ -94,6 +96,8 @@
         rgba(255, 255, 255, 0.2), 
         transparent);
     transition: left 0.6s ease;
+    pointer-events: none; /* 确保伪元素不会阻挡点击事件 */
+    z-index: 1; /* 设置较低的层级 */
 }
 
 .user-message .bubble-container:hover::before {
@@ -135,7 +139,8 @@
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: xor;
     -webkit-mask-composite: xor;
-    pointer-events: none;
+    pointer-events: none; /* 确保伪元素不会阻挡点击事件 */
+    z-index: 1; /* 设置较低的层级 */
 }
 
 /* 气泡尾巴 - 更新颜色以匹配新设计 */

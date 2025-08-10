@@ -1,4 +1,4 @@
-/* SessionsList ×é¼şÑùÊ½ */
+ï»¿/* SessionsList ç»„ä»¶æ ·å¼ */
 .chat-history-list {
     flex: 1;
     overflow-y: auto;
@@ -28,7 +28,7 @@
     background: rgba(102, 126, 234, 0.5);
 }
 
-/* ¿Õ×´Ì¬ÑùÊ½ */
+/* ç©ºçŠ¶æ€æ ·å¼ */
 .empty-sessions {
     display: flex;
     align-items: center;
@@ -111,7 +111,7 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-/* °µÉ«Ö÷ÌâÖ§³Ö */
+/* æš—è‰²ä¸»é¢˜æ”¯æŒ */
 body.dark-theme .chat-history-list {
     scrollbar-color: rgba(102, 126, 234, 0.4) transparent;
 }

@@ -87,8 +87,6 @@ public partial class EmptyMessage : ComponentBase
                 {
                     new() { Text = "友好问候", Message = "你好！很高兴见到你，请介绍一下自己吧" },
                     new() { Text = "了解功能", Message = "你能帮我做什么？有哪些特色功能？" },
-                    new() { Text = "随意聊聊", Message = "我想开始一个轻松有趣的对话" },
-                    new() { Text = "获得帮助", Message = "我需要一些帮助，你能指导我吗？" }
                 }
             },
             new CategoryData
@@ -99,8 +97,6 @@ public partial class EmptyMessage : ComponentBase
                 {
                     new() { Text = "AI基础知识", Message = "请解释一下人工智能的基本工作原理" },
                     new() { Text = "机器学习入门", Message = "什么是机器学习？它是如何工作的？" },
-                    new() { Text = "技术趋势", Message = "当前AI技术的发展趋势是什么？" },
-                    new() { Text = "学习计划", Message = "帮我制定一个AI学习计划" }
                 }
             },
             new CategoryData
@@ -111,8 +107,6 @@ public partial class EmptyMessage : ComponentBase
                 {
                     new() { Text = "代码编写", Message = "帮我写一个实用的代码示例" },
                     new() { Text = "代码解析", Message = "请解释这段代码的功能和逻辑" },
-                    new() { Text = "最佳实践", Message = "分享一些编程的最佳实践和技巧" },
-                    new() { Text = "调试帮助", Message = "帮我分析和解决代码中的问题" }
                 }
             }
         };

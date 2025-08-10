@@ -1,4 +1,4 @@
-/* »á»°Ïî×é¼şÑùÊ½ - ÍêÈ«Æ¥ÅäÔ­°æÉè¼Æ */
+ï»¿/* ä¼šè¯é¡¹ç»„ä»¶æ ·å¼ - å®Œå…¨åŒ¹é…åŸç‰ˆè®¾è®¡ */
 .chat-session-item {
     position: relative;
     margin-bottom: 0.5rem;
@@ -32,7 +32,7 @@
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
 }
 
-/* ×ó²à»îÔ¾Ö¸Ê¾Æ÷ - Æ¥ÅäÔ­°æÉè¼Æ */
+/* å·¦ä¾§æ´»è·ƒæŒ‡ç¤ºå™¨ - åŒ¹é…åŸç‰ˆè®¾è®¡ */
 .session-indicator {
     position: absolute;
     left: 0;
@@ -120,7 +120,7 @@
     opacity: 0.7;
 }
 
-/* »á»°²Ù×÷°´Å¥ */
+/* ä¼šè¯æ“ä½œæŒ‰é’® */
 .session-actions {
     position: absolute;
     right: 1rem;
@@ -172,7 +172,7 @@
     transform: scale(1.1);
 }
 
-/* °µÉ«Ö÷ÌâÖ§³Ö */
+/* æš—è‰²ä¸»é¢˜æ”¯æŒ */
 body.dark-theme .session-item-bg {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
@@ -210,13 +210,13 @@ body.dark-theme .chat-session-item.active .session-icon {
     color: white;
 }
 
-/* ĞÔÄÜÓÅ»¯ */
+/* æ€§èƒ½ä¼˜åŒ– */
 .chat-session-item {
     will-change: transform;
     backface-visibility: hidden;
 }
 
-/* ¸ß·Ö±æÂÊÆÁÄ»ÓÅ»¯ */
+/* é«˜åˆ†è¾¨ç‡å±å¹•ä¼˜åŒ– */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
     .session-indicator {
         backface-visibility: hidden;
@@ -224,7 +224,7 @@ body.dark-theme .chat-session-item.active .session-icon {
     }
 }
 
-/* ÎŞÕÏ°­Ö§³Ö */
+/* æ— éšœç¢æ”¯æŒ */
 @media (prefers-reduced-motion: reduce) {
     .chat-session-item,
     .session-icon,
@@ -234,7 +234,7 @@ body.dark-theme .chat-session-item.active .session-icon {
     }
 }
 
-/* ½¹µãÑùÊ½ */
+/* ç„¦ç‚¹æ ·å¼ */
 .chat-session-item:focus-visible {
     outline: 2px solid #667eea;
     outline-offset: -2px;
@@ -245,7 +245,7 @@ body.dark-theme .chat-session-item.active .session-icon {
     outline-offset: 2px;
 }
 
-/* ÏìÓ¦Ê½Éè¼Æ */
+/* å“åº”å¼è®¾è®¡ */
 @media (max-width: 768px) {
     .session-content {
         padding: 0.875rem 1rem;
@@ -266,7 +266,7 @@ body.dark-theme .chat-session-item.active .session-icon {
     }
 
     .session-actions {
-        opacity: 1; /* ÔÚÒÆ¶¯¶ËÊ¼ÖÕÏÔÊ¾²Ù×÷°´Å¥ */
+        opacity: 1; /* åœ¨ç§»åŠ¨ç«¯å§‹ç»ˆæ˜¾ç¤ºæ“ä½œæŒ‰é’® */
     }
 
     .session-action-btn {
