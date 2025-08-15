@@ -30,12 +30,12 @@ public partial class UserIdFilter<TContext, TUser>
     /// </summary>
     public override void Reset()
     {
-        SearchValue = "";
+        SearchValue = null;
 
         StateHasChanged();
     }
 
-    private string SearchValue { get; set; } = "";
+    private Guid? SearchValue { get; set; } 
 
     /// <summary>
     /// 生成过滤条件方法

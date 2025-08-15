@@ -465,68 +465,6 @@ public partial class TItemTable<TContext, TItem>
     [Parameter]
     public PropertyFilterParameters? PropertyFilterParameters { get; set; }
 
-    /// <summary>
-    /// 默认查询方法，普通分页查询
-    /// </summary>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public async Task<QueryData<TItem>> DefaultOnQueryAsync_Old(QueryPageOptions options)
-    {
-        if (IsOpenNavigationVerification == true)
-        {
-            // 没有权限查询数据
-            // if (DataOperationVerification?.IsCanQuery == false)
-            // {
-            //     return await Task.FromResult(new QueryData<TItem>());
-            // }
-        }
-
-        ReSetContext();
-
-        // 处理过滤与搜索逻辑
-        var searches = options.ToFilter();
-
-
-        // 创建 AutoMapper 配置
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<PropertyFilterParameters, PropertyFilterParameters>());
-        var mapper = new Mapper(config);
-
-        // 使用 AutoMapper 进行深拷贝
-        var _propertyFilterParameters = mapper.Map<PropertyFilterParameters>(PropertyFilterParameters);
-
-        // 将 FilterKeyValueAction 转换为 PropertyFilterParameters
-        if (searches != null)
-        {
-            if (_propertyFilterParameters == null)
-            {
-                _propertyFilterParameters = searches.ToPropertyFilterParameters();
-            }
-            else
-            {
-                _propertyFilterParameters.Add(searches.ToPropertyFilterParameters());
-            }
-        }
-
-        var query = Context.Set<TItem>()
-            //.Where(searches.GetFilterLambda<TItem>(), searches.HasFilters())
-            //.PropertyFilter(searches) // 属性过滤
-            .AutoFilter(_propertyFilterParameters) // 类属性与泛型集合过滤
-            .Sort(options.SortName!, options.SortOrder, !string.IsNullOrEmpty(options.SortName))
-            .Count(out var count)
-            .Page((options.PageIndex - 1) * options.PageItems, options.PageItems);
-
-        var ret = new QueryData<TItem>()
-        {
-            TotalCount = count,
-            Items = query,
-            IsSorted = options.SortOrder != SortOrder.Unset,
-            IsFiltered = options.Filters.Count != 0,
-            IsAdvanceSearch = options.AdvanceSearches.Count != 0,
-            IsSearch = options.Searches.Count != 0 || options.CustomerSearches.Count != 0
-        };
-
-        return await Task.FromResult(ret);
-    }
 
     /// <summary>
     /// 默认查询方法，支持普通表格和树形表格
@@ -546,36 +484,41 @@ public partial class TItemTable<TContext, TItem>
         var searches = options.ToFilter();
 
         // 创建 AutoMapper 配置
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<PropertyFilterParameters, PropertyFilterParameters>());
-        var mapper = new Mapper(config);
+        //var config = new MapperConfiguration(cfg => cfg.CreateMap<PropertyFilterParameters, PropertyFilterParameters>());
+        //var mapper = new Mapper(config);
 
         // 使用 AutoMapper 进行深拷贝
-        var _propertyFilterParameters = mapper.Map<PropertyFilterParameters>(PropertyFilterParameters);
+        //var _propertyFilterParameters = mapper.Map<PropertyFilterParameters>(PropertyFilterParameters);
 
         // 将 FilterKeyValueAction 转换为 PropertyFilterParameters
-        if (searches != null)
-        {
-            if (_propertyFilterParameters == null)
-            {
-                _propertyFilterParameters = searches.ToPropertyFilterParameters();
-            }
-            else
-            {
-                _propertyFilterParameters.Add(searches.ToPropertyFilterParameters());
-            }
-        }
+        //if (searches != null)
+        //{
+        //    if (_propertyFilterParameters == null)
+        //    {
+        //        _propertyFilterParameters = searches.ToPropertyFilterParameters();
+        //    }
+        //    else
+        //    {
+        //        _propertyFilterParameters.Add(searches.ToPropertyFilterParameters());
+        //    }
+        //}
+
+
+        // 处理过滤与搜索逻辑
+        var finalFilterParameters = BuildFilterParameters(options, PropertyFilterParameters);
+
 
         // 检查是否为树形表格，使用不同的数据加载策略
         if (IsTree)
         {
             // 树形表格查询逻辑
-            return await GetTreeQueryData(options, _propertyFilterParameters);
+            return await GetTreeQueryData(options, finalFilterParameters);
         }
         else
         {
             // 原有的普通表格查询逻辑
             var query = Context.Set<TItem>()
-                .AutoFilter(_propertyFilterParameters)
+                .AutoFilter(finalFilterParameters)
                 .Sort(options.SortName!, options.SortOrder, !string.IsNullOrEmpty(options.SortName))
                 .Count(out var count)
                 .Page((options.PageIndex - 1) * options.PageItems, options.PageItems);
@@ -593,6 +536,39 @@ public partial class TItemTable<TContext, TItem>
             return ret;
         }
 
+    }
+
+    /// <summary>
+    /// 构建过滤参数
+    /// </summary>
+    private static PropertyFilterParameters? BuildFilterParameters(
+        QueryPageOptions options,
+        PropertyFilterParameters? propertyFilterParameters)
+    {
+        PropertyFilterParameters? finalFilterParameters = null;
+
+        var searches = options.ToFilter();
+        if (searches != null)
+        {
+            var searchParameters = searches.ToPropertyFilterParameters();
+            if (propertyFilterParameters == null)
+            {
+                finalFilterParameters = searchParameters;
+            }
+            else
+            {
+                // 避免修改原始参数，创建新实例
+                finalFilterParameters = new PropertyFilterParameters();
+                finalFilterParameters.Add(propertyFilterParameters);
+                finalFilterParameters.Add(searchParameters);
+            }
+        }
+        else
+        {
+            finalFilterParameters = propertyFilterParameters;
+        }
+
+        return finalFilterParameters;
     }
 
     /// <summary>

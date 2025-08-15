@@ -20,7 +20,7 @@ public class RoleService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="roleName"></param>
     /// <returns></returns>
-    public string? GetRoleIdByName(string roleName)
+    public Guid? GetRoleIdByName(string roleName)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -34,7 +34,7 @@ public class RoleService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="roleId"></param>
     /// <returns></returns>
-    public string? GetRoleShowNameById(string roleId)
+    public string? GetRoleShowNameById(Guid roleId)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -62,7 +62,7 @@ public class RoleService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="roleId"></param>
     /// <returns></returns>
-    public int GetRoleHierarchy(string roleId)
+    public int GetRoleHierarchy(Guid roleId)
     {
         using var context = _dbFactory.CreateDbContext();
 

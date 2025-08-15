@@ -11,14 +11,14 @@ public interface IRoleService
     /// </summary>
     /// <param name="roleName"></param>
     /// <returns></returns>
-    string? GetRoleIdByName(string roleName);
+    Guid? GetRoleIdByName(string roleName);
 
     /// <summary>
     /// 获取角色显示名称
     /// </summary>
     /// <param name="roleId"></param>
     /// <returns></returns>
-    string? GetRoleShowNameById(string roleId);
+    string? GetRoleShowNameById(Guid roleId);
 
     /// <summary>
     /// 获取角色显示名称
@@ -32,7 +32,8 @@ public interface IRoleService
     /// </summary>
     /// <param name="roleId"></param>
     /// <returns></returns>
-    int GetRoleHierarchy(string roleId);
+    int GetRoleHierarchy(Guid roleId);
+
 
 
 }

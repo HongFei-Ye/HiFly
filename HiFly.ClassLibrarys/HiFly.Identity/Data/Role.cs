@@ -9,17 +9,25 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiFly.Identity.Data;
 
-public class Role : IdentityRole, IRole
+public class Role : IdentityRole<Guid>, IRole
 {
     [Key]
     [DisplayName("识别码")]
-    public override string Id { get; set; } = Guid.NewGuid().ToString();
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [DisplayName("创建时间(UTC)")]
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("角色名称")]
-    public override string? Name { get; set; }
+    public override string? Name
+    {
+        get => base.Name;
+        set
+        {
+            base.Name = value;
+            NormalizedName = value?.ToUpperInvariant();
+        }
+    }
 
     [DisplayName("标准角色名称")]
     public override string? NormalizedName { get; set; }
@@ -29,9 +37,6 @@ public class Role : IdentityRole, IRole
 
     [DisplayName("权限等级")]
     public int Hierarchy { get; set; }
-
-    [DisplayName("上级角色ID")]
-    public string? SuperiorRoleId { get; set; }
 
     [DisplayName("并发标识")]
     public override string? ConcurrencyStamp { get; set; }

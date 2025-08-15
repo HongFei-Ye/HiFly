@@ -9,19 +9,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiFly.Identity.Data;
 
-public class User : IdentityUser, IUser
+public class User : IdentityUser<Guid>, IUser
 {
     [Key]
     [DisplayName("识别码")]
     [PersonalData]
-    public override string Id { get; set; } = Guid.NewGuid().ToString();
+    public override Guid Id { get; set; } = Guid.NewGuid();
 
     [DisplayName("创建时间(UTC)")]
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("用户名称")]
     [ProtectedPersonalData]
-    public override string? UserName { get; set; }
+    public override string? UserName
+    {
+        get => base.UserName;
+        set
+        {
+            base.UserName = value;
+            NormalizedUserName = value?.ToUpperInvariant();
+        }
+    }
 
     [DisplayName("标准用户名称")]
     public override string? NormalizedUserName { get; set; }
@@ -31,7 +39,15 @@ public class User : IdentityUser, IUser
 
     [DisplayName("邮箱地址")]
     [ProtectedPersonalData]
-    public override string? Email { get; set; }
+    public override string? Email
+    {
+        get => base.Email;
+        set
+        {
+            base.Email = value;
+            NormalizedEmail = value?.ToUpperInvariant();
+        }
+    }
 
     [DisplayName("标准邮箱地址")]
     public override string? NormalizedEmail { get; set; }
@@ -48,14 +64,6 @@ public class User : IdentityUser, IUser
     [PersonalData]
     public override bool PhoneNumberConfirmed { get; set; }
 
-
-    [DisplayName("QQ号码")]
-    [ProtectedPersonalData]
-    public string? QQNumber { get; set; }
-
-    [DisplayName("微信号码")]
-    [ProtectedPersonalData]
-    public string? WeChatNumber { get; set; }
 
     [DisplayName("登录首选角色")]
     public string? LoginedRole { get; set; }

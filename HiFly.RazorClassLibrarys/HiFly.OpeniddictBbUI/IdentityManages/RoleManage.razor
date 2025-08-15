@@ -12,7 +12,7 @@
 
     <TableColumns>
 
-        <TableColumn @bind-Field="@context.SuperiorRoleId" Text="上级角色" >
+@*         <TableColumn @bind-Field="@context.SuperiorRoleId" Text="上级角色" >
             <Template Context="value">
                 <div>@RoleService.GetRoleShowNameById(value.Value ?? "")</div>
             </Template>
@@ -24,7 +24,7 @@
             <FilterTemplate>
                 <RoleIdFilter TContext="TContext" TRole="TRole"></RoleIdFilter>
             </FilterTemplate>
-        </TableColumn>
+        </TableColumn> *@
 
     </TableColumns>
 

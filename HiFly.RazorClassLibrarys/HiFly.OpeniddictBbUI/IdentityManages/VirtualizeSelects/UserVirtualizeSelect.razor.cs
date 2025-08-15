@@ -18,10 +18,10 @@ public partial class UserVirtualizeSelect<TContext, TUser>
     private TContext? Context { get; set; }
 
     [Parameter]
-    public string Value { get; set; } = "";
+    public Guid? Value { get; set; } 
 
     [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
+    public EventCallback<Guid?> ValueChanged { get; set; }
 
     private SelectedItem? VirtualItem { get; set; }
 
@@ -72,7 +72,7 @@ public partial class UserVirtualizeSelect<TContext, TUser>
         var selectedItems = await items
             .OrderBy(u => u.CreateTime)
             .Skip(option.StartIndex).Take(option.Count)
-            .Select(u => new SelectedItem(u.Id, u.UserName ?? u.Email ?? ""))
+            .Select(u => new SelectedItem(u.Id.ToString(), u.UserName ?? u.Email ?? ""))
             .ToListAsync();
 
         selectedItems?.Insert(0, new SelectedItem("", "请选择"));
@@ -86,14 +86,14 @@ public partial class UserVirtualizeSelect<TContext, TUser>
 
     private async Task OnSelectedItemChanged(SelectedItem value)
     {
-        if (IsCanNull == true && value.Value == "")
-        {
-            await ValueChanged.InvokeAsync(null);
-        }
-        else
-        {
-            await ValueChanged.InvokeAsync(value.Value);
-        }
+        //if (IsCanNull == true && value.Value == "")
+        //{
+        //    await ValueChanged.InvokeAsync(null);
+        //}
+        //else
+        //{
+        //    await ValueChanged.InvokeAsync(value.Value);
+        //}
     }
 
 

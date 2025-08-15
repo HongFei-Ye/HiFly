@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiFly.Identity.Data;
 
-public class UserClaim : IdentityUserClaim<string>, IUserClaim
+public class UserClaim : IdentityUserClaim<Guid>, IUserClaim
 {
     [Key]
     [DisplayName("识别码")]
@@ -19,7 +19,7 @@ public class UserClaim : IdentityUserClaim<string>, IUserClaim
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("用户ID")]
-    public override string UserId { get; set; } = default!;
+    public override Guid UserId { get; set; } = default!;
 
     [DisplayName("申明类型")]
     public override string? ClaimType { get; set; }

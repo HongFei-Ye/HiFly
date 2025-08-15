@@ -12,21 +12,21 @@ public interface IUserService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    string GetUserNameById(string userId);
+    string GetUserNameById(Guid userId);
 
     /// <summary>
     /// 根据用户名称获取用户ID
     /// </summary>
     /// <param name="userName"></param>
     /// <returns></returns>
-    Task<string?> GetUserIdByName(string userName);
+    Task<Guid?> GetUserIdByName(string userName);
 
     /// <summary>
     /// 是否启用
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<bool> IsEnableByIdAsync(string userId);
+    Task<bool> IsEnableByIdAsync(Guid userId);
 
     /// <summary>
     /// 是否启用
@@ -41,14 +41,14 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="loginedRole"></param>
     /// <returns></returns>
-    Task<bool> SetLoginedRoleAsync(string userId, string loginedRole);
+    Task<bool> SetLoginedRoleAsync(Guid userId, string loginedRole);
 
     /// <summary>
     /// 获取登录首选角色ID
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<string> GetLoginedRoleByIdAsync(string userId);
+    Task<string> GetLoginedRoleByIdAsync(Guid userId);
 
     /// <summary>
     /// 设置QQ号码
@@ -56,7 +56,7 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="qQNumber"></param>
     /// <returns></returns>
-    Task<bool> SetQQNumberAsync(string userId, string qQNumber);
+    //Task<bool> SetQQNumberAsync(Guid userId, string qQNumber);
 
     /// <summary>
     /// 设置微信号码
@@ -64,6 +64,6 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="weChatNumber"></param>
     /// <returns></returns>
-    Task<bool> SetWeChatNumberAsync(string userId, string weChatNumber);
+    //Task<bool> SetWeChatNumberAsync(Guid userId, string weChatNumber);
 
 }

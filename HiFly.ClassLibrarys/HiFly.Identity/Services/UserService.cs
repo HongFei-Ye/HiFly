@@ -20,7 +20,7 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public string GetUserNameById(string userId)
+    public string GetUserNameById(Guid userId)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -34,7 +34,7 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="userName"></param>
     /// <returns></returns>
-    public async Task<string?> GetUserIdByName(string userName)
+    public async Task<Guid?> GetUserIdByName(string userName)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -49,7 +49,7 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<bool> IsEnableByIdAsync(string userId)
+    public async Task<bool> IsEnableByIdAsync(Guid userId)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -80,7 +80,7 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// <param name="userId"></param>
     /// <param name="loginedRole"></param>
     /// <returns></returns>
-    public async Task<bool> SetLoginedRoleAsync(string userId, string loginedRole)
+    public async Task<bool> SetLoginedRoleAsync(Guid userId, string loginedRole)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -108,7 +108,7 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<string> GetLoginedRoleByIdAsync(string userId)
+    public async Task<string> GetLoginedRoleByIdAsync(Guid userId)
     {
         using var context = _dbFactory.CreateDbContext();
 
@@ -125,23 +125,23 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// <param name="userId"></param>
     /// <param name="qQNumber"></param>
     /// <returns></returns>
-    public async Task<bool> SetQQNumberAsync(string userId, string qQNumber)
-    {
-        using var context = _dbFactory.CreateDbContext();
+    //public async Task<bool> SetQQNumberAsync(Guid userId, string qQNumber)
+    //{
+    //    using var context = _dbFactory.CreateDbContext();
 
-        var user = await context.Set<TItem>().FirstOrDefaultAsync(u => u.Id == userId);
+    //    var user = await context.Set<TItem>().FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (user == null)
-        {
-            return false;
-        }
+    //    if (user == null)
+    //    {
+    //        return false;
+    //    }
 
-        user.QQNumber = qQNumber;
+    //    user.QQNumber = qQNumber;
 
-        var result = await context.SaveChangesAsync();
+    //    var result = await context.SaveChangesAsync();
 
-        return result > 0;
-    }
+    //    return result > 0;
+    //}
 
     /// <summary>
     /// 设置微信号码
@@ -149,23 +149,23 @@ public class UserService<TContext, TItem>(IDbContextFactory<TContext> factory) :
     /// <param name="userId"></param>
     /// <param name="weiXinNumber"></param>
     /// <returns></returns>
-    public async Task<bool> SetWeChatNumberAsync(string userId, string weChatNumber)
-    {
-        using var context = _dbFactory.CreateDbContext();
+    //public async Task<bool> SetWeChatNumberAsync(Guid userId, string weChatNumber)
+    //{
+    //    using var context = _dbFactory.CreateDbContext();
 
-        var user = context.Set<TItem>().FirstOrDefault(u => u.Id == userId);
+    //    var user = context.Set<TItem>().FirstOrDefault(u => u.Id == userId);
 
-        if (user == null)
-        {
-            return false;
-        }
+    //    if (user == null)
+    //    {
+    //        return false;
+    //    }
 
-        user.WeChatNumber = weChatNumber;
+    //    user.WeChatNumber = weChatNumber;
 
-        var result = await context.SaveChangesAsync();
+    //    var result = await context.SaveChangesAsync();
 
-        return result > 0;
-    }
+    //    return result > 0;
+    //}
 
 
 

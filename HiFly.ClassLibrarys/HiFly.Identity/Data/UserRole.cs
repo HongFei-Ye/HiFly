@@ -9,23 +9,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiFly.Identity.Data;
 
-public class UserRole : IdentityUserRole<string>, IUserRole
+public class UserRole : IdentityUserRole<Guid>, IUserRole
 {
     [Key]
     [DisplayName("识别码")]
-    public virtual string Id { get; set; } = Guid.NewGuid().ToString();
+    public virtual Guid Id { get; set; } = Guid.NewGuid();
 
     [DisplayName("创建时间(UTC)")]
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("用户ID")]
-    public override string UserId { get; set; } = default!;
+    public override Guid UserId { get; set; } = default!;
 
     [DisplayName("角色ID")]
-    public override string RoleId { get; set; } = default!;
+    public override Guid RoleId { get; set; } = default!;
 
     [DisplayName("上级用户ID")]
-    public string? SuperiorUserId { get; set; }
+    public Guid? SuperiorUserId { get; set; }
 
     [DisplayName("是否启用")]
     public bool Enable { get; set; } = true;

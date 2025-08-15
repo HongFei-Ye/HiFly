@@ -2,16 +2,25 @@
 // 官方网站: www.hongfei8.cn
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
+using System.ComponentModel;
+
 namespace HiFly.Identity.Data.Interfaces;
 
 public interface IUserRole
 {
-    string UserId { get; set; }
+    [DisplayName("识别码")]
+    Guid Id { get; set; } 
 
-    string RoleId { get; set; }
+    [DisplayName("用户ID")]
+    Guid UserId { get; set; }
 
-    string? SuperiorUserId { get; set; }
+    [DisplayName("角色ID")]
+    Guid RoleId { get; set; }
 
+    [DisplayName("上级用户ID")]
+    Guid? SuperiorUserId { get; set; }
+
+    [DisplayName("是否启用")]
     bool Enable { get; set; }
 
 }

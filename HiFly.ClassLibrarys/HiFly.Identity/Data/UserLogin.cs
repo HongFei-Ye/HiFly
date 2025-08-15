@@ -8,13 +8,13 @@ using System.ComponentModel;
 
 namespace HiFly.Identity.Data;
 
-public class UserLogin : IdentityUserLogin<string>, IUserLogin
+public class UserLogin : IdentityUserLogin<Guid>, IUserLogin
 {
     [DisplayName("创建时间(UTC)")]
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("用户ID")]
-    public override string UserId { get; set; } = default!;
+    public override Guid UserId { get; set; } = default!;
 
     [DisplayName("登录提供程序")]
     public override string LoginProvider { get; set; } = default!;

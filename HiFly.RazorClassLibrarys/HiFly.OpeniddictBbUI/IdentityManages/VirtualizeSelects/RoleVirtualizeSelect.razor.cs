@@ -18,10 +18,10 @@ public partial class RoleVirtualizeSelect<TContext, TRole>
     private TContext? Context { get; set; }
 
     [Parameter]
-    public string Value { get; set; } = "";
+    public Guid? Value { get; set; } 
 
     [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
+    public EventCallback<Guid?> ValueChanged { get; set; }
 
     private SelectedItem? VirtualItem { get; set; }
 
@@ -72,7 +72,7 @@ public partial class RoleVirtualizeSelect<TContext, TRole>
         var selectedItems = await items
             .OrderByDescending(r => r.Hierarchy)
             .Skip(option.StartIndex).Take(option.Count)
-            .Select(r => new SelectedItem(r.Id, r.ShowName ?? r.Name ?? ""))
+            .Select(r => new SelectedItem(r.Id.ToString(), r.ShowName ?? r.Name ?? ""))
             .ToListAsync();
 
         selectedItems?.Insert(0, new SelectedItem("", "请选择"));
@@ -86,14 +86,14 @@ public partial class RoleVirtualizeSelect<TContext, TRole>
 
     private async Task OnSelectedItemChanged(SelectedItem value)
     {
-        if (IsCanNull == true && value.Value == "")
-        {
-            await ValueChanged.InvokeAsync(null);
-        }
-        else
-        {
-            await ValueChanged.InvokeAsync(value.Value);
-        }
+        //if (IsCanNull == true && value.Value == "")
+        //{
+        //    await ValueChanged.InvokeAsync(null);
+        //}
+        //else
+        //{
+        //    await ValueChanged.InvokeAsync(value.Value);
+        //}
     }
 
 

@@ -14,7 +14,7 @@
 
     <TableColumns>
 
-        <TableColumn @bind-Field="@context.UserId" Text="用户名" Filterable="true" Sortable="true">
+@*         <TableColumn @bind-Field="@context.UserId" Text="用户名" Filterable="true" Sortable="true">
             <Template Context="value">
                 <div>@UserService.GetUserNameById(value.Value)</div>
             </Template>
@@ -26,9 +26,9 @@
             <FilterTemplate>
                 <UserIdFilter TContext="@TContext" TUser="@TUser"></UserIdFilter>
             </FilterTemplate>
-        </TableColumn>
+        </TableColumn> *@
 
-        <TableColumn @bind-Field="@context.RoleId" Text="角色名称" Filterable="true" Sortable="true">
+@*         <TableColumn @bind-Field="@context.RoleId" Text="角色名称" Filterable="true" Sortable="true">
             <Template Context="value">
                 <div>@RoleService.GetRoleShowNameById(value.Value ?? "")</div>
             </Template>
@@ -40,9 +40,9 @@
             <FilterTemplate>
                 <RoleIdFilter TContext="TContext" TRole="TRole"></RoleIdFilter>
             </FilterTemplate>
-        </TableColumn>
+        </TableColumn> *@
 
-        <TableColumn @bind-Field="@context.SuperiorUserId" Text="上级用户" Filterable="true" Sortable="true">
+@*         <TableColumn @bind-Field="@context.SuperiorUserId" Text="上级用户" Filterable="true" Sortable="true">
             <Template Context="value">
                 <div>@UserService.GetUserNameById(value.Value ?? "")</div>
             </Template>
@@ -54,7 +54,7 @@
             <FilterTemplate>
                 <UserIdFilter TContext="@TContext" TUser="@TUser"></UserIdFilter>
             </FilterTemplate>
-        </TableColumn>
+        </TableColumn> *@
 
 
     </TableColumns>

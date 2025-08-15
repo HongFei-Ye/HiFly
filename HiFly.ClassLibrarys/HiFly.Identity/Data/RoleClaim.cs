@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiFly.Identity.Data;
 
-public class RoleClaim : IdentityRoleClaim<string>, IRoleClaim
+public class RoleClaim : IdentityRoleClaim<Guid>, IRoleClaim
 {
     [Key]
     [DisplayName("识别码")]
@@ -19,7 +19,7 @@ public class RoleClaim : IdentityRoleClaim<string>, IRoleClaim
     public virtual DateTime CreateTime { get; set; } = DateTime.UtcNow;
 
     [DisplayName("角色ID")]
-    public override string RoleId { get; set; } = default!;
+    public override Guid RoleId { get; set; } = default!;
 
     [DisplayName("申明类型")]
     public override string? ClaimType { get; set; }

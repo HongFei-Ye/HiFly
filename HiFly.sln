@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.BbAiChat", "HiFly.AiC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Identity", "HiFly.ClassLibrarys\HiFly.Identity\HiFly.Identity.csproj", "{2F40BAD8-4EC7-4813-B298-162EA92FF55E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HiFly.Tables", "HiFly.Tables", "{45F3CB61-070F-454E-BB3F-0FE21BBC1658}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
