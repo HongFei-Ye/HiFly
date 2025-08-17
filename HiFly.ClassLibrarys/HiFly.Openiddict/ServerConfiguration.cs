@@ -76,9 +76,16 @@ public static class ServerConfiguration
             idOptions.Stores.MaxLengthForKeys = options.MaxLengthForKeys;
             idOptions.Stores.ProtectPersonalData = options.ProtectPersonalData;
         })
-        .AddEntityFrameworkStores<TContext>()
-        .AddSignInManager()
-        .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<TContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+
+        services.PostConfigure<AuthenticationOptions>(opts =>
+        {
+            opts.DefaultScheme = IdentityConstants.ApplicationScheme;
+            opts.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            opts.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+        });
 
         // 根据配置添加额外的令牌提供程序
         //if (options.AddEmailTokenProvider)

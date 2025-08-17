@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
+    <!-- 包信息 -->
+    <PackageId>HiFly.Orm.EFcore</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>HiFly Tech</Authors>
+    <Company>弘飞帮联科技有限公司</Company>
+    <Product>HiFly ORM Entity Framework Core</Product>
+    <Description>HiFly Tables 的 Entity Framework Core 数据访问实现</Description>
+    <PackageTags>HiFly;ORM;EntityFramework;EFCore;Tables</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/HiFly.Tables</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core 核心包 -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.8" />
+    
+    <!-- 主流数据库提供程序 -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+    
+    <!-- 企业级数据库提供程序 -->
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.90" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="9.0.8" />
+    
+    <!-- 依赖注入和日志 -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HiFly.Tables\HiFly.Tables.Core\HiFly.Tables.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Examples\" />
+  </ItemGroup>
+
+</Project>

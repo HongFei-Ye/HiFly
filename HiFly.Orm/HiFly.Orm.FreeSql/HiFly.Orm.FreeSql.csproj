@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
+    <!-- 包信息 -->
+    <PackageId>HiFly.Orm.FreeSql</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>HiFly Tech</Authors>
+    <Company>弘飞帮联科技有限公司</Company>
+    <Product>HiFly ORM FreeSql</Product>
+    <Description>HiFly Tables 的 FreeSql 数据访问实现</Description>
+    <PackageTags>HiFly;ORM;FreeSql;Tables</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/HiFly.Tables</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- FreeSql 核心包 -->
+    <PackageReference Include="FreeSql" Version="3.5.212" />
+    
+    <!-- 主流数据库提供程序 - 立即支持 -->
+    <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.5.212" />
+    <PackageReference Include="FreeSql.Provider.MySql" Version="3.5.212" />
+    <PackageReference Include="FreeSql.Provider.SqlServer" Version="3.5.212" />
+    <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.212" />
+    
+    <!-- 企业级数据库提供程序 - 可选 -->
+    <PackageReference Include="FreeSql.Provider.Oracle" Version="3.5.212" />
+    
+    <!-- 国产数据库提供程序 - FreeSql 独有优势 -->
+    <PackageReference Include="FreeSql.Provider.Dameng" Version="3.5.212" />
+    <PackageReference Include="FreeSql.Provider.KingbaseES" Version="3.5.212" />
+    
+    <!-- 依赖注入和日志 -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HiFly.Tables\HiFly.Tables.Core\HiFly.Tables.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -40,7 +40,6 @@ public static class ServiceCollectionExtensions
         //});
 
 
-
         // BB默认模板数据服务
         services.AddScoped<ILayoutDataService, LayoutDataService>();
 

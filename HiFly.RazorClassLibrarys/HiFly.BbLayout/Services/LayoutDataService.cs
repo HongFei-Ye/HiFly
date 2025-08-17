@@ -12,7 +12,7 @@ public class LayoutDataService : ILayoutDataService
     /// <summary>
     /// 头像路径
     /// </summary>
-    public string AvatarUrl { get; set; } = "./images/avatars/noportrait.png";
+    public string AvatarUrl { get; set; } = "./_content/HiFly.BbLayout/images/avatars/noportrait.png";
 
     /// <summary>
     /// 当前用户名称
@@ -31,7 +31,7 @@ public class LayoutDataService : ILayoutDataService
     [
         new(){ Text="个人资料", Url="/Account/Manage", Icon="fas fa-address-card" },
         new(){ Text="安全中心", Url="/Backstage/UserInfo", Icon="fa-solid fa-shield" },
-        new(){ Text="注销登录", Url="/Account/UserLogout", Icon="fas fa-power-off" },
+        new(){ Text="注销登录", Url="/Account/Logout", Icon="fas fa-power-off" },
     ];
 
     /// <summary>

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
+    <!-- 包信息 -->
+    <PackageId>HiFly.Tables.Extensions</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>HiFly Tech</Authors>
+    <Company>弘飞帮联科技有限公司</Company>
+    <Product>HiFly Tables Extensions</Product>
+    <Description>HiFly Tables 统一注册扩展包，提供简化的服务配置和注册方法</Description>
+    <PackageTags>HiFly;Tables;Blazor;CRUD;Extensions;DI</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/HiFly.Tables</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- 文档 -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="appsettings.hiflytables.json" Pack="true" PackagePath="content\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hifly.Tables.Cache\Hifly.Tables.Cache.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.8" />
+  </ItemGroup>
+
+</Project>

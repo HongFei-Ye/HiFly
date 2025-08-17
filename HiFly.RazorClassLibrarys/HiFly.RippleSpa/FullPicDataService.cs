@@ -12,7 +12,6 @@ public class FullPicDataService
     public string LoadingText { get; set; } = "正在加载中...";
 
 
-
     /// <summary>
     /// 背景图片
     /// </summary>
@@ -67,7 +66,7 @@ public class FullPicDataService
     /// <summary>
     /// 注销路径
     /// </summary>
-    public string LogoutUrl { get; set; } = "/Connect/Logout";
+    public string LogoutUrl { get; set; } = "/Account/Logout";
 
     /// <summary>
     /// 登录路径

@@ -1,40 +1,53 @@
-﻿// Copyright (c) 厦门链友融人工智能应用科技有限公司. All rights reserved.
-// 官方网站: www.oklyr.com
+﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
+// 官方网站: www.hongfei8.cn
+// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
-using AutoMapper;
 using BootstrapBlazor.Components;
-using HiFly.BbTables;
-using HiFly.BbTables.Attributes;
-using HiFly.BbTables.Extensions;
+using HiFly.Tables.Core.Interfaces;
+using HiFly.Tables.Core.Models;
+using HiFly.Orm.EFcore.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace HiFly.BbTables.Services;
+namespace HiFly.Orm.EFcore.Services;
 
 /// <summary>
-/// 泛型 CRUD 服务基类
+/// Entity Framework Core 数据服务实现
 /// </summary>
 /// <typeparam name="TContext">数据库上下文类型</typeparam>
 /// <typeparam name="TItem">实体类型</typeparam>
-public class GenericCrudService<TContext, TItem>(
-    IDbContextFactory<TContext> dbContextFactory,
-    ILogger<GenericCrudService<TContext, TItem>> logger) : IDisposable
+public class EfDataService<TContext, TItem> : IHiFlyDataService<TItem>
     where TContext : DbContext
     where TItem : class, new()
 {
-    protected readonly IDbContextFactory<TContext> _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
-    protected readonly ILogger<GenericCrudService<TContext, TItem>> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    /// <summary>
+    /// 数据库上下文工厂
+    /// </summary>
+    protected readonly IDbContextFactory<TContext> _dbContextFactory;
 
     /// <summary>
-    /// 默认查询方法，支持普通表格和树形表格
+    /// 日志记录器
     /// </summary>
-    /// <param name="options">查询选项</param>
-    /// <param name="propertyFilterParameters">属性过滤参数</param>
-    /// <param name="isTree">是否为树形表格</param>
-    /// <returns>查询数据</returns>
+    protected readonly ILogger<EfDataService<TContext, TItem>> _logger;
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="dbContextFactory">数据库上下文工厂</param>
+    /// <param name="logger">日志记录器</param>
+    public EfDataService(
+        IDbContextFactory<TContext> dbContextFactory,
+        ILogger<EfDataService<TContext, TItem>> logger)
+    {
+        _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <summary>
+    /// 查询数据
+    /// </summary>
     public virtual async Task<QueryData<TItem>> OnQueryAsync(
         QueryPageOptions options,
         PropertyFilterParameters? propertyFilterParameters = null,
@@ -53,19 +66,15 @@ public class GenericCrudService<TContext, TItem>(
 
             using var context = _dbContextFactory.CreateDbContext();
 
-            // 处理过滤与搜索逻辑
-            var finalFilterParameters = GenericCrudService<TContext, TItem>.BuildFilterParameters(options, propertyFilterParameters);
-
             // 检查是否为树形表格，使用不同的数据加载策略
             if (isTree)
             {
-                return await GetTreeQueryDataAsync(context, options, finalFilterParameters);
+                return await GetTreeQueryDataAsync(context, options, propertyFilterParameters);
             }
             else
             {
-                return await GetStandardQueryDataAsync(context, options, finalFilterParameters);
+                return await GetStandardQueryDataAsync(context, options, propertyFilterParameters);
             }
-
         }
         catch (Exception ex)
         {
@@ -85,36 +94,75 @@ public class GenericCrudService<TContext, TItem>(
     }
 
     /// <summary>
-    /// 构建过滤参数
+    /// 保存数据
     /// </summary>
-    private static PropertyFilterParameters? BuildFilterParameters(
-        QueryPageOptions options,
-        PropertyFilterParameters? propertyFilterParameters)
+    public virtual async Task<bool> OnSaveAsync(TItem item, ItemChangedType changedType)
     {
-        PropertyFilterParameters? finalFilterParameters = null;
+        ArgumentNullException.ThrowIfNull(item);
 
-        var searches = options.ToFilter();
-        if (searches != null)
+        try
         {
-            var searchParameters = searches.ToPropertyFilterParameters();
-            if (propertyFilterParameters == null)
+            using var context = _dbContextFactory.CreateDbContext();
+
+            // 获取实体类型元数据
+            var entityType = context.Model.FindEntityType(typeof(TItem)) 
+                ?? throw new InvalidOperationException($"实体类型 {typeof(TItem).Name} 不在模型中。");
+
+            // 获取主键属性
+            var primaryKey = entityType.FindPrimaryKey() 
+                ?? throw new InvalidOperationException($"实体类型 {typeof(TItem).Name} 没有定义主键。");
+
+            if (changedType == ItemChangedType.Add)
             {
-                finalFilterParameters = searchParameters;
+                return await EfSaveExtensions.HandleAddAsync(context, item, primaryKey, _logger);
+            }
+            else // ItemChangedType.Update
+            {
+                return await EfSaveExtensions.HandleUpdateAsync(context, item, primaryKey, _logger);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "保存数据时发生错误，实体: {EntityType}, 变更类型: {ChangeType}", 
+                typeof(TItem).Name, changedType);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 删除数据
+    /// </summary>
+    public virtual async Task<bool> OnDeleteAsync(IEnumerable<TItem> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+
+        var itemsList = items.ToList();
+        if (itemsList.Count == 0)
+        {
+            return true; // 空集合视为成功
+        }
+
+        try
+        {
+            using var context = _dbContextFactory.CreateDbContext();
+
+            // 检查是否为树形结构
+            var isTreeStructure = HasTreeStructure();
+            
+            if (isTreeStructure)
+            {
+                return await EfDeleteExtensions.HandleTreeDeleteAsync(context, itemsList, _logger);
             }
             else
             {
-                // 避免修改原始参数，创建新实例
-                finalFilterParameters = new PropertyFilterParameters();
-                finalFilterParameters.Add(propertyFilterParameters);
-                finalFilterParameters.Add(searchParameters);
+                return await EfDeleteExtensions.HandleStandardDeleteAsync(context, itemsList, _logger);
             }
         }
-        else
+        catch (Exception ex)
         {
-            finalFilterParameters = propertyFilterParameters;
+            _logger.LogError(ex, "删除数据时发生错误，实体: {EntityType}", typeof(TItem).Name);
+            return false;
         }
-
-        return finalFilterParameters;
     }
 
     /// <summary>
@@ -123,28 +171,28 @@ public class GenericCrudService<TContext, TItem>(
     private async Task<QueryData<TItem>> GetStandardQueryDataAsync(
         TContext context,
         QueryPageOptions options,
-        PropertyFilterParameters? finalFilterParameters)
+        PropertyFilterParameters? propertyFilterParameters)
     {
         // 使用 AsNoTracking 提升只读查询性能
         var baseQuery = context.Set<TItem>().AsNoTracking();
 
-        // 应用过滤条件
-        if (finalFilterParameters != null)
+        // 应用过滤条件 - 简化实现
+        if (propertyFilterParameters != null)
         {
-            baseQuery = baseQuery.AutoFilter(finalFilterParameters);
+            baseQuery = baseQuery.ApplySimpleFilter(propertyFilterParameters);
         }
 
         // 先获取总数
         var totalCount = await baseQuery.CountAsync();
         if (totalCount == 0)
         {
-            return GenericCrudService<TContext, TItem>.CreateEmptyQueryData(options);
+            return CreateEmptyQueryData(options);
         }
 
         // 应用排序
         if (!string.IsNullOrEmpty(options.SortName))
         {
-            baseQuery = baseQuery.Sort(options.SortName, options.SortOrder, true);
+            baseQuery = baseQuery.ApplySort(options.SortName, options.SortOrder);
         }
         else
         {
@@ -176,29 +224,23 @@ public class GenericCrudService<TContext, TItem>(
     private async Task<QueryData<TItem>> GetTreeQueryDataAsync(
         TContext context,
         QueryPageOptions options,
-        PropertyFilterParameters? filterParams)
+        PropertyFilterParameters? propertyFilterParameters)
     {
         try
         {
             // 验证树形结构必需的属性
-            var (idProp, parentIdProp) = GenericCrudService<TContext, TItem>.ValidateTreeProperties();
+            var (idProp, parentIdProp) = ValidateTreeProperties();
 
             // 1. 构建根节点查询
             var rootQuery = context.Set<TItem>().AsNoTracking();
 
-            // 应用过滤条件
-            if (filterParams != null)
-            {
-                rootQuery = rootQuery.AutoFilter(filterParams);
-            }
-
             // 应用根节点筛选条件（ParentId为null）
-            rootQuery = GenericCrudService<TContext, TItem>.ApplyRootNodeFilter(rootQuery, parentIdProp);
+            rootQuery = ApplyRootNodeFilter(rootQuery, parentIdProp);
 
             // 应用排序
             if (!string.IsNullOrEmpty(options.SortName))
             {
-                rootQuery = rootQuery.Sort(options.SortName, options.SortOrder);
+                rootQuery = rootQuery.ApplySort(options.SortName, options.SortOrder);
             }
             else
             {
@@ -209,7 +251,7 @@ public class GenericCrudService<TContext, TItem>(
             var totalCount = await rootQuery.CountAsync();
             if (totalCount == 0)
             {
-                return GenericCrudService<TContext, TItem>.CreateEmptyQueryData(options);
+                return CreateEmptyQueryData(options);
             }
 
             // 分页查询根节点
@@ -224,7 +266,7 @@ public class GenericCrudService<TContext, TItem>(
             foreach (var root in pagedRoots)
             {
                 allItems.Add(root);
-                await LoadChildNodesAsync(context, root, allItems, idProp, parentIdProp);
+                await EfTreeExtensions.LoadChildNodesAsync(context, root, allItems, idProp, parentIdProp, _logger);
             }
 
             return new QueryData<TItem>
@@ -242,8 +284,18 @@ public class GenericCrudService<TContext, TItem>(
             _logger.LogError(ex, "获取树形表格数据时发生错误");
 
             // 降级到标准查询
-            return await GetStandardQueryDataAsync(context, options, filterParams);
+            return await GetStandardQueryDataAsync(context, options, propertyFilterParameters);
         }
+    }
+
+    /// <summary>
+    /// 检查是否具有树形结构
+    /// </summary>
+    private static bool HasTreeStructure()
+    {
+        var idProp = typeof(TItem).GetProperty("Id");
+        var parentIdProp = typeof(TItem).GetProperty("ParentId");
+        return idProp != null && parentIdProp != null;
     }
 
     /// <summary>
@@ -305,98 +357,6 @@ public class GenericCrudService<TContext, TItem>(
     }
 
     /// <summary>
-    /// 递归加载子节点
-    /// </summary>
-    private async Task LoadChildNodesAsync(
-        TContext context,
-        TItem parent,
-        List<TItem> collector,
-        PropertyInfo idProp,
-        PropertyInfo parentIdProp,
-        int maxDepth = 10,
-        int currentDepth = 0)
-    {
-        // 防止无限递归
-        if (currentDepth >= maxDepth)
-        {
-            _logger.LogWarning("树形结构递归深度超过最大限制 {MaxDepth}", maxDepth);
-            return;
-        }
-
-        var parentIdValue = idProp.GetValue(parent);
-        if (parentIdValue == null)
-            return;
-
-        try
-        {
-            // 构建查询表达式以查找子节点
-            var parameter = Expression.Parameter(typeof(TItem), "x");
-            var property = Expression.Property(parameter, parentIdProp);
-
-            // 处理类型转换
-            var convertedValue = CreateConvertedExpression(parentIdValue, idProp, parentIdProp);
-            var equalExpression = Expression.Equal(property, convertedValue);
-            var lambda = Expression.Lambda<Func<TItem, bool>>(equalExpression, parameter);
-
-            // 查询子节点
-            var children = await context.Set<TItem>()
-                .AsNoTracking()
-                .Where(lambda)
-                .ToListAsync();
-
-            // 添加子节点并继续递归
-            foreach (var child in children)
-            {
-                // 防止循环引用
-                if (!collector.Any(x => GenericCrudService<TContext, TItem>.IsEqual(idProp.GetValue(x), idProp.GetValue(child))))
-                {
-                    collector.Add(child);
-                    await LoadChildNodesAsync(context, child, collector, idProp, parentIdProp, maxDepth, currentDepth + 1);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "加载子节点时发生错误，父节点ID: {ParentId}", parentIdValue);
-        }
-    }
-
-    /// <summary>
-    /// 创建类型转换表达式
-    /// </summary>
-    private static Expression CreateConvertedExpression(
-        object parentIdValue,
-        PropertyInfo idProp,
-        PropertyInfo parentIdProp)
-    {
-        var value = Expression.Constant(parentIdValue, idProp.PropertyType);
-
-        // 如果 ParentId 是可空类型，需要将 Id 值转换为可空类型
-        if (Nullable.GetUnderlyingType(parentIdProp.PropertyType) != null)
-        {
-            return Expression.Convert(value, parentIdProp.PropertyType);
-        }
-
-        // 如果类型不匹配，尝试转换
-        if (idProp.PropertyType != parentIdProp.PropertyType)
-        {
-            return Expression.Convert(value, parentIdProp.PropertyType);
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    /// 比较两个对象是否相等
-    /// </summary>
-    private static bool IsEqual(object? obj1, object? obj2)
-    {
-        if (obj1 == null && obj2 == null) return true;
-        if (obj1 == null || obj2 == null) return false;
-        return obj1.Equals(obj2);
-    }
-
-    /// <summary>
     /// 创建空的查询数据
     /// </summary>
     private static QueryData<TItem> CreateEmptyQueryData(QueryPageOptions options)
@@ -412,32 +372,11 @@ public class GenericCrudService<TContext, TItem>(
         };
     }
 
-
-
-
-
-
-
-
-
-
-
-
     /// <summary>
     /// 资源释放
     /// </summary>
     public virtual void Dispose()
     {
-        // 基类实现为空，子类可以重写
+        GC.SuppressFinalize(this);
     }
-
-
-
-}
-
-/// <summary>
-/// 标记接口，用于标识需要 CRUD 服务的实体
-/// </summary>
-public interface ICrudEntity
-{
 }
