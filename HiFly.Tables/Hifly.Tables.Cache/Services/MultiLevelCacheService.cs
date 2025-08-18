@@ -8,6 +8,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HiFly.Tables.Cache.Services;
 
@@ -21,6 +22,7 @@ public class MultiLevelCacheService : IMultiLevelCacheService
     private readonly ILogger<MultiLevelCacheService> _logger;
     private readonly CacheOptions _options;
     private readonly Dictionary<string, CacheStatistics> _levelStatistics;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public MultiLevelCacheService(
         MemoryCacheService memoryCacheService,
@@ -37,6 +39,22 @@ public class MultiLevelCacheService : IMultiLevelCacheService
         {
             ["Level1"] = new CacheStatistics(),
             ["Level2"] = new CacheStatistics()
+        };
+
+        // 配置专门用于缓存的JSON序列化选项
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = false, // 缓存中不需要格式化
+            IncludeFields = true, // 包含字段
+            PropertyNameCaseInsensitive = true, // 大小写不敏感
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            Converters = 
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            }
         };
     }
 
@@ -427,7 +445,7 @@ public class MultiLevelCacheService : IMultiLevelCacheService
             if (cachedBytes != null)
             {
                 var json = System.Text.Encoding.UTF8.GetString(cachedBytes);
-                return JsonSerializer.Deserialize<T>(json);
+                return JsonSerializer.Deserialize<T>(json, _jsonOptions);
             }
         }
         catch (Exception ex)
@@ -447,7 +465,7 @@ public class MultiLevelCacheService : IMultiLevelCacheService
 
         try
         {
-            var json = JsonSerializer.Serialize(value);
+            var json = JsonSerializer.Serialize(value, _jsonOptions);
             var bytes = System.Text.Encoding.UTF8.GetBytes(json);
 
             var options = new DistributedCacheEntryOptions

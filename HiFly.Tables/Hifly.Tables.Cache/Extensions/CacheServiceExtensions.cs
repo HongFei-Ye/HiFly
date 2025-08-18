@@ -7,13 +7,12 @@ using HiFly.Tables.Cache.Configuration;
 using HiFly.Tables.Cache.Interfaces;
 using HiFly.Tables.Cache.Services;
 using HiFly.Tables.Core.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace HiFly.Tables.Cache.Extensions;
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// 缓存服务扩展方法
@@ -33,13 +32,15 @@ public static class CacheServiceExtensions
         // 注册配置
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
 
-        // 注册内存缓存
+        // 🔧 修复：不设置 SizeLimit 以避免与 BootstrapBlazor 的 CacheManager 冲突
+        // BootstrapBlazor 的 CacheManager 在设置缓存条目时不指定大小
         services.AddMemoryCache(options =>
         {
             var cacheConfig = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>();
             if (cacheConfig != null)
             {
-                options.SizeLimit = cacheConfig.MemoryCache.MaxItems;
+                // 移除 SizeLimit 设置，避免与 BootstrapBlazor 冲突
+                // options.SizeLimit = cacheConfig.MemoryCache.MaxItems;
                 options.CompactionPercentage = cacheConfig.MemoryCache.CompactionPercentage;
                 options.ExpirationScanFrequency = TimeSpan.FromSeconds(cacheConfig.MemoryCache.ExpirationScanFrequencySeconds);
             }
@@ -160,13 +161,34 @@ public static class CacheServiceExtensions
             // 移除原始服务注册
             services.Remove(descriptor);
 
-            // 重新注册原始服务（不使用接口）
-            var originalImplementationType = descriptor.ImplementationType ?? descriptor.ImplementationFactory?.Method.ReturnType;
+            // 重新注册原始服务（不使用接口）- 修复构造函数参数问题
+            var originalImplementationType = descriptor.ImplementationType;
             if (originalImplementationType != null)
             {
                 services.Add(new ServiceDescriptor(
                     originalImplementationType,
-                    descriptor.ImplementationFactory ?? (provider => Activator.CreateInstance(originalImplementationType, provider.GetRequiredService<IServiceProvider>())!),
+                    provider =>
+                    {
+                        // 正确地创建 EfDataService 实例，传递正确的构造函数参数
+                        if (originalImplementationType.IsGenericType && 
+                            originalImplementationType.GetGenericTypeDefinition().Name == "EfDataService`2")
+                        {
+                            var contextType = originalImplementationType.GetGenericArguments()[0];
+                            var itemType = originalImplementationType.GetGenericArguments()[1];
+                            
+                            // 获取所需的服务
+                            var dbContextFactoryType = typeof(IDbContextFactory<>).MakeGenericType(contextType);
+                            var dbContextFactory = provider.GetRequiredService(dbContextFactoryType);
+                            
+                            var loggerType = typeof(ILogger<>).MakeGenericType(originalImplementationType);
+                            var logger = provider.GetRequiredService(loggerType);
+                            
+                            return Activator.CreateInstance(originalImplementationType, dbContextFactory, logger)!;
+                        }
+                        
+                        // 对于其他类型，尝试通过 DI 容器创建
+                        return ActivatorUtilities.CreateInstance(provider, originalImplementationType);
+                    },
                     descriptor.Lifetime));
             }
 

@@ -5,11 +5,10 @@
 using HiFly.Tables.Core.Interfaces;
 using HiFly.Orm.EFcore.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
-namespace HiFly.Orm.EFcore.Extensions;
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// EF Core 服务注册扩展方法

@@ -18,32 +18,26 @@ namespace HiFly.Orm.EFcore.Services;
 /// </summary>
 /// <typeparam name="TContext">数据库上下文类型</typeparam>
 /// <typeparam name="TItem">实体类型</typeparam>
-public class EfDataService<TContext, TItem> : IHiFlyDataService<TItem>
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="dbContextFactory">数据库上下文工厂</param>
+/// <param name="logger">日志记录器</param>
+public class EfDataService<TContext, TItem>(
+    IDbContextFactory<TContext> dbContextFactory,
+    ILogger<EfDataService<TContext, TItem>> logger) : IHiFlyDataService<TItem>
     where TContext : DbContext
     where TItem : class, new()
 {
     /// <summary>
     /// 数据库上下文工厂
     /// </summary>
-    protected readonly IDbContextFactory<TContext> _dbContextFactory;
+    protected readonly IDbContextFactory<TContext> _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
 
     /// <summary>
     /// 日志记录器
     /// </summary>
-    protected readonly ILogger<EfDataService<TContext, TItem>> _logger;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="dbContextFactory">数据库上下文工厂</param>
-    /// <param name="logger">日志记录器</param>
-    public EfDataService(
-        IDbContextFactory<TContext> dbContextFactory,
-        ILogger<EfDataService<TContext, TItem>> logger)
-    {
-        _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    protected readonly ILogger<EfDataService<TContext, TItem>> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     /// 查询数据

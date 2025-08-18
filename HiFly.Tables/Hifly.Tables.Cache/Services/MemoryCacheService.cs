@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace HiFly.Tables.Cache.Services;
@@ -23,6 +24,7 @@ public class MemoryCacheService : ICacheService
     private readonly CacheOptions _options;
     private readonly ConcurrentDictionary<string, DateTime> _keyTracker;
     private readonly CacheStatistics _statistics;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public MemoryCacheService(
         IMemoryCache memoryCache,
@@ -34,6 +36,26 @@ public class MemoryCacheService : ICacheService
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _keyTracker = new ConcurrentDictionary<string, DateTime>();
         _statistics = new CacheStatistics();
+        
+        // 配置专门用于缓存的JSON序列化选项
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = false, // 缓存中不需要格式化
+            IncludeFields = true, // 包含字段
+            PropertyNameCaseInsensitive = true, // 大小写不敏感
+            NumberHandling = JsonNumberHandling.AllowReadingFromString, // 允许从字符串读取数字
+            Converters = 
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
+                // 添加对 Guid 的支持
+                new JsonGuidConverter(),
+                // 添加对 DateTime 的支持
+                new JsonDateTimeConverter()
+            }
+        };
     }
 
     /// <summary>
@@ -54,9 +76,20 @@ public class MemoryCacheService : ICacheService
 
                 if (cachedValue is string jsonString)
                 {
-                    var result = JsonSerializer.Deserialize<T>(jsonString);
-                    _logger.LogDebug("缓存命中: {Key}", key);
-                    return result;
+                    try
+                    {
+                        var result = JsonSerializer.Deserialize<T>(jsonString, _jsonOptions);
+                        _logger.LogDebug("缓存命中: {Key}", key);
+                        return result;
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        _logger.LogWarning(jsonEx, "JSON 反序列化失败，移除损坏的缓存项: {Key}", key);
+                        _memoryCache.Remove(fullKey);
+                        _keyTracker.TryRemove(fullKey, out _);
+                        _statistics.MissCount++;
+                        return null;
+                    }
                 }
 
                 if (cachedValue is T directValue)
@@ -64,6 +97,12 @@ public class MemoryCacheService : ICacheService
                     _logger.LogDebug("缓存直接命中: {Key}", key);
                     return directValue;
                 }
+                
+                // 如果缓存值类型不匹配，记录警告并移除
+                _logger.LogWarning("缓存值类型不匹配，移除缓存项: {Key}, 期望类型: {ExpectedType}, 实际类型: {ActualType}", 
+                    key, typeof(T).Name, cachedValue?.GetType().Name ?? "null");
+                _memoryCache.Remove(fullKey);
+                _keyTracker.TryRemove(fullKey, out _);
             }
 
             _statistics.MissCount++;
@@ -88,41 +127,41 @@ public class MemoryCacheService : ICacheService
         try
         {
             var fullKey = BuildFullKey(key);
-            var expiryTime = expiry ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
+            var cacheExpiry = expiry ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
+
+            // 序列化为 JSON 字符串以确保一致性
+            string jsonValue;
+            try
+            {
+                jsonValue = JsonSerializer.Serialize(value, _jsonOptions);
+            }
+            catch (JsonException jsonEx)
+            {
+                _logger.LogError(jsonEx, "JSON 序列化失败: {Key}, 类型: {Type}", key, typeof(T).Name);
+                return false;
+            }
 
             var entryOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = expiryTime,
-                SlidingExpiration = TimeSpan.FromMinutes(Math.Min(expiryTime.TotalMinutes / 2, 30)),
+                AbsoluteExpirationRelativeToNow = cacheExpiry,
+                Size = CalculateSize(jsonValue),
                 Priority = CacheItemPriority.Normal
             };
 
-            // 注册移除回调
-            entryOptions.RegisterPostEvictionCallback((evictedKey, evictedValue, reason, state) =>
+            // 检查内存限制 - 使用 SizeLimitMB 配置
+            var maxSizeBytes = _options.MemoryCache.SizeLimitMB * 1024 * 1024; // 转换为字节
+            if (entryOptions.Size > maxSizeBytes / 100) // 单个项目不应超过总限制的1%
             {
-                if (evictedKey is string keyStr)
-                {
-                    _keyTracker.TryRemove(keyStr, out _);
-                    _statistics.ItemCount = Math.Max(0, _statistics.ItemCount - 1);
-                }
-            });
-
-            // 序列化复杂对象
-            object cacheValue = value;
-            if (ShouldSerialize<T>())
-            {
-                cacheValue = JsonSerializer.Serialize(value, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                });
+                _logger.LogWarning("缓存项过大，跳过缓存: {Key}, 大小: {Size} bytes, 限制: {Limit} bytes", 
+                    key, entryOptions.Size, maxSizeBytes / 100);
+                return false;
             }
 
-            _memoryCache.Set(fullKey, cacheValue, entryOptions);
-            _keyTracker.TryAdd(fullKey, DateTime.UtcNow);
-            _statistics.ItemCount++;
-            _statistics.LastUpdated = DateTime.UtcNow;
+            _memoryCache.Set(fullKey, jsonValue, entryOptions);
+            _keyTracker[fullKey] = DateTime.UtcNow.Add(cacheExpiry);
+            _statistics.ItemCount = _keyTracker.Count;
 
-            _logger.LogDebug("缓存设置成功: {Key}, 过期时间: {Expiry}", key, expiryTime);
+            _logger.LogDebug("缓存设置成功: {Key}, 过期时间: {Expiry}", key, cacheExpiry);
             return true;
         }
         catch (Exception ex)
@@ -144,7 +183,7 @@ public class MemoryCacheService : ICacheService
             var fullKey = BuildFullKey(key);
             _memoryCache.Remove(fullKey);
             _keyTracker.TryRemove(fullKey, out _);
-            _statistics.ItemCount = Math.Max(0, _statistics.ItemCount - 1);
+            _statistics.ItemCount = _keyTracker.Count;
             _statistics.LastUpdated = DateTime.UtcNow;
 
             _logger.LogDebug("缓存项已删除: {Key}", key);
@@ -188,7 +227,7 @@ public class MemoryCacheService : ICacheService
                 removedCount++;
             }
 
-            _statistics.ItemCount = Math.Max(0, _statistics.ItemCount - removedCount);
+            _statistics.ItemCount = _keyTracker.Count;
             _statistics.LastUpdated = DateTime.UtcNow;
 
             _logger.LogDebug("批量删除缓存项: {Pattern}, 删除数量: {Count}", pattern, removedCount);
@@ -247,23 +286,68 @@ public class MemoryCacheService : ICacheService
     }
 
     /// <summary>
+    /// 计算缓存项大小
+    /// </summary>
+    private static int CalculateSize(string value)
+    {
+        return System.Text.Encoding.UTF8.GetByteCount(value);
+    }
+
+    /// <summary>
     /// 构建完整的缓存键
     /// </summary>
     private string BuildFullKey(string key)
     {
-        return key.StartsWith(_options.KeyPrefix) ? key : $"{_options.KeyPrefix}{key}";
+        return $"{_options.KeyPrefix}{key}";
+    }
+}
+
+/// <summary>
+/// 自定义 Guid 转换器
+/// </summary>
+public class JsonGuidConverter : JsonConverter<Guid>
+{
+    public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var stringValue = reader.GetString();
+            if (Guid.TryParse(stringValue, out var guid))
+            {
+                return guid;
+            }
+        }
+        
+        throw new JsonException($"无法将值转换为 Guid: {reader.GetString()}");
     }
 
-    /// <summary>
-    /// 判断是否需要序列化
-    /// </summary>
-    private static bool ShouldSerialize<T>()
+    public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)
     {
-        var type = typeof(T);
-        return !type.IsPrimitive && 
-               type != typeof(string) && 
-               type != typeof(DateTime) && 
-               type != typeof(TimeSpan) &&
-               type != typeof(Guid);
+        writer.WriteStringValue(value.ToString("D"));
+    }
+}
+
+/// <summary>
+/// 自定义 DateTime 转换器
+/// </summary>
+public class JsonDateTimeConverter : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var stringValue = reader.GetString();
+            if (DateTime.TryParse(stringValue, out var dateTime))
+            {
+                return dateTime;
+            }
+        }
+        
+        throw new JsonException($"无法将值转换为 DateTime: {reader.GetString()}");
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString("O")); // ISO 8601 格式
     }
 }

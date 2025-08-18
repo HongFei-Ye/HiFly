@@ -3,7 +3,6 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using HiFly.Tables.Cache.Configuration;
-using HiFly.Tables.Cache.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

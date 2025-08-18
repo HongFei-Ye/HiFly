@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Tables.Controllers", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Tables.Core", "HiFly.Tables\HiFly.Tables.Core\HiFly.Tables.Core.csproj", "{F60F8748-5259-F6FA-8B41-66967534FD79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hifly.Tables.Cache", "HiFly.Tables\Hifly.Tables.Cache\Hifly.Tables.Cache.csproj", "{A99585BC-B6B8-43B4-B656-F37431525AF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Tables.Cache", "HiFly.Tables\Hifly.Tables.Cache\HiFly.Tables.Cache.csproj", "{A99585BC-B6B8-43B4-B656-F37431525AF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiFly.Tables.Extensions", "HiFly.Tables\HiFly.Tables.Extensions\HiFly.Tables.Extensions.csproj", "{15B766E4-A2FC-2EC7-D8E4-086405F05257}"
 EndProject

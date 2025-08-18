@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hifly.Tables.Cache\Hifly.Tables.Cache.csproj" />
+    <ProjectReference Include="..\Hifly.Tables.Cache\HiFly.Tables.Cache.csproj" />
   </ItemGroup>
 
   <ItemGroup>

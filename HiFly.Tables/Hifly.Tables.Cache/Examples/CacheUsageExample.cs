@@ -9,7 +9,6 @@
  */
 
 using BootstrapBlazor.Components;
-using HiFly.Tables.Cache.Extensions;
 using HiFly.Tables.Cache.Interfaces;
 using HiFly.Tables.Cache.Services;
 using HiFly.Tables.Core.Interfaces;
