@@ -43,8 +43,4 @@
     <ProjectReference Include="..\..\HiFly.Tables\HiFly.Tables.Core\HiFly.Tables.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Examples\" />
-  </ItemGroup>
-
 </Project>

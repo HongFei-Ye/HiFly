@@ -49,6 +49,9 @@ public class EfDataService<TContext, TItem>(
     {
         ArgumentNullException.ThrowIfNull(options);
 
+        // 处理过滤与搜索逻辑
+        var finalFilterParameters = BuildFilterParameters(options, propertyFilterParameters);
+
         try
         {
             // 参数验证
@@ -63,11 +66,11 @@ public class EfDataService<TContext, TItem>(
             // 检查是否为树形表格，使用不同的数据加载策略
             if (isTree)
             {
-                return await GetTreeQueryDataAsync(context, options, propertyFilterParameters);
+                return await GetTreeQueryDataAsync(context, options, finalFilterParameters);
             }
             else
             {
-                return await GetStandardQueryDataAsync(context, options, propertyFilterParameters);
+                return await GetStandardQueryDataAsync(context, options, finalFilterParameters);
             }
         }
         catch (Exception ex)
@@ -86,6 +89,40 @@ public class EfDataService<TContext, TItem>(
             };
         }
     }
+
+    /// <summary>
+    /// 构建过滤参数
+    /// </summary>
+    private static PropertyFilterParameters? BuildFilterParameters(
+        QueryPageOptions options,
+        PropertyFilterParameters? propertyFilterParameters)
+    {
+        PropertyFilterParameters? finalFilterParameters = null;
+
+        var searches = options.ToFilter();
+        if (searches != null)
+        {
+            var searchParameters = searches.ToPropertyFilterParameters();
+            if (propertyFilterParameters == null)
+            {
+                finalFilterParameters = searchParameters;
+            }
+            else
+            {
+                // 避免修改原始参数，创建新实例
+                finalFilterParameters = new PropertyFilterParameters();
+                finalFilterParameters.Add(propertyFilterParameters);
+                finalFilterParameters.Add(searchParameters);
+            }
+        }
+        else
+        {
+            finalFilterParameters = propertyFilterParameters;
+        }
+
+        return finalFilterParameters;
+    }
+
 
     /// <summary>
     /// 保存数据
@@ -170,10 +207,10 @@ public class EfDataService<TContext, TItem>(
         // 使用 AsNoTracking 提升只读查询性能
         var baseQuery = context.Set<TItem>().AsNoTracking();
 
-        // 应用过滤条件 - 简化实现
+        // 应用过滤条件 - 使用完整的过滤功能
         if (propertyFilterParameters != null)
         {
-            baseQuery = baseQuery.ApplySimpleFilter(propertyFilterParameters);
+            baseQuery = baseQuery.ApplySmartFilter(propertyFilterParameters);
         }
 
         // 先获取总数

@@ -3,8 +3,14 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
+using HiFly.Tables.Core.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace HiFly.BbTables.Extensions;
+namespace HiFly.Orm.EFcore.Extensions;
 
 public static class FilterKeyValueActionExtensions
 {
@@ -41,6 +47,7 @@ public static class FilterKeyValueActionExtensions
         return _propertyFilterParameters;
     }
 
+
     private static PropertyFilterParameters? BuildPropertyFilterParameters(FilterKeyValueAction filterKeyValueAction)
     {
         if (filterKeyValueAction.FieldKey == null)
@@ -66,4 +73,3 @@ public static class FilterKeyValueActionExtensions
 
 
 }
-

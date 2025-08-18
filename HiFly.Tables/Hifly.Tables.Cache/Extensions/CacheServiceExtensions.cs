@@ -32,8 +32,6 @@ public static class CacheServiceExtensions
         // 注册配置
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
 
-        // 🔧 修复：不设置 SizeLimit 以避免与 BootstrapBlazor 的 CacheManager 冲突
-        // BootstrapBlazor 的 CacheManager 在设置缓存条目时不指定大小
         services.AddMemoryCache(options =>
         {
             var cacheConfig = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>();
