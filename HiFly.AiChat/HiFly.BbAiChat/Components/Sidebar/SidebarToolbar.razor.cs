@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
 
@@ -148,7 +148,7 @@ public partial class SidebarToolbar
 
         // 移除非数字字符，提取数值
         var numericPart = System.Text.RegularExpressions.Regex.Replace(width, @"[^\d]", "");
-        
+
         if (int.TryParse(numericPart, out var result))
             return result;
 

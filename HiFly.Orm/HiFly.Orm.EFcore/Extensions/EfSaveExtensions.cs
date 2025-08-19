@@ -1,15 +1,10 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HiFly.Orm.EFcore.Extensions;
 
@@ -45,10 +40,10 @@ internal static class EfSaveExtensions
 
             // 添加新实体
             await context.Set<TItem>().AddAsync(item);
-            
+
             // 确保 PostgreSQL DateTime 兼容性
             context.EnsurePostgreSqlDateTimeCompatibility();
-            
+
             var result = await context.SaveChangesAsync();
             return result > 0;
         }
@@ -96,17 +91,17 @@ internal static class EfSaveExtensions
 
                 // 更新实体值
                 originalEntry.CurrentValues.SetValues(item);
-                
+
                 // 确保 PostgreSQL DateTime 兼容性
                 context.EnsurePostgreSqlDateTimeCompatibility();
-                
+
                 var result = await context.SaveChangesAsync();
                 return result > 0;
             }
             catch (DbUpdateConcurrencyException ex)
             {
                 currentRetry++;
-                logger.LogWarning(ex, "更新实体时发生并发冲突（重试 {Retry}/{MaxRetries}): {EntityType}", 
+                logger.LogWarning(ex, "更新实体时发生并发冲突（重试 {Retry}/{MaxRetries}): {EntityType}",
                     currentRetry, maxRetries, typeof(TItem).Name);
 
                 if (currentRetry >= maxRetries)
@@ -163,7 +158,7 @@ internal static class EfSaveExtensions
             // 重新生成并发标识并尝试添加
             EnsureFreshConcurrencyToken(item);
             await context.Set<TItem>().AddAsync(item);
-            
+
             var result = await context.SaveChangesAsync();
             return result > 0;
         }
@@ -204,10 +199,10 @@ internal static class EfSaveExtensions
             // 使用最新实体进行更新
             var entry = context.Entry(freshEntity);
             entry.CurrentValues.SetValues(item);
-            
+
             // 更新并发标识
             EnsureFreshConcurrencyToken(freshEntity);
-            
+
             var result = await context.SaveChangesAsync();
             return result > 0;
         }

@@ -216,7 +216,7 @@ csharp_preserve_single_line_blocks = true
 visual_basic_preferred_modifier_order = Partial,Default,Private,Protected,Public,Friend,NotOverridable,Overridable,MustOverride,Overloads,Overrides,MustInherit,NotInheritable,Static,Shared,Shadows,ReadOnly,WriteOnly,Dim,Const,WithEvents,Widening,Narrowing,Custom,Async:suggestion
 [*.cs]
 # Add file header
-file_header_template = Copyright (c) 弘飞帮联科技有限公司. All rights reserved.\n官方网站: www.hongfei8.cn\n联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+file_header_template = Copyright (c) HiFly. All rights reserved.\n官方网站: www.hongfei8.net\n联系方式: hongfei8@outlook.com
 csharp_style_namespace_declarations = file_scoped:suggestion
 csharp_style_expression_bodied_local_functions = true:silent
 csharp_using_directive_placement = outside_namespace:silent

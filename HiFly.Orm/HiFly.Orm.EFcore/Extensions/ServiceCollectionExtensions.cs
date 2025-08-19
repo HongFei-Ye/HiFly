@@ -1,9 +1,9 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
-using HiFly.Tables.Core.Interfaces;
 using HiFly.Orm.EFcore.Services;
+using HiFly.Tables.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
     {
         // 注册统一接口
         services.AddScoped<IHiFlyDataService<TItem>, EfDataService<TContext, TItem>>();
-        
+
         return services;
     }
 
@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
     {
         var contextType = typeof(TContext);
         var dbSetProperties = contextType.GetProperties()
-            .Where(p => p.PropertyType.IsGenericType && 
+            .Where(p => p.PropertyType.IsGenericType &&
                        p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
             .ToList();
 
@@ -55,7 +55,7 @@ public static class ServiceCollectionExtensions
             // 注册数据服务
             var serviceType = typeof(IHiFlyDataService<>).MakeGenericType(entityType);
             var implementationType = typeof(EfDataService<,>).MakeGenericType(contextType, entityType);
-            
+
             services.AddScoped(serviceType, implementationType);
         }
 
@@ -85,7 +85,7 @@ public static class ServiceCollectionExtensions
             {
                 var serviceType = typeof(IHiFlyDataService<>).MakeGenericType(entityType);
                 var implementationType = typeof(EfDataService<,>).MakeGenericType(typeof(TContext), entityType);
-                
+
                 services.AddScoped(serviceType, implementationType);
             }
         }

@@ -1,8 +1,7 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
-using BootstrapBlazor.Components;
 using HiFly.BbAiChat.Components;
 using HiFly.BbAiChat.Components.Sidebar;
 
@@ -274,7 +273,7 @@ public partial class Home
     {
         // 从数据库删除会话记录
         await DeleteSessionFromDatabase(sessionId);
-        
+
         // 如果删除的是当前正在显示的会话，清空消息列表
         if (currentSessionId == sessionId)
         {
@@ -356,7 +355,7 @@ public partial class Home
         // 随机选择一个响应模板
         var random = new Random();
         var response = responses[random.Next(responses.Length)];
-        
+
         // 模拟网络延迟
         await Task.CompletedTask;
         return response;
@@ -379,7 +378,7 @@ public partial class Home
 
         // 从会话ID中提取序号，用于生成测试数据
         var sessionNumber = sessionId.Replace("session-", "");
-        var sessionMessageCount = int.TryParse(sessionNumber, out var num) 
+        var sessionMessageCount = int.TryParse(sessionNumber, out var num)
             ? Math.Min(num * 2, 10)  // 限制最大消息数为10条
             : 2;  // 默认2条消息
 

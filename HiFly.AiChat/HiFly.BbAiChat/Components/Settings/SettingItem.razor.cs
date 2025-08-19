@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
+
+using Microsoft.AspNetCore.Components;
 
 namespace HiFly.BbAiChat.Components.Settings;
 
@@ -67,16 +71,16 @@ public partial class SettingItem : ComponentBase
     private string GetCssClass()
     {
         var classes = new List<string>();
-        
+
         if (IsDisabled)
             classes.Add("disabled");
-            
+
         if (IsHighlighted)
             classes.Add("highlighted");
-            
+
         if (!string.IsNullOrEmpty(CssClass))
             classes.Add(CssClass);
-            
+
         return string.Join(" ", classes);
     }
 }

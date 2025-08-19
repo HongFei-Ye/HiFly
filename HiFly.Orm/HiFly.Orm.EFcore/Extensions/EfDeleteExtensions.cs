@@ -1,16 +1,11 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HiFly.Orm.EFcore.Extensions;
 
@@ -130,7 +125,7 @@ internal static class EfDeleteExtensions
             }
 
             var keyValues = primaryKey.Properties.Select(p => p.PropertyInfo?.GetValue(item)).ToArray();
-            
+
             // 重新从数据库加载最新实体
             var freshEntity = await context.Set<TItem>().FindAsync(keyValues);
             if (freshEntity == null)
@@ -142,7 +137,7 @@ internal static class EfDeleteExtensions
             // 删除最新实体
             context.Set<TItem>().Remove(freshEntity);
             var result = await context.SaveChangesAsync();
-            
+
             return result > 0;
         }
         catch (DbUpdateConcurrencyException)
@@ -188,7 +183,7 @@ internal static class EfDeleteExtensions
             }
         }
 
-        logger.LogInformation("并发冲突处理完成: {EntityType}, 成功删除 {Count}/{Total}", 
+        logger.LogInformation("并发冲突处理完成: {EntityType}, 成功删除 {Count}/{Total}",
             typeof(TItem).Name, deletedCount, items.Count);
 
         return deletedCount > 0;

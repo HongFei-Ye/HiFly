@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
+
+using Microsoft.AspNetCore.Components;
 
 namespace HiFly.BbAiChat.Components.Settings;
 
@@ -123,12 +127,12 @@ public partial class QuickActionsSection : ComponentBase
         try
         {
             SetButtonState("export", ButtonState.Loading);
-            
+
             if (OnExportChat.HasDelegate)
             {
                 await OnExportChat.InvokeAsync();
             }
-            
+
             SetButtonState("export", ButtonState.Success);
             _ = ResetButtonStateAsync("export");
         }
@@ -149,12 +153,12 @@ public partial class QuickActionsSection : ComponentBase
         try
         {
             SetButtonState("share", ButtonState.Loading);
-            
+
             if (OnShareChat.HasDelegate)
             {
                 await OnShareChat.InvokeAsync();
             }
-            
+
             SetButtonState("share", ButtonState.Success);
             _ = ResetButtonStateAsync("share");
         }
@@ -175,12 +179,12 @@ public partial class QuickActionsSection : ComponentBase
         try
         {
             SetButtonState("theme", ButtonState.Loading);
-            
+
             if (OnToggleTheme.HasDelegate)
             {
                 await OnToggleTheme.InvokeAsync();
             }
-            
+
             SetButtonState("theme", ButtonState.Success);
             _ = ResetButtonStateAsync("theme", 1000); // 主题切换反馈更快
         }
@@ -201,12 +205,12 @@ public partial class QuickActionsSection : ComponentBase
         try
         {
             SetButtonState("reset", ButtonState.Loading);
-            
+
             if (OnResetSettings.HasDelegate)
             {
                 await OnResetSettings.InvokeAsync();
             }
-            
+
             SetButtonState("reset", ButtonState.Success);
             _ = ResetButtonStateAsync("reset");
         }
@@ -229,17 +233,17 @@ public enum ButtonState
     /// 正常状态
     /// </summary>
     Normal,
-    
+
     /// <summary>
     /// 加载状态
     /// </summary>
     Loading,
-    
+
     /// <summary>
     /// 成功状态
     /// </summary>
     Success,
-    
+
     /// <summary>
     /// 错误状态
     /// </summary>

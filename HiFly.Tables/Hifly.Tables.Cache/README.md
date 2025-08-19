@@ -1,15 +1,15 @@
-# HiFly.Tables 动态多级混合缓存系统
+# HiFly.Tables 内存缓存系统
 
 ## 概述
 
-HiFly.Tables.Cache 是一个为 HiFly.Tables 组件设计的高性能多级缓存系统，提供了内存缓存(L1)和分布式缓存(L2)的混合解决方案。
+HiFly.Tables.Cache 是一个为 HiFly.Tables 组件设计的高性能内存缓存系统，提供了快速、可靠的数据缓存解决方案。
 
 ## 特性
 
-### 🚀 多级缓存架构
-- **L1缓存**: 高速内存缓存，毫秒级访问
-- **L2缓存**: 分布式缓存(Redis)，跨实例共享
-- **智能降级**: 自动降级到可用的缓存层级
+### 🚀 高性能内存缓存
+- **毫秒级访问**: 超快的内存缓存访问速度
+- **智能过期**: 自动管理缓存过期和清理
+- **内存优化**: 智能的内存使用和压缩策略
 
 ### 📊 智能缓存策略
 - **动态过期时间**: 根据查询类型和数据特征自动调整
@@ -17,9 +17,9 @@ HiFly.Tables.Cache 是一个为 HiFly.Tables 组件设计的高性能多级缓�
 - **树形结构优化**: 专门优化树形表格的缓存策略
 
 ### 🔧 灵活的配置
-- **可配置的缓存层级**: 支持启用/禁用不同缓存层
 - **细粒度控制**: 支持实体级别的缓存控制
 - **监控统计**: 实时缓存命中率和性能统计
+- **内存限制**: 可配置的内存使用限制和清理策略
 
 ### 🌳 树形结构支持
 - **完整子树缓存**: 一次查询缓存完整树结构
@@ -35,8 +35,8 @@ HiFly.Tables.Cache 是一个为 HiFly.Tables 组件设计的高性能多级缓�
 // 添加Table缓存服务
 services.AddTableCache(configuration);
 
-// 自动注册所有实体的带缓存CRUD服务
-services.AddAllCachedGenericCrudServices<YourDbContext>();
+// 自动注册所有实体的带缓存数据服务
+services.AddCacheForAllDataServices();
 ```
 
 ### 2. 配置文件
@@ -47,12 +47,13 @@ services.AddAllCachedGenericCrudServices<YourDbContext>();
 {
   "Cache": {
     "DefaultExpirationMinutes": 30,
-    "EnableDistributedCache": false,
-    "RedisConnectionString": "localhost:6379",
     "KeyPrefix": "HiFly:Tables:",
+    "EnableStatistics": true,
     "MemoryCache": {
       "MaxItems": 10000,
-      "SizeLimitMB": 100
+      "SizeLimitMB": 100,
+      "ExpirationScanFrequencySeconds": 60,
+      "CompactionPercentage": 0.25
     }
   }
 }
@@ -61,9 +62,9 @@ services.AddAllCachedGenericCrudServices<YourDbContext>();
 ### 3. 在组件中使用
 
 ```csharp
-@inject CachedGenericCrudService<YourDbContext, YourEntity> CrudService
+@inject IHiFlyDataService<YourEntity> DataService
 
-<TItemTable TContext="YourDbContext" TItem="YourEntity"
+<TItemTable TItem="YourEntity"
             OnQueryAsync="OnQueryAsync"
             OnSaveAsync="OnSaveAsync"
             OnDeleteAsync="OnDeleteAsync" />
@@ -72,19 +73,19 @@ services.AddAllCachedGenericCrudServices<YourDbContext>();
     private async Task<QueryData<YourEntity>> OnQueryAsync(QueryPageOptions options)
     {
         // 自动使用缓存的查询
-        return await CrudService.OnQueryAsync(options);
+        return await DataService.QueryAsync(options);
     }
 
     private async Task<bool> OnSaveAsync(YourEntity item, ItemChangedType changedType)
     {
         // 保存时自动清理相关缓存
-        return await CrudService.OnSaveAsync(item, changedType);
+        return await DataService.SaveAsync(item, changedType);
     }
 
     private async Task<bool> OnDeleteAsync(IEnumerable<YourEntity> items)
     {
         // 删除时自动清理相关缓存
-        return await CrudService.OnDeleteAsync(items);
+        return await DataService.DeleteAsync(items);
     }
 }
 ```
@@ -94,36 +95,30 @@ services.AddAllCachedGenericCrudServices<YourDbContext>();
 ### 缓存预热
 
 ```csharp
-// 预热常用查询
-await CrudService.WarmupCommonQueriesAsync(pageSize: 20, maxPages: 3);
-
-// 自定义预热
-var commonQueries = new[]
+// 预热常用查询（如果使用CachedDataService）
+if (DataService is CachedDataService<YourEntity> cachedService)
 {
-    new QueryPageOptions { PageIndex = 1, PageItems = 50 },
-    new QueryPageOptions { PageIndex = 1, PageItems = 50, SortName = "Name", SortOrder = SortOrder.Asc }
-};
-await CrudService.WarmupCacheAsync(commonQueries);
-```
-
-### 缓存监控
-
-```razor
-@* 添加缓存管理组件 *@
-<CacheManagerComponent ShowDetailedStats="true" AutoRefresh="true" />
+    await cachedService.WarmupCommonQueriesAsync(pageSize: 20, maxPages: 3);
+}
 ```
 
 ### 手动缓存控制
 
 ```csharp
 // 获取统计信息
-var stats = await CrudService.GetCacheStatisticsAsync();
+if (DataService is CachedDataService<YourEntity> cachedService)
+{
+    var stats = await cachedService.GetCacheStatisticsAsync();
 
-// 清除实体缓存
-await CrudService.ClearEntityCacheAsync();
+    // 清除实体缓存
+    await cachedService.ClearEntityCacheAsync();
+}
+
+// 直接操作缓存服务
+@inject IMultiLevelCacheService CacheService
 
 // 清除所有缓存
-await _cacheService.ClearAllAsync();
+await CacheService.ClearAllAsync();
 ```
 
 ## 缓存键设计
@@ -149,16 +144,17 @@ HiFly:Tables:Tree:{EntityName}:{ParentId}:depth{Depth}
 - **MaxItems**: 根据可用内存调整，建议 10000-50000
 - **SizeLimitMB**: 建议设置为可用内存的 10-20%
 - **CompactionPercentage**: 建议 0.2-0.3
+- **ExpirationScanFrequency**: 根据数据更新频率调整
 
-### 2. 分布式缓存配置
-- **Redis连接池**: 配置适当的连接池大小
-- **过期时间**: 平衡数据新鲜度和性能需求
-- **压缩**: 对大数据集启用压缩
-
-### 3. 查询优化
+### 2. 查询优化
 - **分页查询**: 避免一次性查询大量数据
 - **索引优化**: 确保数据库索引合理
 - **预热策略**: 在应用启动时预热热点数据
+
+### 3. 内存管理
+- **监控内存使用**: 定期检查内存缓存占用
+- **合理设置过期时间**: 平衡性能和数据新鲜度
+- **避免内存泄漏**: 确保及时清理不再需要的缓存
 
 ## 监控指标
 
@@ -172,8 +168,7 @@ HiFly:Tables:Tree:{EntityName}:{ParentId}:depth{Depth}
 - 避免内存泄漏和过度使用
 
 ### 响应时间
-- L1缓存: < 1ms
-- L2缓存: < 10ms
+- 内存缓存: < 1ms
 - 数据库查询: 监控并优化慢查询
 
 ## 故障排除
@@ -188,12 +183,12 @@ HiFly:Tables:Tree:{EntityName}:{ParentId}:depth{Depth}
 2. **内存使用过高**
    - 调整MaxItems和SizeLimitMB
    - 检查是否有内存泄漏
-   - 考虑启用压缩
+   - 减少缓存过期时间
 
-3. **Redis连接问题**
-   - 验证连接字符串
-   - 检查网络连接
-   - 查看Redis服务器状态
+3. **性能不佳**
+   - 检查缓存命中率
+   - 优化查询策略
+   - 调整预热策略
 
 ### 调试技巧
 
@@ -208,27 +203,74 @@ HiFly:Tables:Tree:{EntityName}:{ParentId}:depth{Depth}
 }
 ```
 
-2. **使用缓存管理组件**
-```razor
-<CacheManagerComponent ShowDetailedStats="true" />
-```
-
-3. **检查缓存统计**
+2. **检查缓存统计**
 ```csharp
-var stats = await _cacheService.GetStatisticsAsync();
+@inject IMultiLevelCacheService CacheService
+
+var stats = await CacheService.GetStatisticsAsync();
 foreach (var kvp in stats)
 {
     Console.WriteLine($"{kvp.Key}: 命中率 {kvp.Value.HitRate:P}");
 }
 ```
 
+## 配置示例
+
+### 基本配置
+```json
+{
+  "Cache": {
+    "DefaultExpirationMinutes": 30,
+    "MemoryCache": {
+      "MaxItems": 10000,
+      "SizeLimitMB": 100
+    }
+  }
+}
+```
+
+### 高性能配置
+```json
+{
+  "Cache": {
+    "DefaultExpirationMinutes": 60,
+    "MemoryCache": {
+      "MaxItems": 50000,
+      "SizeLimitMB": 500,
+      "ExpirationScanFrequencySeconds": 30,
+      "CompactionPercentage": 0.2
+    }
+  }
+}
+```
+
+### 内存受限配置
+```json
+{
+  "Cache": {
+    "DefaultExpirationMinutes": 15,
+    "MemoryCache": {
+      "MaxItems": 5000,
+      "SizeLimitMB": 50,
+      "ExpirationScanFrequencySeconds": 120,
+      "CompactionPercentage": 0.4
+    }
+  }
+}
+```
+
 ## 版本历史
+
+### v2.0.0
+- 简化为纯内存缓存架构
+- 移除Redis和分布式缓存依赖
+- 优化内存使用和性能
+- 简化配置和使用方式
 
 ### v1.0.0
 - 初始版本
 - 支持多级缓存架构
 - 支持树形结构缓存
-- 提供缓存管理组件
 
 ## 许可证
 

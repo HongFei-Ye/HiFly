@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 namespace HiFly.Tables.Cache.Interfaces;
 
@@ -35,6 +35,19 @@ public interface IMultiLevelCacheService : ICacheService
     /// <param name="dataLoader">数据加载器</param>
     /// <returns>预热成功的项数</returns>
     Task<int> WarmupAsync<T>(IEnumerable<string> keys, Func<string, Task<T?>> dataLoader) where T : class;
+
+    /// <summary>
+    /// 获取所有缓存键
+    /// </summary>
+    /// <returns>所有缓存键列表</returns>
+    Task<List<string>> GetAllKeysAsync();
+
+    /// <summary>
+    /// 获取匹配模式的缓存键
+    /// </summary>
+    /// <param name="pattern">模式，支持通配符*</param>
+    /// <returns>匹配的缓存键列表</returns>
+    Task<List<string>> GetKeysByPatternAsync(string pattern);
 }
 
 /// <summary>

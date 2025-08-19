@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -82,7 +82,7 @@ public partial class ChatMessagesArea : ComponentBase, IDisposable
         try
         {
             dotNetRef = DotNetObjectReference.Create(this);
-            
+
             await JSRuntime.InvokeVoidAsync("eval", @"
                 const container = arguments[0];
                 const dotnetRef = arguments[1];

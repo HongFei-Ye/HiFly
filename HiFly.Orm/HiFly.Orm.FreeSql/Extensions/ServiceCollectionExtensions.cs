@@ -1,10 +1,10 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using FreeSql;
-using HiFly.Tables.Core.Interfaces;
 using HiFly.Orm.FreeSql.Services;
+using HiFly.Tables.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -105,10 +105,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFreeSql>(provider =>
         {
             var freeSql = freeSqlBuilder().Build();
-            
+
             // 自动同步结构（开发环境）
             freeSql.CodeFirst.SyncStructure(GetEntityTypes(assemblies));
-            
+
             return freeSql;
         });
 
@@ -358,7 +358,7 @@ public static class ServiceCollectionExtensions
         {
             var message = formatter(state, exception);
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] [{logLevel}] [{_categoryName}] {message}");
-            
+
             if (exception != null)
             {
                 Console.WriteLine($"Exception: {exception}");

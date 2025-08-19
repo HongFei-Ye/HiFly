@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace HiFly.BbAiChat.Components.Input;
@@ -52,14 +56,14 @@ public partial class SendButton : ComponentBase
         get
         {
             var classes = new List<string>();
-            
+
             if (IsLoading)
                 classes.Add("loading");
             else if (CanSend && !IsDisabled)
                 classes.Add("active");
             else
                 classes.Add("disabled");
-                
+
             return string.Join(" ", classes);
         }
     }

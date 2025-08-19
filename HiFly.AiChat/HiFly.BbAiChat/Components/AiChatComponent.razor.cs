@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -149,7 +149,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     private string CurrentMessage { get; set; } = string.Empty;
     private bool IsLoading { get; set; } = false;
     private bool IsVoiceRecording { get; set; } = false;
-    
+
     // 添加一个内部状态追踪，防止状态意外重置
     private bool _hasUserToggledPanel = false;
     private bool _initialPanelState = false;
@@ -221,7 +221,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         // 记录初始面板状态（不调用JavaScript）
         _initialPanelState = ShowRightPanel;
-        
+
         // 确保CurrentMessage为空
         EnsureCurrentMessageIsEmpty();
 
@@ -249,7 +249,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
             {
                 // 先恢复面板状态
                 await RestorePanelStateFromStorage();
-                
+
                 // 然后初始化主题
                 await JSRuntime.InvokeVoidAsync("aiChatHelper.initTheme");
             }
@@ -286,13 +286,13 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         const int maxRetries = 3;
         const int delayMs = 100;
-        
+
         for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
             try
             {
                 var savedPanelState = await JSRuntime.InvokeAsync<bool>("aiChatHelper.storage.getRightPanelState");
-                
+
                 // 只有在用户未手动切换过面板状态且保存的状态与当前状态不同时才更新
                 if (!_hasUserToggledPanel && savedPanelState != ShowRightPanel)
                 {
@@ -313,10 +313,10 @@ public partial class AiChatComponent : ComponentBase, IDisposable
                     try
                     {
                         // 尝试使用基础的localStorage访问
-                        var result = await JSRuntime.InvokeAsync<string>("eval", 
+                        var result = await JSRuntime.InvokeAsync<string>("eval",
                             "localStorage.getItem('aiChat_rightPanelOpen') || 'false'");
 
-                        if (bool.TryParse(result, out bool fallbackState) && 
+                        if (bool.TryParse(result, out bool fallbackState) &&
                             !_hasUserToggledPanel && fallbackState != ShowRightPanel)
                         {
                             ShowRightPanel = fallbackState;
@@ -335,10 +335,10 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     protected override void OnParametersSet()
     {
         // 增强参数设置逻辑，防止外部参数意外覆盖用户操作
-        
+
         // 确保CurrentMessage为空（防止测试数据残留）
         EnsureCurrentMessageIsEmpty();
-        
+
         // 只有在首次设置或者用户未手动切换过面板时，才允许外部参数影响面板状态
         if (!_hasUserToggledPanel)
         {
@@ -348,7 +348,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
                 _initialPanelState = true;
             }
         }
-        
+
         base.OnParametersSet();
     }
     #endregion
@@ -372,7 +372,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
 
         Messages.Add(message);
         StateHasChanged();
-        
+
         // 等待DOM更新后滚动到底部
         await Task.Delay(100);
         await ScrollToBottomIfPossible();
@@ -463,7 +463,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
     {
         _hasUserToggledPanel = true; // 标记用户已手动切换
         ShowRightPanel = !ShowRightPanel;
-        
+
         // 保存状态到localStorage（包含错误处理）
         await SavePanelStateToStorage();
 
@@ -485,7 +485,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         if (ShowRightPanel == show) return; // 状态相同，无需切换
 
         ShowRightPanel = show;
-        
+
         if (saveToStorage)
         {
             await SavePanelStateToStorage();
@@ -513,7 +513,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
             // 尝试降级方案
             try
             {
-                await JSRuntime.InvokeVoidAsync("eval", 
+                await JSRuntime.InvokeVoidAsync("eval",
                     $"localStorage.setItem('aiChat_rightPanelOpen', '{ShowRightPanel.ToString().ToLower()}')");
             }
             catch (Exception)
@@ -531,7 +531,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         try
         {
             var localStorageState = await JSRuntime.InvokeAsync<bool>("aiChatHelper.storage.getRightPanelState");
-            
+
             return new
             {
                 CurrentShowRightPanel = ShowRightPanel,
@@ -582,7 +582,7 @@ public partial class AiChatComponent : ComponentBase, IDisposable
         StateHasChanged();
         await Task.CompletedTask;
     }
-    
+
     /// <summary>
     /// 重置组件状态（包括清空输入框）
     /// </summary>

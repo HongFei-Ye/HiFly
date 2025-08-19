@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -103,7 +103,7 @@ public partial class ChatInputArea_Old : ComponentBase
         if (firstRender)
         {
             await FocusInput();
-            
+
             // 初始化自动高度调整
             try
             {
@@ -127,10 +127,10 @@ public partial class ChatInputArea_Old : ComponentBase
             return; // 只处理左键点击
 
         var message = CurrentMessage.Trim();
-        
+
         // 首先清空本地状态
         CurrentMessage = string.Empty;
-        
+
         // 然后通知父组件状态变化
         if (CurrentMessageChanged.HasDelegate)
         {
@@ -316,15 +316,15 @@ public partial class ChatInputArea_Old : ComponentBase
     {
         // 只处理左键点击
         if (mouseArgs.Button != 0) return;
-        
+
         // 如果正在加载或禁用状态，不处理点击
         if (IsLoading) return;
 
         // 检查是否在拖拽选择过程中，如果是则不处理
         // 这里通过检查鼠标位置变化来判断是否为拖拽
-        var hasSelection = await JSRuntime.InvokeAsync<bool>("eval", 
+        var hasSelection = await JSRuntime.InvokeAsync<bool>("eval",
             "!!document.querySelector('textarea.chat-input-enhanced')?.selectionStart !== document.querySelector('textarea.chat-input-enhanced')?.selectionEnd");
-        
+
         if (!hasSelection)
         {
             // 只有在没有选择文本时才重新聚焦
@@ -339,7 +339,7 @@ public partial class ChatInputArea_Old : ComponentBase
     {
         // 只处理左键点击
         if (mouseArgs.Button != 0) return;
-        
+
         // 如果正在加载或禁用状态，不处理点击
         if (IsLoading) return;
 
@@ -355,7 +355,7 @@ public partial class ChatInputArea_Old : ComponentBase
     {
         // 只处理左键点击
         if (mouseArgs.Button != 0) return;
-        
+
         // 如果正在加载或禁用状态，不处理点击
         if (IsLoading) return;
 
@@ -450,7 +450,7 @@ public partial class ChatInputArea_Old : ComponentBase
     {
         // 只处理左键
         if (mouseArgs.Button != 0) return;
-        
+
         // 确保输入框有焦点，但保留选择状态
         await FocusInput(preserveSelection: true);
     }
@@ -461,7 +461,7 @@ public partial class ChatInputArea_Old : ComponentBase
     private async Task HandleTextSelectionEnd(MouseEventArgs mouseArgs)
     {
         if (mouseArgs.Button != 0) return;
-        
+
         // 不需要任何额外处理，让浏览器处理选择完成
         await Task.CompletedTask;
     }
@@ -472,13 +472,13 @@ public partial class ChatInputArea_Old : ComponentBase
     private async Task HandleTextDoubleClick(MouseEventArgs mouseArgs)
     {
         if (mouseArgs.Button != 0) return;
-        
+
         try
         {
             // 获取当前详细信息用于调试
             var debugInfo = await JSRuntime.InvokeAsync<object>("aiChatHelper.getDetailedSelectionInfo", inputTextarea);
             System.Console.WriteLine($"Double-click debug info: {debugInfo}");
-            
+
             // 使用防抖版本，避免重复触发
             await JSRuntime.InvokeVoidAsync("aiChatHelper.selectWordAtCursorWithDebounce", inputTextarea);
         }
@@ -512,7 +512,7 @@ public partial class ChatInputArea_Old : ComponentBase
     {
         // 更新消息内容
         CurrentMessage = e.Value?.ToString() ?? string.Empty;
-        
+
         // 通知父组件状态变化
         if (CurrentMessageChanged.HasDelegate)
         {

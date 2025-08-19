@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -135,10 +135,10 @@ public partial class ChatInputArea : ComponentBase
     #region 私有字段和引用
 
     private TextInputField? textInputField;
-    
+
     // 调试相关字段
     private bool _lastCanSendState = false;
-    
+
     // 实时更新状态
     private int _currentMessageLength = 0;
     private bool _canSendMessage = false;
@@ -154,7 +154,7 @@ public partial class ChatInputArea : ComponentBase
         {
             CurrentMessage = string.Empty;
         }
-        
+
         base.OnInitialized();
     }
 
@@ -164,14 +164,14 @@ public partial class ChatInputArea : ComponentBase
         if (CurrentMessage == "CurrentMessage")
         {
             CurrentMessage = string.Empty;
-            
+
             // 通知父组件值已清理
             if (CurrentMessageChanged.HasDelegate)
             {
                 _ = Task.Run(async () => await CurrentMessageChanged.InvokeAsync(CurrentMessage));
             }
         }
-        
+
         base.OnParametersSet();
     }
 
@@ -191,7 +191,7 @@ public partial class ChatInputArea : ComponentBase
                 // 记录错误但不影响功能
             }
         }
-        
+
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -220,17 +220,17 @@ public partial class ChatInputArea : ComponentBase
         {
             await textInputField.ClearContent();
         }
-        
+
         // 2. 清空当前消息状态
         CurrentMessage = string.Empty;
-        
+
         // 3. 重置内部实时状态
         _currentMessageLength = 0;
         _canSendMessage = false;
-        
+
         // 4. 立即强制UI更新，确保InputStatsDisplay显示0/2000
         StateHasChanged();
-        
+
         // 5. 通知父组件状态变更
         if (CurrentMessageChanged.HasDelegate)
         {
@@ -254,16 +254,16 @@ public partial class ChatInputArea : ComponentBase
         }
         return CurrentMessage.Length;
     }
-    
+
     /// <summary>
     /// 检查当前消息是否可以发送（不是空内容且不是测试数据）
     /// </summary>
     private bool CanSendMessage()
     {
-        var canSend = !string.IsNullOrWhiteSpace(CurrentMessage) && 
-                      CurrentMessage != "CurrentMessage" && 
+        var canSend = !string.IsNullOrWhiteSpace(CurrentMessage) &&
+                      CurrentMessage != "CurrentMessage" &&
                       !IsLoading;
-        
+
         return canSend;
     }
 
@@ -277,10 +277,10 @@ public partial class ChatInputArea : ComponentBase
         {
             CurrentMessage = "测试消息";
         }
-        
+
         // 重置状态
         IsLoading = false;
-        
+
         // 强制更新UI
         StateHasChanged();
     }
@@ -295,13 +295,13 @@ public partial class ChatInputArea : ComponentBase
             // 更新内部状态
             var newLength = value?.Length ?? 0;
             var newCanSend = !string.IsNullOrWhiteSpace(value) && !IsLoading;
-            
+
             // 只有在值真正变化时才更新状态
             if (_currentMessageLength != newLength || _canSendMessage != newCanSend)
             {
                 _currentMessageLength = newLength;
                 _canSendMessage = newCanSend;
-                
+
                 // 立即强制UI更新
                 StateHasChanged();
             }
@@ -367,9 +367,9 @@ public partial class ChatInputArea : ComponentBase
         // 检查是否有文本选择
         try
         {
-            var hasSelection = await JSRuntime.InvokeAsync<bool>("eval", 
+            var hasSelection = await JSRuntime.InvokeAsync<bool>("eval",
                 "!!document.querySelector('textarea.chat-input-enhanced')?.selectionStart !== document.querySelector('textarea.chat-input-enhanced')?.selectionEnd");
-            
+
             if (!hasSelection)
             {
                 await FocusInput();

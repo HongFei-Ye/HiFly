@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
+
+using Microsoft.AspNetCore.Components;
 
 namespace HiFly.BbAiChat.Components.Settings;
 
@@ -56,7 +60,7 @@ public partial class ModelSettingsSection : ComponentBase
     {
         var modelId = e.Value?.ToString() ?? string.Empty;
         SelectedModel = modelId;
-        
+
         if (SelectedModelChanged.HasDelegate)
         {
             await SelectedModelChanged.InvokeAsync(modelId);
@@ -83,7 +87,7 @@ public partial class ModelSettingsSection : ComponentBase
         if (double.TryParse(e.Value?.ToString(), out double temperature))
         {
             Temperature = Math.Round(temperature, 1);
-            
+
             if (TemperatureChanged.HasDelegate)
             {
                 await TemperatureChanged.InvokeAsync(Temperature);
@@ -101,7 +105,7 @@ public partial class ModelSettingsSection : ComponentBase
             // 确保值在有效范围内
             tokens = Math.Max(100, Math.Min(4000, tokens));
             MaxTokens = tokens;
-            
+
             if (MaxTokensChanged.HasDelegate)
             {
                 await MaxTokensChanged.InvokeAsync(tokens);

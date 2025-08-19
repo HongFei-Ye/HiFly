@@ -1,13 +1,10 @@
-﻿// Copyright (c) 厦门链友融人工智能应用科技有限公司. All rights reserved.
-// 官方网站: www.oklyr.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
-using AutoMapper;
 using BootstrapBlazor.Components;
-using HiFly.BbTables;
-using HiFly.BbTables.Attributes;
 using HiFly.BbTables.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Reflection;

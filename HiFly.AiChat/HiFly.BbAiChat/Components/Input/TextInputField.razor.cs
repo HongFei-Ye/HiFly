@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
@@ -78,7 +82,7 @@ public partial class TextInputField : ComponentBase, IDisposable
         {
             CurrentValue = string.Empty;
         }
-        
+
         await base.OnInitializedAsync();
     }
 
@@ -91,7 +95,7 @@ public partial class TextInputField : ComponentBase, IDisposable
                 // 首次渲染时强制清空任何残留值
                 await ClearTextareaValue();
                 await InitializeTextarea();
-                
+
                 // 首次渲染后，触发一次实时更新以同步当前状态
                 if (OnRealTimeUpdate.HasDelegate)
                 {
@@ -118,7 +122,7 @@ public partial class TextInputField : ComponentBase, IDisposable
                 _ = Task.Run(async () => await CurrentValueChanged.InvokeAsync(CurrentValue));
             }
         }
-        
+
         base.OnParametersSet();
     }
 
@@ -131,7 +135,7 @@ public partial class TextInputField : ComponentBase, IDisposable
         {
             // 等待DOM完全加载
             await Task.Delay(200);
-            
+
             await JSRuntime.InvokeVoidAsync("eval", @"
                 (function() {
                     console.log('🔄 开始启动实时更新监听器...');
@@ -210,14 +214,14 @@ public partial class TextInputField : ComponentBase, IDisposable
                     
                 })();
             ");
-            
+
             System.Console.WriteLine("✅ 实时更新监听器初始化完成");
         }
         catch (Exception ex)
         {
             System.Console.WriteLine($"❌ 启动实时更新失败: {ex.Message}");
             System.Console.WriteLine($"详细错误: {ex.StackTrace}");
-            
+
             // 提供降级方案
             await StartFallbackUpdate();
         }
@@ -231,7 +235,7 @@ public partial class TextInputField : ComponentBase, IDisposable
         try
         {
             System.Console.WriteLine("🔄 启动降级更新方案...");
-            
+
             // 每500ms检查一次输入框值的变化，延迟1秒启动以避免预渲染问题
             _updateTimer?.Dispose();
             _updateTimer = new Timer(async _ =>
@@ -243,9 +247,9 @@ public partial class TextInputField : ComponentBase, IDisposable
                         try
                         {
                             // 检查是否可以安全调用JavaScript
-                            var currentValue = await JSRuntime.InvokeAsync<string>("eval", 
+                            var currentValue = await JSRuntime.InvokeAsync<string>("eval",
                                 "document.querySelector('textarea.chat-input-enhanced')?.value || ''");
-                            
+
                             if (currentValue != CurrentValue)
                             {
                                 CurrentValue = currentValue;
@@ -275,7 +279,7 @@ public partial class TextInputField : ComponentBase, IDisposable
                     System.Console.WriteLine($"降级更新失败: {ex.Message}");
                 }
             }, null, TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(500));
-            
+
             System.Console.WriteLine("✅ 降级更新方案启动成功");
         }
         catch (Exception ex)
@@ -291,7 +295,7 @@ public partial class TextInputField : ComponentBase, IDisposable
     {
         // 取消之前的定时器
         _updateTimer?.Dispose();
-        
+
         // 启动新的定时器（100ms防抖）
         _updateTimer = new Timer(async _ =>
         {
@@ -315,7 +319,7 @@ public partial class TextInputField : ComponentBase, IDisposable
         {
             // 聚焦输入框
             await FocusTextarea();
-            
+
             // 初始化自动高度调整
             await JSRuntime.InvokeVoidAsync("aiChatHelper.initAutoResize", textareaRef);
         }
@@ -369,7 +373,7 @@ public partial class TextInputField : ComponentBase, IDisposable
     {
         // 1. 清空当前值
         CurrentValue = string.Empty;
-        
+
         // 2. 立即强制清空DOM中的textarea
         try
         {
@@ -389,22 +393,22 @@ public partial class TextInputField : ComponentBase, IDisposable
         {
             // 记录错误但不影响功能
         }
-        
+
         // 3. 重置高度
         await ResetHeight();
-        
+
         // 4. 通知父组件
         if (CurrentValueChanged.HasDelegate)
         {
             await CurrentValueChanged.InvokeAsync(CurrentValue);
         }
-        
+
         // 5. 强制立即触发实时更新事件
         if (OnRealTimeUpdate.HasDelegate)
         {
             await OnRealTimeUpdate.InvokeAsync(CurrentValue);
         }
-        
+
         // 6. 强制UI更新
         StateHasChanged();
     }
@@ -443,7 +447,7 @@ public partial class TextInputField : ComponentBase, IDisposable
                 await OnSendMessage.InvokeAsync(CurrentValue.Trim());
             }
         }
-        
+
         if (OnKeyDown.HasDelegate)
         {
             await OnKeyDown.InvokeAsync(e);
@@ -474,7 +478,7 @@ public partial class TextInputField : ComponentBase, IDisposable
     private async Task HandleTextDoubleClick(MouseEventArgs mouseArgs)
     {
         if (mouseArgs.Button != 0) return;
-        
+
         try
         {
             await JSRuntime.InvokeVoidAsync("aiChatHelper.selectWordAtCursor", textareaRef);
@@ -491,34 +495,34 @@ public partial class TextInputField : ComponentBase, IDisposable
     private async Task HandleInput(ChangeEventArgs e)
     {
         var newValue = e.Value?.ToString() ?? string.Empty;
-        
+
         // 防止无意义的更新
         if (CurrentValue == newValue)
         {
             return;
         }
-        
+
         // 过滤测试数据
         if (newValue == "CurrentMessage")
         {
             newValue = string.Empty;
         }
-        
+
         // 更新当前值
         CurrentValue = newValue;
-        
+
         // 立即通知父组件值变更
         if (CurrentValueChanged.HasDelegate)
         {
             await CurrentValueChanged.InvokeAsync(CurrentValue);
         }
-        
+
         // 立即触发实时更新
         if (OnRealTimeUpdate.HasDelegate)
         {
             await OnRealTimeUpdate.InvokeAsync(CurrentValue);
         }
-        
+
         // 强制UI更新
         StateHasChanged();
     }

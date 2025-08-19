@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using HiFly.Tables.Cache.Configuration;
 using HiFly.Tables.Cache.Interfaces;
@@ -36,7 +36,7 @@ public class MemoryCacheService : ICacheService
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _keyTracker = new ConcurrentDictionary<string, DateTime>();
         _statistics = new CacheStatistics();
-        
+
         // 配置专门用于缓存的JSON序列化选项
         _jsonOptions = new JsonSerializerOptions
         {
@@ -47,7 +47,7 @@ public class MemoryCacheService : ICacheService
             IncludeFields = true, // 包含字段
             PropertyNameCaseInsensitive = true, // 大小写不敏感
             NumberHandling = JsonNumberHandling.AllowReadingFromString, // 允许从字符串读取数字
-            Converters = 
+            Converters =
             {
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
                 // 添加对 Guid 的支持
@@ -68,7 +68,7 @@ public class MemoryCacheService : ICacheService
         try
         {
             var fullKey = BuildFullKey(key);
-            
+
             if (_memoryCache.TryGetValue(fullKey, out var cachedValue))
             {
                 _statistics.HitCount++;
@@ -97,9 +97,9 @@ public class MemoryCacheService : ICacheService
                     _logger.LogDebug("缓存直接命中: {Key}", key);
                     return directValue;
                 }
-                
+
                 // 如果缓存值类型不匹配，记录警告并移除
-                _logger.LogWarning("缓存值类型不匹配，移除缓存项: {Key}, 期望类型: {ExpectedType}, 实际类型: {ActualType}", 
+                _logger.LogWarning("缓存值类型不匹配，移除缓存项: {Key}, 期望类型: {ExpectedType}, 实际类型: {ActualType}",
                     key, typeof(T).Name, cachedValue?.GetType().Name ?? "null");
                 _memoryCache.Remove(fullKey);
                 _keyTracker.TryRemove(fullKey, out _);
@@ -152,7 +152,7 @@ public class MemoryCacheService : ICacheService
             var maxSizeBytes = _options.MemoryCache.SizeLimitMB * 1024 * 1024; // 转换为字节
             if (entryOptions.Size > maxSizeBytes / 100) // 单个项目不应超过总限制的1%
             {
-                _logger.LogWarning("缓存项过大，跳过缓存: {Key}, 大小: {Size} bytes, 限制: {Limit} bytes", 
+                _logger.LogWarning("缓存项过大，跳过缓存: {Key}, 大小: {Size} bytes, 限制: {Limit} bytes",
                     key, entryOptions.Size, maxSizeBytes / 100);
                 return false;
             }
@@ -300,6 +300,59 @@ public class MemoryCacheService : ICacheService
     {
         return $"{_options.KeyPrefix}{key}";
     }
+
+    /// <summary>
+    /// 获取所有缓存键
+    /// </summary>
+    /// <returns>所有缓存键列表</returns>
+    public async Task<List<string>> GetAllKeysAsync()
+    {
+        await Task.CompletedTask; // 保持异步签名一致性
+        
+        // 清理过期的键
+        CleanupExpiredKeys();
+        
+        return _keyTracker.Keys.ToList();
+    }
+
+    /// <summary>
+    /// 获取匹配模式的缓存键
+    /// </summary>
+    /// <param name="pattern">模式，支持通配符*</param>
+    /// <returns>匹配的缓存键列表</returns>
+    public async Task<List<string>> GetKeysByPatternAsync(string pattern)
+    {
+        await Task.CompletedTask;
+        
+        CleanupExpiredKeys();
+        
+        if (string.IsNullOrEmpty(pattern) || pattern == "*")
+        {
+            return _keyTracker.Keys.ToList();
+        }
+        
+        var regex = new Regex(pattern.Replace("*", ".*"), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        return _keyTracker.Keys.Where(key => regex.IsMatch(key)).ToList();
+    }
+
+    /// <summary>
+    /// 清理过期的键跟踪记录
+    /// </summary>
+    private void CleanupExpiredKeys()
+    {
+        var now = DateTime.UtcNow;
+        var expiredKeys = _keyTracker
+            .Where(kvp => kvp.Value < now)
+            .Select(kvp => kvp.Key)
+            .ToList();
+            
+        foreach (var expiredKey in expiredKeys)
+        {
+            _keyTracker.TryRemove(expiredKey, out _);
+        }
+        
+        _statistics.ItemCount = _keyTracker.Count;
+    }
 }
 
 /// <summary>
@@ -317,7 +370,7 @@ public class JsonGuidConverter : JsonConverter<Guid>
                 return guid;
             }
         }
-        
+
         throw new JsonException($"无法将值转换为 Guid: {reader.GetString()}");
     }
 
@@ -342,7 +395,7 @@ public class JsonDateTimeConverter : JsonConverter<DateTime>
                 return dateTime;
             }
         }
-        
+
         throw new JsonException($"无法将值转换为 DateTime: {reader.GetString()}");
     }
 

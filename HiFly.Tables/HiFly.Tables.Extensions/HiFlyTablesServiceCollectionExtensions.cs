@@ -1,7 +1,8 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
+using Hifly.Tables.Cache.Extensions;
 using HiFly.Tables.Cache.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -261,7 +262,7 @@ public static class HiFlyTablesServiceCollectionExtensions
 
         public IDisposable BeginScope<TState>(TState state) => new NullScope();
 
-        public bool IsEnabled(LogLevel logLevel) => 
+        public bool IsEnabled(LogLevel logLevel) =>
             logLevel >= (_enableDebug ? LogLevel.Debug : LogLevel.Information);
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
@@ -270,9 +271,9 @@ public static class HiFlyTablesServiceCollectionExtensions
 
             var message = formatter(state, exception);
             var timestamp = DateTime.Now.ToString("HH:mm:ss");
-            
+
             Console.WriteLine($"[{timestamp}] [{logLevel}] {_categoryName}: {message}");
-            
+
             if (exception != null)
             {
                 Console.WriteLine($"Exception: {exception}");

@@ -1,6 +1,6 @@
-// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
 using FreeSql;
@@ -108,7 +108,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "保存数据时发生错误，实体: {EntityType}, 变更类型: {ChangeType}", 
+            _logger.LogError(ex, "保存数据时发生错误，实体: {EntityType}, 变更类型: {ChangeType}",
                 typeof(TItem).Name, changedType);
             return false;
         }
@@ -131,7 +131,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
         {
             // 检查是否为树形结构
             var isTreeStructure = HasTreeStructure();
-            
+
             if (isTreeStructure)
             {
                 return await HandleTreeDeleteAsync(itemsList);
@@ -322,8 +322,8 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
         try
         {
             // 确定字段名称
-            var fieldName = !string.IsNullOrEmpty(filter.ReferenceTypeField) 
-                ? filter.ReferenceTypeField 
+            var fieldName = !string.IsNullOrEmpty(filter.ReferenceTypeField)
+                ? filter.ReferenceTypeField
                 : filter.ValueTypeField;
 
             if (string.IsNullOrEmpty(fieldName) || filter.MatchValue == null)
@@ -349,8 +349,8 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
                 FilterAction.LessThanOrEqual => ApplyLessThanOrEqualFilter(query, fieldName, filter.MatchValue),
                 FilterAction.Contains => ApplyContainsFilter(query, fieldName, filter.MatchValue),
                 FilterAction.NotContains => ApplyNotContainsFilter(query, fieldName, filter.MatchValue),
-                
-                
+
+
                 _ => query
             };
         }
@@ -551,11 +551,11 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
             // 构建 lambda 表达式: x => x.PropertyName
             var parameter = Expression.Parameter(typeof(TItem), "x");
             var property = Expression.Property(parameter, sortName);
-            
+
             // 将属性转换为 object 类型以匹配 OrderByDescending<object> 签名
             var converted = Expression.Convert(property, typeof(object));
             var lambda = Expression.Lambda<Func<TItem, object>>(converted, parameter);
-            
+
             return query.OrderByDescending(lambda);
         }
         catch (Exception)
@@ -745,7 +745,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
             // 构建查询表达式
             var parameter = Expression.Parameter(typeof(TItem), "x");
             var property = Expression.Property(parameter, parentIdProp);
-            
+
             // 处理类型转换
             Expression valueExpression;
             if (parentIdProp.PropertyType == idProp.PropertyType)
@@ -762,7 +762,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
                 // 尝试类型转换
                 valueExpression = Expression.Convert(Expression.Constant(parentId, idProp.PropertyType), parentIdProp.PropertyType);
             }
-            
+
             var equalExpression = Expression.Equal(property, valueExpression);
             var lambda = Expression.Lambda<Func<TItem, bool>>(equalExpression, parameter);
 
@@ -793,7 +793,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
             // 构建查询表达式
             var parameter = Expression.Parameter(typeof(TItem), "x");
             var property = Expression.Property(parameter, parentIdProp);
-            
+
             // 处理类型转换
             Expression valueExpression;
             if (parentIdProp.PropertyType == idProp.PropertyType)
@@ -810,7 +810,7 @@ public class FreeSqlDataService<TItem> : IHiFlyDataService<TItem>
                 // 尝试类型转换
                 valueExpression = Expression.Convert(Expression.Constant(parentId, idProp.PropertyType), parentIdProp.PropertyType);
             }
-            
+
             var equalExpression = Expression.Equal(property, valueExpression);
             var lambda = Expression.Lambda<Func<TItem, bool>>(equalExpression, parameter);
 

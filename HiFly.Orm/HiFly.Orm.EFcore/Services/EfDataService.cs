@@ -1,11 +1,11 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
+using HiFly.Orm.EFcore.Extensions;
 using HiFly.Tables.Core.Interfaces;
 using HiFly.Tables.Core.Models;
-using HiFly.Orm.EFcore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
@@ -136,11 +136,11 @@ public class EfDataService<TContext, TItem>(
             using var context = _dbContextFactory.CreateDbContext();
 
             // 获取实体类型元数据
-            var entityType = context.Model.FindEntityType(typeof(TItem)) 
+            var entityType = context.Model.FindEntityType(typeof(TItem))
                 ?? throw new InvalidOperationException($"实体类型 {typeof(TItem).Name} 不在模型中。");
 
             // 获取主键属性
-            var primaryKey = entityType.FindPrimaryKey() 
+            var primaryKey = entityType.FindPrimaryKey()
                 ?? throw new InvalidOperationException($"实体类型 {typeof(TItem).Name} 没有定义主键。");
 
             if (changedType == ItemChangedType.Add)
@@ -154,7 +154,7 @@ public class EfDataService<TContext, TItem>(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "保存数据时发生错误，实体: {EntityType}, 变更类型: {ChangeType}", 
+            _logger.LogError(ex, "保存数据时发生错误，实体: {EntityType}, 变更类型: {ChangeType}",
                 typeof(TItem).Name, changedType);
             return false;
         }
@@ -179,7 +179,7 @@ public class EfDataService<TContext, TItem>(
 
             // 检查是否为树形结构
             var isTreeStructure = HasTreeStructure();
-            
+
             if (isTreeStructure)
             {
                 return await EfDeleteExtensions.HandleTreeDeleteAsync(context, itemsList, _logger);

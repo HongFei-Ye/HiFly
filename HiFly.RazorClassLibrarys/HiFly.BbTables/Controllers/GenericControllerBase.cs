@@ -1,8 +1,8 @@
-﻿// Copyright (c) 厦门链友融人工智能应用科技有限公司. All rights reserved.
-// 官方网站: www.oklyr.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
-using HiFly.BbTables;
 using HiFly.BbTables.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

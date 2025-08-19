@@ -1,6 +1,6 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
 using HiFly.Tables.Core.Models;
@@ -17,9 +17,10 @@ public class TableCacheKeyGenerator
 {
     private readonly string _keyPrefix;
 
-    public TableCacheKeyGenerator(string keyPrefix = "HiFly:Tables:")
+    public TableCacheKeyGenerator(string keyPrefix = "")
     {
-        _keyPrefix = keyPrefix;
+        // 不设置默认前缀，让 MemoryCacheService 统一管理前缀
+        _keyPrefix = string.IsNullOrEmpty(keyPrefix) ? "" : keyPrefix;
     }
 
     /// <summary>

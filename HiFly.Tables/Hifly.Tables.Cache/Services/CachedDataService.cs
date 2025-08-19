@@ -1,10 +1,9 @@
-﻿// Copyright (c) 弘飞帮联科技有限公司. All rights reserved.
-// 官方网站: www.hongfei8.cn
-// 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
+﻿// Copyright (c) HiFly. All rights reserved.
+// 官方网站: www.hongfei8.net
+// 联系方式: hongfei8@outlook.com
 
 using BootstrapBlazor.Components;
 using HiFly.Tables.Cache.Interfaces;
-using HiFly.Tables.Cache.Services;
 using HiFly.Tables.Core.Interfaces;
 using HiFly.Tables.Core.Models;
 using Microsoft.Extensions.Logging;
@@ -76,7 +75,7 @@ public class CachedDataService<TItem>(
         catch (Exception ex)
         {
             _logger.LogError(ex, "查询数据时发生错误，实体: {EntityType}", typeof(TItem).Name);
-            
+
             // 发生错误时直接调用基础服务
             return await _baseService.OnQueryAsync(options, propertyFilterParameters, isTree);
         }
@@ -98,10 +97,10 @@ public class CachedDataService<TItem>(
             {
                 // 使用智能缓存清理策略
                 await SmartCacheClearAsync();
-                
+
                 // 延迟验证缓存清理效果
                 await VerifyCacheClearingAsync();
-                
+
                 _logger.LogDebug("删除成功，已清理 {EntityType} 相关缓存", typeof(TItem).Name);
             }
 
@@ -232,7 +231,7 @@ public class CachedDataService<TItem>(
 
             // 1. 获取所有相关的缓存模式
             var patterns = GetAllRelatedCachePatterns();
-            
+
             // 2. 清理每个模式的缓存
             foreach (var pattern in patterns)
             {
@@ -251,7 +250,7 @@ public class CachedDataService<TItem>(
             // 3. 强制清理多级缓存的特定级别
             await ForceCleanAllCacheLevelsAsync();
 
-            _logger.LogInformation("增强缓存清理完成: {EntityType}, 总清理项数: {TotalCleared}", 
+            _logger.LogInformation("增强缓存清理完成: {EntityType}, 总清理项数: {TotalCleared}",
                 entityName, totalCleared);
         }
         catch (Exception ex)
@@ -273,13 +272,13 @@ public class CachedDataService<TItem>(
 
         // 2. 查询缓存模式（不同的查询可能有不同的缓存键）
         patterns.Add($"HiFly:Tables:Query:{entityName}:*");
-        
+
         // 3. 树形缓存模式（如果适用）
         patterns.Add($"HiFly:Tables:Tree:{entityName}:*");
-        
+
         // 4. 实体详情缓存模式
         patterns.Add($"HiFly:Tables:Entity:{entityName}:*");
-        
+
         // 5. 统计缓存模式
         patterns.Add($"HiFly:Tables:Stats:{entityName}:*");
 
@@ -297,20 +296,20 @@ public class CachedDataService<TItem>(
         try
         {
             var entityName = typeof(TItem).Name;
-            
+
             // 等待一小段时间让缓存清理完成
             await Task.Delay(100);
-            
+
             // 验证主要缓存模式是否确实被清理
             var mainPattern = $"HiFly:Tables:Query:{entityName}:*";
-            
+
             // 如果是多级缓存服务，检查各级别的统计信息
             if (_cacheService is MultiLevelCacheService multiLevelService)
             {
                 var stats = await multiLevelService.GetStatisticsAsync();
                 _logger.LogDebug("缓存清理后统计信息: {Stats}", JsonSerializer.Serialize(stats));
             }
-            
+
             _logger.LogDebug("缓存清理验证完成: {EntityType}", entityName);
         }
         catch (Exception ex)
@@ -329,12 +328,12 @@ public class CachedDataService<TItem>(
             if (_cacheService is MultiLevelCacheService multiLevelService)
             {
                 var entityName = typeof(TItem).Name;
-                
+
                 // 获取清理前的统计信息
                 var statsBefore = await multiLevelService.GetStatisticsAsync();
                 _logger.LogDebug("清理前缓存统计: {EntityType}, 统计: {Stats}",
                     entityName, JsonSerializer.Serialize(statsBefore));
-                
+
                 // 使用模式清理而不是清理整个级别
                 var patterns = GetAllRelatedCachePatterns();
                 foreach (var pattern in patterns)
@@ -352,7 +351,7 @@ public class CachedDataService<TItem>(
                         _logger.LogWarning(ex, "多级缓存清理模式失败: {Pattern}", pattern);
                     }
                 }
-                
+
                 // 获取清理后的统计信息
                 var statsAfter = await multiLevelService.GetStatisticsAsync();
                 _logger.LogDebug("清理后缓存统计: {EntityType}, 统计: {Stats}",
@@ -399,7 +398,7 @@ public class CachedDataService<TItem>(
 
             // 清理该键在所有级别的缓存
             var removed = await _cacheService.RemoveAsync(cacheKey);
-            
+
             if (_cacheService is MultiLevelCacheService multiLevelService)
             {
                 // 确保在所有级别都清理
@@ -431,7 +430,7 @@ public class CachedDataService<TItem>(
 
             // 1. 清理所有可能的缓存模式
             var patterns = GetAllRelatedCachePatterns();
-            
+
             // 添加更广泛的模式
             patterns.AddRange(new[]
             {
@@ -490,12 +489,12 @@ public class CachedDataService<TItem>(
         try
         {
             var entityName = typeof(TItem).Name;
-            
+
             // 第一步：常规清理
             _logger.LogDebug("开始智能缓存清理第一步：常规清理 {EntityType}", entityName);
             var initialCleared = 0;
             var patterns = GetAllRelatedCachePatterns();
-            
+
             foreach (var pattern in patterns)
             {
                 try
@@ -511,11 +510,11 @@ public class CachedDataService<TItem>(
 
             // 第二步：验证清理效果
             await Task.Delay(50);
-            
+
             if (_cacheService is MultiLevelCacheService multiLevelService)
             {
                 var stats = await multiLevelService.GetStatisticsAsync();
-                
+
                 // 检查是否还有大量缓存项（简化的检查）
                 if (stats.Count > 0)
                 {
