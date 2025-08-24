@@ -24,6 +24,8 @@ public static class ServiceCollectionExtensions
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 
+        // 设置控制台编码格式
+        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         // 增加多语言支持配置信息
         //services.AddRequestLocalization<IOptionsMonitor<BootstrapBlazorOptions>>((localizerOption, blazorOption) =>

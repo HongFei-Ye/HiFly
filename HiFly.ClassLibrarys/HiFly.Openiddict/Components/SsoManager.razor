@@ -1,0 +1,366 @@
+﻿@* Copyright (c) 弘飞帮联科技有限公司. All rights reserved. *@
+@* 官方网站: www.hongfei8.cn *@
+@* 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com *@
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.JSInterop
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="sso-manager @CssClass" style="@Style">
+    @if (ShowControls)
+    {
+        <div class="sso-controls">
+            @if (IsAuthenticated)
+            {
+                <div class="sso-info">
+                    <span class="user-info">
+                        <i class="fas fa-user"></i>
+                        @CurrentUser
+                    </span>
+                    @if (SsoSession != null && ShowSessionInfo)
+                    {
+                        <div class="session-details">
+                            <small>会话ID: @SsoSession.SessionId</small>
+                            <small>认证时间: @SsoSession.AuthTime.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                            @if (SsoSession.ExpiresAt.HasValue)
+                            {
+                                <small>过期时间: @SsoSession.ExpiresAt.Value.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="sso-actions">
+                    <button class="btn btn-sm btn-outline-primary" @onclick="RefreshSession" disabled="@IsRefreshing">
+                        @if (IsRefreshing)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-sync-alt"></i>
+                        }
+                        刷新会话
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="SignOut">
+                        <i class="fas fa-sign-out-alt"></i>
+                        登出
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="sso-actions">
+                    <button class="btn btn-sm btn-primary" @onclick="SignIn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        登录
+                    </button>
+                </div>
+            }
+        </div>
+    }
+
+    @if (ShowStatusBar)
+    {
+        <div class="sso-status-bar">
+            <div class="status-indicator @GetStatusClass()">
+                <span class="status-dot"></span>
+                <span class="status-text">@GetStatusText()</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool ShowControls { get; set; } = true;
+    [Parameter] public bool ShowStatusBar { get; set; } = true;
+    [Parameter] public bool ShowSessionInfo { get; set; } = false;
+    [Parameter] public bool AutoCheckSession { get; set; } = true;
+    [Parameter] public int CheckIntervalSeconds { get; set; } = 60;
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public string Style { get; set; } = "";
+    [Parameter] public EventCallback<SsoSessionInfo> OnSessionChanged { get; set; }
+    [Parameter] public EventCallback OnSignInCompleted { get; set; }
+    [Parameter] public EventCallback OnSignOutCompleted { get; set; }
+
+    private Timer? _sessionCheckTimer;
+    private SsoSessionInfo? SsoSession { get; set; }
+    private bool IsAuthenticated { get; set; }
+    private string CurrentUser { get; set; } = "";
+    private bool IsRefreshing { get; set; } = false;
+    private bool _disposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateSessionStatus();
+        
+        if (AutoCheckSession)
+        {
+            StartAutoSessionCheck();
+        }
+
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private void StartAutoSessionCheck()
+    {
+        _sessionCheckTimer = new Timer(async _ => await InvokeAsync(UpdateSessionStatus), 
+            null, TimeSpan.Zero, TimeSpan.FromSeconds(CheckIntervalSeconds));
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await InvokeAsync(UpdateSessionStatus);
+    }
+
+    private async Task UpdateSessionStatus()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            IsAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+            CurrentUser = authState.User.Identity?.Name ?? "";
+
+            if (IsAuthenticated)
+            {
+                var httpClient = HttpClientFactory.CreateClient();
+                var response = await httpClient.GetAsync("/api/sso/session");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<SsoSessionResponse>(json, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    if (result?.Session != null)
+                    {
+                        SsoSession = result.Session;
+                        await OnSessionChanged.InvokeAsync(SsoSession);
+                    }
+                }
+            }
+            else
+            {
+                SsoSession = null;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"更新SSO会话状态时发生错误: {ex.Message}");
+        }
+    }
+
+    private async Task RefreshSession()
+    {
+        IsRefreshing = true;
+        StateHasChanged();
+
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient();
+            var response = await httpClient.PostAsync("/api/token/refresh", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await UpdateSessionStatus();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"刷新SSO会话时发生错误: {ex.Message}");
+        }
+        finally
+        {
+            IsRefreshing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void SignIn()
+    {
+        var returnUrl = NavigationManager.Uri;
+        NavigationManager.NavigateTo($"/signin?returnUrl={Uri.EscapeDataString(returnUrl)}");
+    }
+
+    private async Task SignOut()
+    {
+        await OnSignOutCompleted.InvokeAsync();
+        NavigationManager.NavigateTo("/signout");
+    }
+
+    private string GetStatusClass()
+    {
+        if (!IsAuthenticated)
+            return "status-disconnected";
+        
+        if (SsoSession?.IsActive == true)
+            return "status-connected";
+            
+        return "status-unknown";
+    }
+
+    private string GetStatusText()
+    {
+        if (!IsAuthenticated)
+            return "未连接";
+        
+        if (SsoSession?.IsActive == true)
+            return "已连接";
+            
+        return "状态未知";
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _sessionCheckTimer?.Dispose();
+            AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+            _disposed = true;
+        }
+    }
+
+    public class SsoSessionResponse
+    {
+        public bool Active { get; set; }
+        public SsoSessionInfo? Session { get; set; }
+    }
+
+    public class SsoSessionInfo
+    {
+        public string SessionId { get; set; } = "";
+        public string UserId { get; set; } = "";
+        public string UserName { get; set; } = "";
+        public DateTimeOffset AuthTime { get; set; }
+        public DateTimeOffset? ExpiresAt { get; set; }
+        public string AuthenticationMethod { get; set; } = "";
+        public string IdentityProvider { get; set; } = "";
+        public List<string> ClientApplications { get; set; } = new();
+        public bool IsActive { get; set; }
+    }
+}
+
+<style>
+    .sso-manager {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sso-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        background-color: #f8f9fa;
+    }
+
+    .sso-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .user-info {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .session-details {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8em;
+        color: #6c757d;
+    }
+
+    .sso-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .sso-status-bar {
+        display: flex;
+        align-items: center;
+        padding: 5px 10px;
+        background-color: #e9ecef;
+        border-radius: 0.375rem;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9em;
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-connected .status-dot {
+        background-color: #28a745;
+        animation: pulse 2s infinite;
+    }
+
+    .status-disconnected .status-dot {
+        background-color: #dc3545;
+    }
+
+    .status-unknown .status-dot {
+        background-color: #ffc107;
+    }
+
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.375rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+        background-color: transparent;
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+        background-color: transparent;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>

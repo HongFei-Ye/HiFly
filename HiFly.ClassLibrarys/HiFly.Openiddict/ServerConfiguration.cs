@@ -3,8 +3,6 @@
 // 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com
 
 using HiFly.Identity.Data.Interfaces;
-using HiFly.Identity.Services;
-using HiFly.Identity.Services.Interfaces;
 using HiFly.Openiddict.NavMenus.Interfaces;
 using HiFly.Openiddict.NavMenus.Services;
 using HiFly.Openiddict.NavMenus.Services.Interfaces;
@@ -34,85 +32,6 @@ namespace HiFly.Openiddict;
 public static class ServerConfiguration
 {
     /// <summary>
-    /// 注册Identity服务配置
-    /// </summary>
-    public static IServiceCollection AddHiFlyIdentity<TContext, TUser, TRole>(
-        this IServiceCollection services,
-        Action<ServerUserOptions>? configureOptions = null)
-        where TContext : DbContext
-        where TUser : class, IUser, new()
-        where TRole : class, IRole, new()
-    {
-        var options = new ServerUserOptions();
-        configureOptions?.Invoke(options);
-
-
-        // 添加 Identity 服务
-        services.AddIdentity<TUser, TRole>(idOptions =>
-        {
-            // 账户确认和密码恢复配置
-            idOptions.SignIn.RequireConfirmedAccount = options.RequireConfirmedAccount;
-            idOptions.SignIn.RequireConfirmedEmail = options.RequireConfirmedEmail;
-            idOptions.SignIn.RequireConfirmedPhoneNumber = options.RequireConfirmedPhoneNumber;
-
-            // 密码复杂度配置
-            idOptions.Password.RequireDigit = options.PasswordRequireDigit;
-            idOptions.Password.RequireLowercase = options.PasswordRequireLowercase;
-            idOptions.Password.RequireUppercase = options.PasswordRequireUppercase;
-            idOptions.Password.RequireNonAlphanumeric = options.PasswordRequireNonAlphanumeric;
-            idOptions.Password.RequiredLength = options.PasswordRequiredLength;
-            idOptions.Password.RequiredUniqueChars = options.PasswordRequiredUniqueChars;
-
-            // 锁定策略配置
-            idOptions.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(options.DefaultLockoutMinutes);
-            idOptions.Lockout.MaxFailedAccessAttempts = options.MaxFailedAccessAttempts;
-            idOptions.Lockout.AllowedForNewUsers = options.LockoutAllowedForNewUsers;
-
-            // 用户配置
-            idOptions.User.RequireUniqueEmail = options.RequireUniqueEmail;
-            idOptions.User.AllowedUserNameCharacters = options.AllowedUserNameCharacters;
-
-            // 存储配置
-            idOptions.Stores.MaxLengthForKeys = options.MaxLengthForKeys;
-            idOptions.Stores.ProtectPersonalData = options.ProtectPersonalData;
-        })
-            .AddEntityFrameworkStores<TContext>()
-            .AddSignInManager()
-            .AddDefaultTokenProviders();
-
-        services.PostConfigure<AuthenticationOptions>(opts =>
-        {
-            opts.DefaultScheme = IdentityConstants.ApplicationScheme;
-            opts.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            opts.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-        });
-
-        // 根据配置添加额外的令牌提供程序
-        //if (options.AddEmailTokenProvider)
-        //{
-        //    services.AddAuthentication()
-        //        .AddGoogle(googleOptions => {
-        //            googleOptions.ClientId = options.GoogleClientId;
-        //            googleOptions.ClientSecret = options.GoogleClientSecret;
-        //        });
-        //}
-
-        // 配置Identity Cookie
-        services.ConfigureApplicationCookie(cookieOptions =>
-        {
-            cookieOptions.Cookie.HttpOnly = options.CookieHttpOnly;
-            cookieOptions.Cookie.SecurePolicy = options.CookieSecurePolicy;
-            cookieOptions.ExpireTimeSpan = TimeSpan.FromMinutes(options.CookieExpirationMinutes);
-            cookieOptions.SlidingExpiration = options.CookieSlidingExpiration;
-            cookieOptions.LoginPath = options.LoginPath;
-            cookieOptions.LogoutPath = options.LogoutPath;
-            cookieOptions.AccessDeniedPath = options.AccessDeniedPath;
-        });
-
-        return services;
-    }
-
-    /// <summary>
     /// 注册OpenIddict服务配置
     /// </summary>
     public static IServiceCollection AddHiFlyOpenIdServer<TContext>(
@@ -141,9 +60,9 @@ public static class ServerConfiguration
                 // 配置端点
                 serverOptions.SetAuthorizationEndpointUris(options.AuthorizationEndpoint)
                             .SetTokenEndpointUris(options.TokenEndpoint)
-                            .SetUserInfoEndpointUris(options.UserInfoEndpoint)
+                            .SetUserinfoEndpointUris(options.UserInfoEndpoint)
                             .SetIntrospectionEndpointUris(options.IntrospectionEndpoint)
-                            .SetEndSessionEndpointUris(options.LogoutEndpoint);
+                            .SetLogoutEndpointUris(options.LogoutEndpoint);
 
                 // 配置授权流程
                 if (options.AllowAuthorizationCodeFlow)
@@ -179,8 +98,8 @@ public static class ServerConfiguration
                 serverOptions.UseAspNetCore()
                             .EnableTokenEndpointPassthrough()
                             .EnableAuthorizationEndpointPassthrough()
-                            .EnableUserInfoEndpointPassthrough()
-                            .EnableEndSessionEndpointPassthrough()
+                            .EnableUserinfoEndpointPassthrough()
+                            .EnableLogoutEndpointPassthrough()
                             .EnableStatusCodePagesIntegration();
 
                 // 在开发环境使用开发证书
@@ -221,25 +140,14 @@ public static class ServerConfiguration
     }
 
     /// <summary>
-    /// 注册核心应用服务
+    /// 注册HiFly应用扩展服务（导航菜单等）
     /// </summary>
-    public static IServiceCollection AddHiFlyAppServices<TContext, TUser, TRole, TMenuPage, TRoleMenu>(
+    public static IServiceCollection AddHiFlyAppServices<TContext, TMenuPage, TRoleMenu>(
         this IServiceCollection services)
         where TContext : DbContext
-        where TUser : class, IUser, new()
-        where TRole : class, IRole, new()
         where TMenuPage : class, IMenuPage, new()
         where TRoleMenu : class, IRoleMenu, new()
     {
-        // 注册验证状态服务
-        services.AddScoped<IAuthStateService, AuthStateService>();
-
-        // 注册用户服务
-        services.AddScoped<IUserService, UserService<TContext, TUser>>();
-
-        // 注册用户服务
-        services.AddScoped<IRoleService, RoleService<TContext, TRole>>();
-
         // 注册导航菜单服务
         services.AddScoped<IMenuPageService, MenuPageService<TContext, TMenuPage>>();
 
@@ -249,6 +157,9 @@ public static class ServerConfiguration
         return services;
     }
 
+    /// <summary>
+    /// 注册HiFly组织架构服务
+    /// </summary>
     public static IServiceCollection AddHiFlyStructureServices<TContext, TOrganization, TUnit, TInstitution, TDepartment, TTeam>
         (this IServiceCollection services)
         where TContext : DbContext
@@ -276,16 +187,15 @@ public static class ServerConfiguration
         return services;
     }
 
-
     /// <summary>
     /// 映射OpenIddict认证服务器端点
     /// </summary>
     public static WebApplication MapHiFlyOpenIdServerEndpoints<TUser>(
         this WebApplication app,
-        Action<ServerEndpointOptions>? configureOptions = null)
+        Action<ServerOptions>? configureOptions = null)
         where TUser : class, IUser
     {
-        var options = new ServerEndpointOptions();
+        var options = new ServerOptions();
         configureOptions?.Invoke(options);
 
         // 授权端点 - 处理OAuth 2.0授权请求
@@ -586,9 +496,9 @@ public static class ServerConfiguration
             {
                 string? clientId = await applicationManager.GetClientIdAsync(application);
 
-                // 获取前端通道登出URI
+                // 获取前端通道登出URI - 修复：使用正确的属性名
                 var properties = await applicationManager.GetPropertiesAsync(application);
-                if (properties.TryGetValue("urn:openid:connect:frontchannel_logout_uri", out var uriElement))
+                if (properties.TryGetValue("front_channel_logout_uri", out var uriElement))
                 {
                     var uri = uriElement.GetString();
                     if (!string.IsNullOrEmpty(uri))
@@ -623,9 +533,7 @@ public static class ServerConfiguration
             <script>
                 window.onload = function() {{
                     // 完成前端通道登出后重定向
-                    setTimeout(function() {{
-                        {redirectScript}
-                    }}, 1500);
+                    setTimeout(function() {{ {redirectScript} }}, 1500);
                 }};
             </script>
         </body>
@@ -651,7 +559,6 @@ public static class ServerConfiguration
                 return Results.Redirect("/", false, true);
             }
         });
-
 
         // 内省端点
         app.MapPost(options.IntrospectionEndpoint, async (
@@ -707,7 +614,6 @@ public static class ServerConfiguration
         return app;
     }
 
-
     /// <summary>
     /// 确定声明应包含在哪些令牌中
     /// </summary>
@@ -750,7 +656,6 @@ public static class ServerConfiguration
         }
     }
 
-
     private static string HtmlEncode(string? text)
     {
         return string.IsNullOrEmpty(text) ? "" : System.Web.HttpUtility.HtmlEncode(text);
@@ -760,8 +665,6 @@ public static class ServerConfiguration
     {
         return string.IsNullOrEmpty(text) ? "" : Uri.EscapeDataString(text);
     }
-
-
 
     /// <summary>
     /// 初始化OpenIddict客户端，不存在则创建，存在则更新
@@ -816,12 +719,13 @@ public static class ServerConfiguration
             // 设置前端通道登出URI（如果提供）
             if (!string.IsNullOrEmpty(client.FrontChannelLogoutUri))
             {
+                // 修复：使用正确的属性名称
                 descriptor.Properties.Add(
-                    "urn:openid:connect:frontchannel_logout_uri",
+                    "front_channel_logout_uri",
                     JsonDocument.Parse($"\"{client.FrontChannelLogoutUri}\"").RootElement);
 
                 descriptor.Properties.Add(
-                    "urn:openid:connect:frontchannel_logout_session_required",
+                    "front_channel_logout_session_required",
                     JsonDocument.Parse($"\"{client.FrontChannelLogoutSessionRequired}\"").RootElement);
             }
 
@@ -838,98 +742,7 @@ public static class ServerConfiguration
             }
         }
     }
-
-    /// <summary>
-    /// 初始化默认用户和角色
-    /// </summary>
-    public static async Task InitializeDefaultUserAsync<TContext, TUser, TRole>(
-        this IServiceProvider services,
-        Action<ServerUserOptions>? configureOptions = null)
-        where TContext : DbContext
-        where TUser : class, IUser, new()
-        where TRole : class, IRole, new()
-    {
-        var options = new ServerUserOptions();
-        configureOptions?.Invoke(options);
-
-        using var scope = services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<TUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<TRole>>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-
-        // 创建角色和权限
-        foreach (var role in options.Roles)
-        {
-            if (!await roleManager.RoleExistsAsync(role.Key))
-            {
-                var identityRole = new TRole
-                {
-                    Name = role.Key,
-                    ShowName = role.Value.ShowName
-                };
-                var result = await roleManager.CreateAsync(identityRole);
-
-                if (!result.Succeeded)
-                {
-                    throw new Exception($"创建角色 {role.Key} 失败: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                }
-
-                // 为角色添加声明（权限）
-                foreach (var permission in role.Value.Permissions)
-                {
-                    await roleManager.AddClaimAsync(identityRole, new Claim("permission", permission));
-                }
-            }
-        }
-
-        // 创建默认系统管理员用户（如果不存在）
-        if (!(await userManager.GetUsersInRoleAsync(options.SystemAdminUserName)).Any())
-        {
-            var adminUser = new TUser
-            {
-                UserName = options.SystemAdminUserName,
-                Email = options.SystemAdminEmail,
-                EmailConfirmed = true
-            };
-
-            var result = await userManager.CreateAsync(adminUser, options.SystemAdminPassword);
-            if (!result.Succeeded)
-            {
-                throw new Exception($"创建管理员用户失败: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-
-            // 添加到管理员角色
-            result = await userManager.AddToRoleAsync(adminUser, options.SystemAdminUserName);
-            if (!result.Succeeded)
-            {
-                throw new Exception($"将用户添加到管理员角色失败: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-        }
-
-    }
-
 }
 
-/// <summary>
-/// 服务器端点选项
-/// </summary>
-public class ServerEndpointOptions
-{
-    // 基本端点路径
-    public string AuthorizationEndpoint { get; set; } = "/connect/authorize";
-    public string TokenEndpoint { get; set; } = "/connect/token";
-    public string UserInfoEndpoint { get; set; } = "/connect/userinfo";
-    public string IntrospectionEndpoint { get; set; } = "/connect/introspect";
-    public string LogoutEndpoint { get; set; } = "/connect/logout";
-    public string SessionCheckEndpoint { get; set; } = "/api/session/check";
 
-    // 登录页面路径
-    public string LoginPath { get; set; } = "/Account/Login";
-
-    // 颁发者URI（用于前端通道登出）
-    public string IssuerUri { get; set; } = "https://localhost:6100";
-
-    // CORS允许的源
-    public string AllowedOrigins { get; set; } = "*";
-}
 

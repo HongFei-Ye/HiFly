@@ -9,6 +9,8 @@ namespace HiFly.Openiddict.Options;
 /// </summary>
 public class ServerOptions
 {
+    #region OAuth2.0/OpenID Connect 核心端点配置
+
     /// <summary>
     /// OAuth2.0授权端点路径，用于处理授权请求
     /// 默认值: "/connect/authorize"
@@ -53,6 +55,19 @@ public class ServerOptions
     /// 客户端应用通过此端点注销用户并终止其会话
     /// </remarks>
     public string LogoutEndpoint { get; set; } = "/connect/logout";
+
+    /// <summary>
+    /// 会话检查端点路径，用于检查用户会话状态
+    /// 默认值: "/api/session/check"
+    /// </summary>
+    /// <remarks>
+    /// 客户端应用可通过此端点检查用户会话是否仍然有效，支持SSO会话同步
+    /// </remarks>
+    public string SessionCheckEndpoint { get; set; } = "/api/session/check";
+
+    #endregion
+
+    #region 授权流程配置
 
     /// <summary>
     /// 是否启用授权码流程
@@ -113,6 +128,10 @@ public class ServerOptions
     /// </remarks>
     public bool RequireProofKeyForCodeExchange { get; set; } = true;
 
+    #endregion
+
+    #region 安全和加密配置
+
     /// <summary>
     /// 是否禁用访问令牌加密
     /// 默认值: false
@@ -123,6 +142,10 @@ public class ServerOptions
     /// </remarks>
     public bool DisableAccessTokenEncryption { get; set; } = false;
 
+    #endregion
+
+    #region 作用域配置
+
     /// <summary>
     /// 自定义OAuth2.0作用域列表，用于定义客户端可请求的权限范围
     /// </summary>
@@ -132,5 +155,45 @@ public class ServerOptions
     /// </remarks>
     public List<string> CustomScopes { get; set; } = [];
 
+    #endregion
 
+    #region 页面和UI配置
+
+    /// <summary>
+    /// 登录页面路径
+    /// 默认值: "/Account/Login"
+    /// </summary>
+    /// <remarks>
+    /// 当用户未认证时，将重定向到此页面进行身份验证
+    /// 适用于Blazor Server、MVC或Razor Pages应用
+    /// </remarks>
+    public string LoginPath { get; set; } = "/Account/Login";
+
+    #endregion
+
+    #region 颁发者和CORS配置
+
+    /// <summary>
+    /// 颁发者URI，用于前端通道登出和令牌验证
+    /// 默认值: "https://localhost:6100"
+    /// </summary>
+    /// <remarks>
+    /// 此URI必须与OpenIddict服务器的实际地址匹配
+    /// 用于前端通道登出时的颁发者标识和令牌验证
+    /// 在生产环境中应设置为实际的域名
+    /// </remarks>
+    public string IssuerUri { get; set; } = "https://localhost:6100";
+
+    /// <summary>
+    /// CORS允许的源
+    /// 默认值: "*"
+    /// </summary>
+    /// <remarks>
+    /// 配置跨域资源共享的允许源
+    /// 在生产环境中应限制为具体的域名，避免使用通配符"*"
+    /// 多个域名可用逗号分隔，例如: "https://app1.example.com,https://app2.example.com"
+    /// </remarks>
+    public string AllowedOrigins { get; set; } = "*";
+
+    #endregion
 }

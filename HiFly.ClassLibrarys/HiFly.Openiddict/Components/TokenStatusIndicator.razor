@@ -1,0 +1,253 @@
+﻿@* Copyright (c) 弘飞帮联科技有限公司. All rights reserved. *@
+@* 官方网站: www.hongfei8.cn *@
+@* 联系方式: felix@hongfei8.com 或 hongfei8@outlook.com *@
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.JSInterop
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@implements IDisposable
+
+<div class="token-status-indicator @CssClass" style="@Style">
+    @if (ShowIndicator)
+    {
+        <div class="token-info">
+            @if (IsAuthenticated)
+            {
+                <span class="badge @GetStatusBadgeClass()">
+                    @GetStatusText()
+                </span>
+                @if (ShowDetails && TokenStatus != null)
+                {
+                    <div class="token-details">
+                        <small>过期时间: @GetExpirationText()</small>
+                        @if (TokenStatus.RemainingSeconds.HasValue)
+                        {
+                            <small>剩余: @GetRemainingTimeText()</small>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <span class="badge badge-danger">未登录</span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool ShowIndicator { get; set; } = true;
+    [Parameter] public bool ShowDetails { get; set; } = false;
+    [Parameter] public bool AutoRefresh { get; set; } = true;
+    [Parameter] public int RefreshIntervalSeconds { get; set; } = 30;
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public string Style { get; set; } = "";
+    [Parameter] public EventCallback<TokenStatusInfo> OnTokenStatusChanged { get; set; }
+    [Parameter] public EventCallback OnTokenRefreshed { get; set; }
+
+    private Timer? _refreshTimer;
+    private TokenStatusInfo? TokenStatus { get; set; }
+    private bool IsAuthenticated { get; set; }
+    private bool _disposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateTokenStatus();
+        
+        if (AutoRefresh)
+        {
+            StartAutoRefresh();
+        }
+
+        // 监听认证状态变化
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private void StartAutoRefresh()
+    {
+        _refreshTimer = new Timer(async _ => await InvokeAsync(UpdateTokenStatus), 
+            null, TimeSpan.Zero, TimeSpan.FromSeconds(RefreshIntervalSeconds));
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await InvokeAsync(UpdateTokenStatus);
+    }
+
+    private async Task UpdateTokenStatus()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            IsAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+
+            if (IsAuthenticated)
+            {
+                var httpClient = HttpClientFactory.CreateClient();
+                var response = await httpClient.GetAsync("/api/token/status");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var status = JsonSerializer.Deserialize<TokenStatusInfo>(json, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    if (status != null)
+                    {
+                        TokenStatus = status;
+                        await OnTokenStatusChanged.InvokeAsync(status);
+
+                        // 如果令牌即将过期，尝试自动刷新
+                        if (status.IsExpiringSoon && AutoRefresh)
+                        {
+                            await RefreshToken();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TokenStatus = null;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"更新Token状态时发生错误: {ex.Message}");
+        }
+    }
+
+    private async Task RefreshToken()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient();
+            var response = await httpClient.PostAsync("/api/token/refresh", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<JsonElement>(json);
+                
+                if (result.TryGetProperty("success", out var success) && success.GetBoolean())
+                {
+                    await OnTokenRefreshed.InvokeAsync();
+                    await UpdateTokenStatus(); // 刷新状态
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"刷新Token时发生错误: {ex.Message}");
+        }
+    }
+
+    private string GetStatusBadgeClass()
+    {
+        if (TokenStatus?.IsExpiringSoon == true)
+            return "badge-warning";
+        return "badge-success";
+    }
+
+    private string GetStatusText()
+    {
+        if (TokenStatus?.IsExpiringSoon == true)
+            return "即将过期";
+        return "已认证";
+    }
+
+    private string GetExpirationText()
+    {
+        if (TokenStatus?.ExpiresAt != null && DateTime.TryParse(TokenStatus.ExpiresAt, out var expiresAt))
+        {
+            return expiresAt.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        return "未知";
+    }
+
+    private string GetRemainingTimeText()
+    {
+        if (TokenStatus?.RemainingSeconds.HasValue == true)
+        {
+            var timeSpan = TimeSpan.FromSeconds(TokenStatus.RemainingSeconds.Value);
+            if (timeSpan.TotalDays >= 1)
+                return $"{timeSpan.Days}天{timeSpan.Hours}小时";
+            else if (timeSpan.TotalHours >= 1)
+                return $"{timeSpan.Hours}小时{timeSpan.Minutes}分钟";
+            else
+                return $"{timeSpan.Minutes}分钟{timeSpan.Seconds}秒";
+        }
+        return "未知";
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _refreshTimer?.Dispose();
+            AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+            _disposed = true;
+        }
+    }
+
+    public class TokenStatusInfo
+    {
+        public bool Authenticated { get; set; }
+        public string? ExpiresAt { get; set; }
+        public double? RemainingSeconds { get; set; }
+        public bool IsExpiringSoon { get; set; }
+    }
+}
+
+<style>
+    .token-status-indicator {
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .token-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .token-details {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    .badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 0.25rem;
+        display: inline-block;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+    }
+
+    .badge-success {
+        color: #fff;
+        background-color: #28a745;
+    }
+
+    .badge-warning {
+        color: #212529;
+        background-color: #ffc107;
+    }
+
+    .badge-danger {
+        color: #fff;
+        background-color: #dc3545;
+    }
+</style>
