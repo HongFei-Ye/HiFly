@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <RootNamespace>HiFly.Table</RootNamespace>
+    <AssemblyName>HiFly.Table.Abstractions</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>HiFly.Table.Abstractions</PackageId>
+    <Version>0.1.0-preview</Version>
+    <Authors>HiFly Contributors</Authors>
+    <Description>Provider-agnostic TItemTable abstractions for BootstrapBlazor — 0 ORM deps, Blazor Server + WASM + any ORM compatible. Includes ITItemDataSource, HttpTItemDataSource, TItemTable single-arg Razor component, ITItemDataSourceFactory.</Description>
+    <PackageTags>blazor;bootstrap;table;datatable;wasm;abstraction</PackageTags>
+    <PackageProjectUrl>https://github.com/HongFei-Ye/HiFly</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HongFei-Ye/HiFly.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- §7.7 P3 — PrivateAssets=all 防止 Microsoft.AspNetCore.App 流入 WASM 消费者
+         （browser-wasm 没有该 framework 的 runtime pack）。Server 路径下编译期仍可见。 -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BootstrapBlazor" Version="10.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

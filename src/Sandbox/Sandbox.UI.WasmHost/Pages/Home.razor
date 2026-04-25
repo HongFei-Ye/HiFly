@@ -1,0 +1,12 @@
+@page "/"
+
+<h1>v5.5 §7.7 P3 — WASM sanity</h1>
+
+<p>Demo 用 TItemTable 在 WASM 环境跑通 HttpTItemDataSource 路径（仅引用 Platform.UI.Table.Abstractions，不带 EF）。</p>
+
+<TItemTable TItem="DummyDto">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id" Text="Id" />
+        <TableColumn @bind-Field="@context.Name" Text="Name" />
+    </TableColumns>
+</TItemTable>

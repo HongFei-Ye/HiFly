@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HiFly.Table.Abstractions/HiFly.Table.Abstractions.csproj" />
+    <Project Path="src/HiFly.Table.EfCore/HiFly.Table.EfCore.csproj" />
+    <Project Path="src/HiFly.Table.FreeSql/HiFly.Table.FreeSql.csproj" />
+  </Folder>
+  <Folder Name="/src/Sandbox/">
+    <Project Path="src/Sandbox/Sandbox.UI.WasmHost/Sandbox.UI.WasmHost.csproj" />
+  </Folder>
+</Solution>

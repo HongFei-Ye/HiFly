@@ -1,0 +1,9 @@
+@* v5.5 §7.7 P3 WASM sanity — 最小路由壳，单页只包一个 TItemTable 验证 *@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <p>页面未找到</p>
+    </NotFound>
+</Router>

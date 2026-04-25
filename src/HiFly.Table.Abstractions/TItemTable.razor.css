@@ -1,0 +1,10 @@
+﻿
+.table-full {
+    height: calc(100vh - 2rem - var(--bb-layout-footer-height) - var(--bb-layout-header-height) - var(--bb-tabs-item-height, 0));
+    display: flex;
+    flex-direction: column;
+}
+
+.table-full-125 {
+    height: calc(100vh - 125px - var(--bb-layout-footer-height) - var(--bb-tabs-item-height, 0px));
+}

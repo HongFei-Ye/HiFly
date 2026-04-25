@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <RootNamespace>Sandbox.UI.WasmHost</RootNamespace>
+    <Description>v5.5 §7.7 P3 — WASM Render Mode sanity 验证。仅 ProjectReference Platform.UI.Table.Abstractions（不含 EF / FreeSQL），证明 TItemTable 抽象层能在浏览器端独立工作。WasmCompatRatchetTests 通过本项目的 deps 图反向锁定"Abstractions 永不拖 EF 进 WASM" 不变量。</Description>
+    <NoWarn>$(NoWarn);CA2255</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0-rc.2.25502.107" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0-rc.2.25502.107" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HiFly.Table.Abstractions\HiFly.Table.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
